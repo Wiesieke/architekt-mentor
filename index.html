@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architekt-Mentor — generator HLD</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --ink:#1F2A44; --ink-soft:#51607A; --paper:#FBFCFE; --board:#F3F6FB;
+    --line:#D8E0EC; --accent:#2E75B6; --accent-deep:#1F3864; --warn:#B23A2E;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:var(--sans); color:var(--ink); background:var(--board); display:flex; flex-direction:column; min-height:100vh}
+  header{background:var(--accent-deep); color:#fff; padding:12px 20px; border-bottom:3px solid var(--accent)}
+  .titlerow{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#A9C6E6}
+  header h1{font-size:16px; font-weight:650; margin:0}
+  .settings{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-top:11px}
+  .field{display:flex; flex-direction:column; gap:3px}
+  .field label{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#A9C6E6}
+  .field select, .field input{font-family:var(--sans); font-size:13px; border:1px solid #3A5180; background:#fff; color:var(--ink); border-radius:6px; padding:7px 9px; height:34px}
+  .field select:focus-visible, .field input:focus-visible{outline:2px solid #fff; outline-offset:1px}
+
+  main{flex:1; display:grid; grid-template-columns:minmax(320px,42%) 1fr; gap:1px; background:var(--line); min-height:0}
+  .pane{background:var(--paper); display:flex; flex-direction:column; min-height:0}
+  .pane-head{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft); padding:10px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px}
+  .pane-head .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  textarea{flex:1; width:100%; border:0; resize:none; padding:16px; font-family:var(--mono); font-size:13px; line-height:1.55; color:var(--ink); background:repeating-linear-gradient(transparent,transparent 27px,#EEF2F8 27px,#EEF2F8 28px); outline:none}
+  textarea:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+  .toolbar{padding:12px 16px; border-top:1px solid var(--line); display:flex; gap:12px; align-items:center}
+  button{font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; background:var(--accent); color:#fff; border:0; border-radius:6px; padding:10px 20px}
+  button:hover{background:var(--accent-deep)}
+  button:disabled{opacity:.5; cursor:not-allowed}
+  button:focus-visible{outline:2px solid var(--accent-deep); outline-offset:2px}
+  .status{font-size:12px; color:var(--ink-soft)}
+  .status.err{color:var(--warn)} .status.run{color:var(--accent)}
+
+  #preview{flex:1; overflow:auto; padding:26px 30px; line-height:1.6}
+  #preview .placeholder{color:var(--ink-soft); font-size:14px}
+  #preview h1{font-size:24px; color:var(--accent-deep); border-bottom:2px solid var(--accent); padding-bottom:6px; margin:.2em 0 .7em}
+  #preview h2{font-size:18px; color:var(--accent-deep); margin:1.4em 0 .5em}
+  #preview h3{font-size:15px; margin:1.1em 0 .4em}
+  #preview table{border-collapse:collapse; width:100%; margin:.8em 0; font-size:13.5px}
+  #preview th{background:var(--accent-deep); color:#fff; text-align:left; padding:7px 10px}
+  #preview td{border:1px solid var(--line); padding:7px 10px; vertical-align:top}
+  #preview tr:nth-child(even) td{background:#F6F9FC}
+  #preview blockquote{margin:1em 0; padding:10px 16px; background:#EAF1FA; border-left:4px solid var(--accent); border-radius:0 6px 6px 0}
+  #preview code{font-family:var(--mono); font-size:.9em; background:#EEF2F8; padding:1px 5px; border-radius:4px}
+  #preview ul,#preview ol{padding-left:1.3em}
+  .diagram{margin:1.2em 0; padding:18px; border:1px solid var(--line); border-radius:8px; position:relative; background-color:#fff;
+    background-image:repeating-linear-gradient(0deg,#EAF0F8,#EAF0F8 1px,transparent 1px,transparent 22px),repeating-linear-gradient(90deg,#EAF0F8,#EAF0F8 1px,transparent 1px,transparent 22px)}
+  .diagram::before{content:"DIAGRAM"; position:absolute; top:8px; right:12px; font-family:var(--mono); font-size:10px; letter-spacing:.18em; color:#9FB2CC}
+  .diagram .mermaid{display:flex; justify-content:center; background:transparent}
+  .diagram .mermaid svg{max-width:100%; height:auto}
+  .render-error{color:var(--warn); font-family:var(--mono); font-size:12px; white-space:pre-wrap}
+  @media (max-width:900px){ main{grid-template-columns:1fr; grid-template-rows:minmax(200px,34vh) 1fr} }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+  <header>
+    <div class="titlerow">
+      <span class="eyebrow">Architekt-Mentor</span>
+      <h1>Generator HLD</h1>
+    </div>
+    <div class="settings">
+      <div class="field">
+        <label for="model">Model</label>
+        <select id="model">
+          <option value="claude-sonnet-4-6">Sonnet 4.6</option>
+          <option value="claude-haiku-4-5">Haiku 4.5 (tanio)</option>
+          <option value="claude-opus-4-8">Opus 4.8 (max)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="mode">Tryb</label>
+        <select id="mode"><option value="skeletal">Szkielet</option><option value="full">Pełny</option></select>
+      </div>
+      <div class="field">
+        <label for="diagram">Diagram</label>
+        <select id="diagram"><option value="yes">Tak</option><option value="no">Nie</option></select>
+      </div>
+      <div class="field">
+        <label for="maxTokens">Max tokens</label>
+        <input id="maxTokens" type="number" value="4000" min="500" max="6000" step="500" style="width:90px">
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="pane">
+      <div class="pane-head"><span class="dot"></span>Brief biznesowy</div>
+      <textarea id="brief" spellcheck="false" placeholder="Opisz w paru zdaniach, co ma powstać — np. 'Aplikacja dla kurierów do odbioru zleceń i potwierdzania dostaw.'"></textarea>
+      <div class="toolbar">
+        <button id="genBtn">Generuj HLD</button>
+        <span id="status" class="status">Wpisz brief i kliknij Generuj (Ctrl/Cmd+Enter).</span>
+      </div>
+    </section>
+    <section class="pane">
+      <div class="pane-head"><span class="dot"></span>Wynik</div>
+      <article id="preview"><p class="placeholder">Tu pojawi się wygenerowany HLD z narysowanym diagramem.</p></article>
+    </section>
+  </main>
+
+<script>
+mermaid.initialize({ startOnLoad:false, theme:"neutral", securityLevel:"loose", flowchart:{ useMaxWidth:true } });
+const $ = id => document.getElementById(id);
+const briefEl=$("brief"), preview=$("preview"), statusEl=$("status"), genBtn=$("genBtn");
+function setStatus(m,c){ statusEl.textContent=m; statusEl.className="status"+(c?(" "+c):""); }
+function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+async function renderMarkdown(raw){
+  const blocks=[];
+  const stripped=raw.replace(/```mermaid\s*([\s\S]*?)```/g,(_,c)=>{ blocks.push(c.trim()); return `\n\n%%MERMAID${blocks.length-1}%%\n\n`; });
+  let html=window.marked.parse(stripped,{breaks:false});
+  html=html.replace(/(?:<p>)?\s*%%MERMAID(\d+)%%\s*(?:<\/p>)?/g,(_,i)=>`<div class="diagram"><pre class="mermaid">${escapeHtml(blocks[+i])}</pre></div>`);
+  preview.innerHTML=html;
+  try{ await mermaid.run({ querySelector:"#preview .mermaid" }); }
+  catch(e){ document.querySelectorAll("#preview .mermaid").forEach(el=>{ if(!el.querySelector("svg")) el.innerHTML=`<div class="render-error">Błąd składni Mermaid.\n${escapeHtml(String(e.message||e))}</div>`; }); }
+}
+
+async function generate(){
+  const brief=briefEl.value.trim();
+  if(!brief){ setStatus("Wpisz brief po lewej.","err"); return; }
+  genBtn.disabled=true;
+  setStatus("Generuję… to potrwa kilka–kilkanaście sekund.","run");
+  preview.innerHTML='<p class="placeholder">Generuję…</p>';
+  try{
+    const res=await fetch("/api/generate",{
+      method:"POST",
+      headers:{ "content-type":"application/json" },
+      body:JSON.stringify({
+        brief,
+        model:$("model").value,
+        mode:$("mode").value,
+        diagram:$("diagram").value,
+        maxTokens:parseInt($("maxTokens").value,10)||4000
+      })
+    });
+    const data=await res.json();
+    if(!res.ok){ throw new Error(data.error||("HTTP "+res.status)); }
+    if(!data.text || !data.text.trim()){ throw new Error("Pusta odpowiedź."); }
+    await renderMarkdown(data.text);
+    const u=data.usage||{};
+    setStatus(`Gotowe. Tokeny: wejście ${u.input_tokens??"?"}, wyjście ${u.output_tokens??"?"}.`,"");
+  }catch(e){
+    preview.innerHTML='<p class="placeholder">—</p>';
+    setStatus("Błąd: "+String(e.message||e),"err");
+  }finally{ genBtn.disabled=false; }
+}
+genBtn.addEventListener("click",generate);
+briefEl.addEventListener("keydown",e=>{ if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault(); generate(); }});
+</script>
+</body>
+</html>
