@@ -72,8 +72,12 @@ Calm, precise, mentoring; encouraging but candid; clarity over jargon.`;
 
 // ---- Guardrails (chronią Twój rachunek) ----
 const ALLOWED_MODELS = new Set(["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8"]);
-const MAX_BRIEF_CHARS = 6000;     // odrzuca gigantyczne briefy
-const MAX_TOKENS_CEILING = 6000;  // sufit niezależny od tego, co przyśle front
+const MAX_BRIEF_CHARS = 30000;    // limit długości briefu w ZNAKACH (było 6000 — za mało)
+const MODEL_MAX_OUT = {           // sufit tokenów WYJŚCIA per model (bezpieczny dla API)
+  "claude-haiku-4-5": 8000,
+  "claude-sonnet-4-6": 16000,
+  "claude-opus-4-8": 16000
+};
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 // ---- Prosty limit zapytań (best-effort, w pamięci instancji) ----
@@ -104,8 +108,9 @@ module.exports = async (req, res) => {
   const mode = body.mode === "full" ? "full" : "skeletal";
   const diagram = body.diagram === "no" ? "no" : "yes";
   const model = ALLOWED_MODELS.has(body.model) ? body.model : DEFAULT_MODEL;
-  let maxTokens = parseInt(body.maxTokens, 10) || 4000;
-  maxTokens = Math.min(Math.max(maxTokens, 500), MAX_TOKENS_CEILING);
+  const ceiling = MODEL_MAX_OUT[model] || 8000;
+  let maxTokens = parseInt(body.maxTokens, 10) || 6000;
+  maxTokens = Math.min(Math.max(maxTokens, 500), ceiling);
 
   if (!brief) { res.status(400).json({ error: "Pusty brief." }); return; }
   if (brief.length > MAX_BRIEF_CHARS) { res.status(400).json({ error: "Brief za długi (limit " + MAX_BRIEF_CHARS + " znaków)." }); return; }
