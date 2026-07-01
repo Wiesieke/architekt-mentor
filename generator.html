@@ -18,6 +18,15 @@
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{font-family:var(--sans); color:var(--ink); background:var(--board); display:flex; flex-direction:column; min-height:100vh}
+  .pnav{background:rgba(251,252,254,.97); border-bottom:1px solid var(--line); flex-shrink:0}
+  .pnav-in{display:flex; align-items:center; gap:20px; height:50px; padding:0 20px}
+  .pbrand{font-weight:700; color:var(--accent-deep); text-decoration:none; letter-spacing:.01em}
+  .pbrand span{color:var(--accent)}
+  .plinks{margin-left:auto; display:flex; gap:20px; align-items:center}
+  .plinks a{color:var(--ink-soft); font-size:14px; font-weight:500; text-decoration:none}
+  .plinks a:hover{color:var(--accent-deep)}
+  .plinks a.active{color:var(--accent-deep); font-weight:600}
+  @media (max-width:640px){ .plinks a.hideSm{display:none} }
   header{background:var(--accent-deep); color:#fff; padding:12px 20px; border-bottom:3px solid var(--accent)}
   .titlerow{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
   .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#A9C6E6}
@@ -70,6 +79,18 @@
 </style>
 </head>
 <body>
+  <nav class="pnav">
+    <div class="pnav-in">
+      <a class="pbrand" href="/">Architekt<span>-Mentor</span></a>
+      <div class="plinks">
+        <a href="/">Strona główna</a>
+        <a class="hideSm" href="/#jak">Jak działa</a>
+        <a class="hideSm" href="/#zywy">Wiedza</a>
+        <a class="hideSm" href="/#omnie">O mnie</a>
+        <a class="active" href="/generator.html">Generator</a>
+      </div>
+    </div>
+  </nav>
   <header>
     <div class="titlerow">
       <span class="eyebrow">Architekt-Mentor</span>
