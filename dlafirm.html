@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dla firm — przegląd i konsultacje architektoniczne | Architekt-Mentor</title>
+<meta name="description" content="Zamów przegląd HLD, przegląd architektury lub konsultację z doświadczonym architektem. Pierwszy szkic robi AI, senior go recenzuje. HLD w 5 dni.">
+<style>
+  :root{
+    --ink:#1F2A44; --ink-soft:#51607A; --paper:#FBFCFE; --board:#F3F6FB;
+    --line:#D8E0EC; --accent:#2E75B6; --accent-deep:#1F3864; --accent-light:#EAF1FA;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:var(--sans); color:var(--ink); background:var(--paper); line-height:1.6}
+  a{color:var(--accent); text-decoration:none}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 22px}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase}
+
+  .pnav{background:rgba(251,252,254,.97); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:20}
+  .pnav-in{max-width:1060px; margin:0 auto; display:flex; align-items:center; gap:18px; height:52px; padding:0 22px}
+  .pbrand{font-weight:700; color:var(--accent-deep)}
+  .pbrand span{color:var(--accent)}
+  .plinks{margin-left:auto; display:flex; gap:18px; align-items:center}
+  .plinks a{color:var(--ink-soft); font-size:14px; font-weight:500}
+  .plinks a:hover{color:var(--accent-deep)}
+  .plinks a.active{color:var(--accent-deep); font-weight:600}
+  @media (max-width:720px){ .plinks a.hideSm{display:none} }
+
+  .btn{display:inline-block; font-weight:600; border:0; border-radius:8px; padding:12px 22px; font-size:15px; cursor:pointer; background:var(--accent); color:#fff}
+  .btn:hover{background:var(--accent-deep)}
+  .btn:focus-visible{outline:2px solid var(--accent-deep); outline-offset:2px}
+  .btn.ghost{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4)}
+  .btn.ghost:hover{background:rgba(255,255,255,.1)}
+
+  .hero{background:var(--accent-deep); color:#fff; background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05),rgba(255,255,255,.05) 1px,transparent 1px,transparent 28px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05),rgba(255,255,255,.05) 1px,transparent 1px,transparent 28px)}
+  .hero .wrap{padding:64px 22px}
+  .hero .eyebrow{color:#8FB8E0; margin-bottom:14px}
+  .hero h1{font-size:clamp(28px,4.4vw,44px); line-height:1.14; margin:0 0 16px; max-width:18ch}
+  .hero p{font-size:clamp(16px,2vw,19px); color:#D3E1F1; max-width:60ch; margin:0 0 26px}
+
+  section{padding:64px 0}
+  section.alt{background:var(--board)}
+  .sec-head{max-width:62ch; margin-bottom:36px}
+  .sec-head .eyebrow{color:var(--accent); margin-bottom:12px}
+  .sec-head h2{font-size:clamp(23px,3vw,32px); color:var(--accent-deep); margin:0 0 10px}
+  .sec-head p{color:var(--ink-soft); font-size:17px; margin:0}
+
+  .grid{display:grid; gap:20px; grid-template-columns:repeat(3,1fr)}
+  @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+  .svc{background:#fff; border:1px solid var(--line); border-radius:14px; padding:28px; display:flex; flex-direction:column}
+  section.alt .svc{background:#fff}
+  .svc .tag{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+  .svc h3{font-size:20px; color:var(--accent-deep); margin:10px 0 8px}
+  .svc .price{font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--accent-light); border:1px solid #CFE0F2; border-radius:8px; padding:6px 10px; display:inline-block; margin-bottom:12px}
+  .svc p{color:var(--ink-soft); font-size:15px; margin:0 0 12px}
+  .svc ul{margin:0 0 18px; padding-left:1.2em; color:var(--ink-soft); font-size:14px}
+  .svc .cta{margin-top:auto}
+
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:18px}
+  @media (max-width:860px){ .steps{grid-template-columns:1fr 1fr} }
+  .step{background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px}
+  .step .n{font-family:var(--mono); color:var(--accent); font-weight:700}
+  .step h4{margin:8px 0 6px; color:var(--accent-deep); font-size:16px}
+  .step p{margin:0; color:var(--ink-soft); font-size:14px}
+
+  .form-wrap{max-width:620px; margin:0 auto; background:#fff; border:1px solid var(--line); border-radius:14px; padding:30px}
+  .form-row{display:flex; gap:14px}
+  @media (max-width:600px){ .form-row{flex-direction:column} }
+  .fg{display:flex; flex-direction:column; gap:5px; margin-bottom:14px; flex:1}
+  .fg label{font-size:13px; font-weight:600; color:var(--ink)}
+  .fg input, .fg select, .fg textarea{border:1px solid var(--line); border-radius:8px; padding:11px 13px; font-family:var(--sans); font-size:15px; color:var(--ink)}
+  .fg input:focus-visible, .fg select:focus-visible, .fg textarea:focus-visible{outline:2px solid var(--accent)}
+  .fg textarea{min-height:110px; resize:vertical}
+  #formMsg{margin-top:12px; font-weight:600; color:var(--accent-deep); min-height:1.2em}
+
+  .note{background:#FFF7E6; border:1px solid #F0D89B; color:#8A6100; font-size:13.5px; padding:14px 16px; border-radius:10px; margin:0 0 26px}
+  .note b{color:#6E4E00}
+
+  footer{background:var(--accent-deep); color:#B9CBE2; padding:36px 0}
+  footer .wrap{display:flex; gap:22px; flex-wrap:wrap; align-items:center; font-size:14px}
+  footer a{color:#B9CBE2} footer a:hover{color:#fff} footer .sp{margin-left:auto}
+</style>
+</head>
+<body>
+  <nav class="pnav">
+    <div class="pnav-in">
+      <a class="pbrand" href="/">Architekt<span>-Mentor</span></a>
+      <div class="plinks">
+        <a class="hideSm" href="/">Strona główna</a>
+        <a class="hideSm" href="/lamiglowki.html">Łamigłówki</a>
+        <a class="hideSm" href="/antywzorce.html">Antywzorce</a>
+        <a class="active" href="/dlafirm.html">Dla firm</a>
+        <a href="/generator.html">Generator</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Dla firm · usługi architektoniczne</div>
+      <h1>Potrzebujesz przeglądu architektury? Zamów doświadczonego architekta.</h1>
+      <p>Przegląd HLD, ocena projektu rozwiązania albo konsultacja — z jasnym zakresem, ceną i terminem. Pierwszy szkic przygotowuje nasze narzędzie AI, a doświadczony architekt go recenzuje i uzupełnia o osąd. AI przyspiesza, człowiek odpowiada.</p>
+      <a class="btn ghost" href="#zapytanie">Wyślij zapytanie</a>
+    </div>
+  </header>
+
+  <!-- USŁUGI -->
+  <section style="padding-top:44px">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">Pakiety</div>
+        <h2>Gotowe usługi z jasnym rezultatem</h2>
+        <p>Nie „architekt na godziny", tylko konkretny zakres i konkretny dokument na wyjściu.</p>
+      </div>
+      <div class="grid">
+        <div class="svc">
+          <span class="tag">Najpopularniejsze</span>
+          <h3>HLD w 5 dni</h3>
+          <span class="price">od [X] zł</span>
+          <p>Od Waszego briefu do zrecenzowanego przez architekta szkicu HLD — w 5 dni roboczych.</p>
+          <ul>
+            <li>Pierwszy szkic z narzędzia AI</li>
+            <li>Przegląd i korekta przez seniora</li>
+            <li>Założenia, ryzyka, kluczowe decyzje (ADR)</li>
+            <li>Dokument PDF/DOCX + krótkie omówienie</li>
+          </ul>
+          <div class="cta"><a class="btn" href="#zapytanie" data-svc="HLD w 5 dni">Zamów przegląd</a></div>
+        </div>
+        <div class="svc">
+          <span class="tag">Ocena</span>
+          <h3>Przegląd architektury</h3>
+          <span class="price">od [X] zł</span>
+          <p>Niezależna ocena istniejącego projektu lub HLD: co jest ryzykowne, czego brakuje, co poprawić.</p>
+          <ul>
+            <li>Analiza dokumentacji i założeń</li>
+            <li>Lista ryzyk i antywzorców</li>
+            <li>Rekomendacje z priorytetami</li>
+            <li>Raport + sesja Q&A</li>
+          </ul>
+          <div class="cta"><a class="btn" href="#zapytanie" data-svc="Przegląd architektury">Zamów przegląd</a></div>
+        </div>
+        <div class="svc">
+          <span class="tag">Rozmowa</span>
+          <h3>Konsultacja / warsztat</h3>
+          <span class="price">od [X] zł / h</span>
+          <p>Sesja z architektem, gdy stoicie przed decyzją: rozwidlenie technologiczne, wybór rozwiązania, kierunek.</p>
+          <ul>
+            <li>Konkretny problem, konkretna rozmowa</li>
+            <li>Warianty i kompromisy</li>
+            <li>Rekomendacja i uzasadnienie</li>
+            <li>Notatka po spotkaniu</li>
+          </ul>
+          <div class="cta"><a class="btn" href="#zapytanie" data-svc="Konsultacja">Umów konsultację</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JAK TO DZIAŁA -->
+  <section class="alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow">Jak to działa</div>
+        <h2>AI przyspiesza, senior odpowiada</h2>
+        <p>To nie jest ani „czysty AI", ani drogi konsulting od zera. Łączymy jedno z drugim.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="n">01</div><h4>Zapytanie</h4><p>Opisujecie potrzebę i kontekst. Ustalamy zakres, cenę i termin.</p></div>
+        <div class="step"><div class="n">02</div><h4>Pierwszy szkic (AI)</h4><p>Narzędzie generuje ustrukturyzowany szkic HLD — szybko i tanio.</p></div>
+        <div class="step"><div class="n">03</div><h4>Przegląd seniora</h4><p>Doświadczony architekt recenzuje, koryguje i dokłada osąd, którego AI nie ma.</p></div>
+        <div class="step"><div class="n">04</div><h4>Rezultat</h4><p>Gotowy dokument i omówienie. Wiecie, co dalej i na co uważać.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZAPYTANIE -->
+  <section id="zapytanie">
+    <div class="wrap">
+      <div class="sec-head" style="text-align:center; margin-left:auto; margin-right:auto">
+        <div class="eyebrow">Zapytanie</div>
+        <h2>Powiedz, czego potrzebujecie</h2>
+        <p>Odpowiadamy zwykle w ciągu 1–2 dni roboczych. Bez zobowiązań.</p>
+      </div>
+      <div class="form-wrap">
+        <form id="enquiry">
+          <div class="form-row">
+            <div class="fg"><label for="name">Imię i nazwisko</label><input id="name" required></div>
+            <div class="fg"><label for="company">Firma</label><input id="company"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg"><label for="email">E-mail</label><input id="email" type="email" required></div>
+            <div class="fg"><label for="svc">Usługa</label>
+              <select id="svc">
+                <option>HLD w 5 dni</option>
+                <option>Przegląd architektury</option>
+                <option>Konsultacja</option>
+                <option>Nie wiem jeszcze — doradźcie</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg"><label for="msg">Krótki opis potrzeby</label><textarea id="msg" placeholder="Nad czym pracujecie, jaki jest kontekst, czego oczekujecie."></textarea></div>
+          <button class="btn" type="submit">Wyślij zapytanie</button>
+          <div id="formMsg" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="pbrand" style="color:#fff">Architekt<span style="color:#8FB8E0">-Mentor</span></div>
+      <a href="/">Strona główna</a>
+      <a href="/generator.html">Generator</a>
+      <a href="/lamiglowki.html">Łamigłówki</a>
+      <span class="sp">© <span id="yr"></span> Architekt-Mentor</span>
+    </div>
+  </footer>
+
+<script>
+  document.getElementById("yr").textContent = new Date().getFullYear();
+
+  // Prefill usługi, gdy ktoś kliknął "Zamów" na konkretnej karcie
+  document.querySelectorAll("[data-svc]").forEach(el=>{
+    el.addEventListener("click", ()=>{ 
+      const v = el.getAttribute("data-svc");
+      const sel = document.getElementById("svc");
+      [...sel.options].forEach(o=>{ if(o.value===v||o.text===v) sel.value=o.value; });
+    });
+  });
+
+  // Formularz zapytania — stopgap przez mailto (działa bez backendu).
+  // DO ZMIANY: wpisz swój adres w TWÓJ_EMAIL. Docelowo podłącz Formspree
+  // albo własny endpoint /api/enquiry, żeby zbierać zapytania bez otwierania klienta poczty.
+  var TWOJ_EMAIL = "TWÓJ_EMAIL";
+  document.getElementById("enquiry").addEventListener("submit", function(e){
+    e.preventDefault();
+    var name=document.getElementById("name").value.trim();
+    var company=document.getElementById("company").value.trim();
+    var email=document.getElementById("email").value.trim();
+    var svc=document.getElementById("svc").value;
+    var msg=document.getElementById("msg").value.trim();
+    var out=document.getElementById("formMsg");
+    if(!name||!email){ out.textContent="Uzupełnij imię i e-mail."; return; }
+    var body =
+      "Imię i nazwisko: "+name+"\n"+
+      "Firma: "+company+"\n"+
+      "E-mail: "+email+"\n"+
+      "Usługa: "+svc+"\n\n"+
+      "Opis:\n"+msg;
+    var href = "mailto:"+TWOJ_EMAIL+"?subject="+encodeURIComponent("Zapytanie: "+svc+" — "+name)+"&body="+encodeURIComponent(body);
+    window.location.href = href;
+    out.textContent = "Otwieram Twój program pocztowy z gotowym zapytaniem…";
+  });
+</script>
+</body>
+</html>
