@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architekt-Mentor — od briefu do pierwszego szkicu architektury (HLD)</title>
+<meta name="description" content="Wklej biznesowy brief, dostań ustrukturyzowany pierwszy szkic HLD z osądem seniora: założenia, właściwe pytania, diagram, decyzje. Nie generator, który zgaduje — mentor, który prowadzi.">
+<meta property="og:title" content="Architekt-Mentor — pierwszy szkic HLD z osądem seniora">
+<meta property="og:description" content="Od biznesowego briefu do ustrukturyzowanego szkicu architektury. Mentor, który dopytuje, oznacza założenia i uczy procesu.">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --ink:#1F2A44; --ink-soft:#51607A; --paper:#FBFCFE; --board:#F3F6FB;
+    --line:#D8E0EC; --accent:#2E75B6; --accent-deep:#1F3864; --accent-light:#EAF1FA;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{margin:0; font-family:var(--sans); color:var(--ink); background:var(--paper); line-height:1.6}
+  a{color:var(--accent); text-decoration:none}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 24px}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase}
+
+  /* NAV */
+  nav{position:sticky; top:0; z-index:10; background:rgba(251,252,254,.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex; align-items:center; gap:20px; height:60px}
+  nav .brand{font-weight:700; color:var(--accent-deep); letter-spacing:.01em}
+  nav .brand span{color:var(--accent)}
+  nav .links{margin-left:auto; display:flex; gap:22px; align-items:center}
+  nav .links a{color:var(--ink-soft); font-size:14px; font-weight:500}
+  nav .links a:hover{color:var(--accent-deep)}
+  .btn{display:inline-block; font-weight:600; border-radius:7px; padding:11px 22px; font-size:15px; cursor:pointer; border:0}
+  .btn-primary{background:var(--accent); color:#fff}
+  .btn-primary:hover{background:var(--accent-deep)}
+  .btn-ghost{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.4)}
+  .btn-ghost:hover{background:rgba(255,255,255,.1)}
+  .btn-sm{padding:8px 16px; font-size:14px}
+  .btn:focus-visible{outline:2px solid var(--accent-deep); outline-offset:2px}
+
+  /* HERO */
+  .hero{background:var(--accent-deep); color:#fff; position:relative; overflow:hidden;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.05), rgba(255,255,255,.05) 1px, transparent 1px, transparent 28px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.05) 1px, transparent 1px, transparent 28px)}
+  .hero .wrap{padding:78px 24px 84px}
+  .hero .eyebrow{color:#8FB8E0; margin-bottom:18px}
+  .hero h1{font-size:clamp(30px,5vw,50px); line-height:1.12; margin:0 0 20px; font-weight:700; max-width:15ch}
+  .hero p.lead{font-size:clamp(16px,2vw,20px); color:#D3E1F1; max-width:60ch; margin:0 0 32px}
+  .hero .cta-row{display:flex; gap:14px; flex-wrap:wrap}
+  .hero .note{margin-top:18px; font-size:13px; color:#9FBAD8}
+
+  /* SECTIONS */
+  section{padding:72px 0}
+  section.alt{background:var(--board)}
+  .sec-head{max-width:60ch; margin-bottom:40px}
+  .sec-head .eyebrow{color:var(--accent); margin-bottom:12px}
+  .sec-head h2{font-size:clamp(24px,3.2vw,34px); color:var(--accent-deep); margin:0 0 12px; line-height:1.2}
+  .sec-head p{color:var(--ink-soft); font-size:17px; margin:0}
+
+  .grid{display:grid; gap:20px}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  @media (max-width:860px){ .g3,.g2{grid-template-columns:1fr} }
+
+  .card{background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:26px}
+  section.alt .card{background:#fff}
+  .card .num{font-family:var(--mono); font-size:13px; color:var(--accent); font-weight:600; letter-spacing:.1em}
+  .card h3{font-size:18px; color:var(--accent-deep); margin:12px 0 8px}
+  .card p{color:var(--ink-soft); font-size:15px; margin:0}
+
+  .who{display:flex; flex-wrap:wrap; gap:12px}
+  .who span{background:var(--accent-light); color:var(--accent-deep); border:1px solid #CFE0F2;
+    padding:8px 14px; border-radius:20px; font-size:14px; font-weight:500}
+
+  /* DIFF list */
+  .diff{display:grid; gap:16px}
+  .diff .row{display:flex; gap:14px; align-items:flex-start; padding:16px 18px; background:#fff; border:1px solid var(--line); border-radius:10px}
+  .diff .mark{font-family:var(--mono); color:var(--accent); font-weight:700; flex-shrink:0}
+  .diff .row strong{color:var(--accent-deep)}
+  .diff .row span.t{color:var(--ink-soft); font-size:15px}
+
+  /* LIVING content cards */
+  .live-card{background:#fff; border:1px solid var(--line); border-radius:12px; padding:28px; position:relative; overflow:hidden}
+  .live-card::before{content:""; position:absolute; inset:0;
+    background-image:repeating-linear-gradient(0deg,#EEF3FA,#EEF3FA 1px,transparent 1px,transparent 20px),repeating-linear-gradient(90deg,#EEF3FA,#EEF3FA 1px,transparent 1px,transparent 20px);
+    opacity:.5; pointer-events:none}
+  .live-card > *{position:relative}
+  .live-card .tag{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent)}
+  .live-card h3{color:var(--accent-deep); font-size:20px; margin:10px 0 8px}
+  .live-card p{color:var(--ink-soft); margin:0 0 14px}
+  .soon{font-family:var(--mono); font-size:11px; color:var(--ink-soft); border:1px solid var(--line); border-radius:12px; padding:2px 9px}
+
+  /* ABOUT */
+  .about{display:grid; grid-template-columns:1.4fr 1fr; gap:40px; align-items:start}
+  @media (max-width:860px){ .about{grid-template-columns:1fr} }
+  .about p{color:var(--ink); font-size:16px}
+  .about .creds{background:var(--accent-deep); color:#fff; border-radius:12px; padding:24px}
+  .about .creds .eyebrow{color:#8FB8E0; margin-bottom:14px}
+  .about .creds ul{list-style:none; margin:0; padding:0}
+  .about .creds li{padding:9px 0; border-bottom:1px solid rgba(255,255,255,.12); font-size:14px; color:#DCE7F3}
+  .about .creds li:last-child{border-bottom:0}
+  .placeholder-note{background:#FFF7E6; border:1px solid #F0D89B; color:#8A6100; font-size:13px; padding:6px 10px; border-radius:6px; display:inline-block; margin-top:8px}
+
+  /* NEWSLETTER */
+  .news{background:var(--accent); color:#fff; text-align:center}
+  .news h2{font-size:clamp(22px,3vw,30px); margin:0 0 10px}
+  .news p{color:#EAF1FA; margin:0 0 24px; font-size:17px}
+  .news form{display:flex; gap:10px; max-width:440px; margin:0 auto; flex-wrap:wrap; justify-content:center}
+  .news input{flex:1; min-width:220px; border:0; border-radius:7px; padding:13px 16px; font-size:15px; font-family:var(--sans)}
+  .news input:focus-visible{outline:3px solid var(--accent-deep)}
+  .news .btn-white{background:#fff; color:var(--accent-deep)}
+  .news .btn-white:hover{background:#EAF1FA}
+  .news .small{font-size:12px; color:#CFE0F2; margin-top:14px}
+  #newsMsg{margin-top:14px; font-weight:600; min-height:1.2em}
+
+  /* FINAL CTA */
+  .final{background:var(--board); text-align:center}
+  .final h2{color:var(--accent-deep); font-size:clamp(24px,3.4vw,34px); margin:0 0 12px}
+  .final p{color:var(--ink-soft); font-size:18px; margin:0 0 26px}
+
+  footer{background:var(--accent-deep); color:#B9CBE2; padding:40px 0}
+  footer .wrap{display:flex; gap:24px; flex-wrap:wrap; align-items:center; font-size:14px}
+  footer a{color:#B9CBE2}
+  footer a:hover{color:#fff}
+  footer .sp{margin-left:auto}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">Architekt<span>-Mentor</span></div>
+    <div class="links">
+      <a href="#jak">Jak działa</a>
+      <a href="#roznica">Czym się różni</a>
+      <a href="#zywy">Wiedza</a>
+      <a href="#omnie">O mnie</a>
+      <a class="btn btn-primary btn-sm" href="/generator.html">Otwórz generator</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Asystent architekta · pierwszy szkic HLD</div>
+    <h1>Od biznesowego briefu do pierwszego szkicu architektury — z osądem seniora.</h1>
+    <p class="lead">Wklej opis tego, co ma powstać. W kilkanaście sekund dostajesz ustrukturyzowany szkic HLD: założenia, właściwe pytania, diagram, decyzje i ryzyka. To nie generator, który zgaduje — to mentor, który prowadzi Cię przez proces i uczy, jak myśli senior.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/generator.html">Wypróbuj generator — za darmo</a>
+      <a class="btn btn-ghost" href="#jak">Zobacz, jak to działa</a>
+    </div>
+    <div class="note">Bez rejestracji. Wynik pobierzesz jako PDF, Word lub Markdown.</div>
+  </div>
+</header>
+
+<!-- DLA KOGO -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Dla kogo</div>
+      <h2>Dla tych, którzy uczą się projektować architekturę</h2>
+      <p>Zwłaszcza jeśli stoisz przed pustą kartką i nie wiesz, od czego zacząć ani czego nie wolno pominąć.</p>
+    </div>
+    <div class="who">
+      <span>Juniorzy wchodzący w rolę architekta</span>
+      <span>Programiści awansujący do projektowania</span>
+      <span>Kandydaci do certyfikatów (iSAQB, TOGAF, AWS/Azure)</span>
+      <span>Zespoły ujednolicające standard HLD</span>
+    </div>
+  </div>
+</section>
+
+<!-- JAK DZIAŁA -->
+<section class="alt" id="jak">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Jak to działa</div>
+      <h2>Trzy kroki od briefu do szkicu</h2>
+    </div>
+    <div class="grid g3">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Wklej brief</h3>
+        <p>Kilka zdań o tym, co ma powstać — cel biznesowy, kontekst, ograniczenia. Nawet bardzo ogólny opis wystarczy na start.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Mentor dopytuje</h3>
+        <p>Zamiast zgadywać, narzędzie wskazuje, czego w briefie brakuje, oznacza jawne założenia i zadaje pytania, które zadałby senior na przeglądzie.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>Dostajesz szkic HLD</h3>
+        <p>Ustrukturyzowany dokument: zakres, wymagania, diagram architektury, kluczowe decyzje (ADR), ryzyka i checklista „co sprawdzić dalej". Do iteracji i eksportu.</p>
+      </div>
+    </div>
+    <div style="margin-top:32px">
+      <a class="btn btn-primary" href="/generator.html">Spróbuj na własnym briefie</a>
+    </div>
+  </div>
+</section>
+
+<!-- CZYM SIĘ RÓŻNI -->
+<section id="roznica">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Czym się różni</div>
+      <h2>„Przecież czat AI to zrobi" — nie tak samo</h2>
+      <p>Wartość nie jest w generowaniu tekstu, tylko w zakodowanym osądzie i powtarzalnym procesie.</p>
+    </div>
+    <div class="diff">
+      <div class="row"><span class="mark">→</span><span class="t"><strong>Najpierw pyta, potem projektuje.</strong> Jak senior — najpierw pokazuje, czego nie wiesz, zamiast produkować pewny siebie projekt z niepełnych danych.</span></div>
+      <div class="row"><span class="mark">→</span><span class="t"><strong>Uczy przenośnych reguł.</strong> Przy każdej decyzji tłumaczy nie tylko „co", ale zasadę, którą zastosujesz też gdzie indziej.</span></div>
+      <div class="row"><span class="mark">→</span><span class="t"><strong>Powtarzalny, standardowy artefakt.</strong> Za każdym razem ta sama profesjonalna struktura: założenia, ADR-y, diagram, ryzyka — a nie luźna odpowiedź.</span></div>
+      <div class="row"><span class="mark">→</span><span class="t"><strong>Osąd, nie tylko wiedza.</strong> Rubryka zbudowana z ponad 20 lat praktyki architektonicznej — wie, co jest ważne i czego nie wolno pominąć.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ŻYWY PORTAL / WIEDZA -->
+<section class="alt" id="zywy">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Wiedza, która żyje</div>
+      <h2>Nie tylko narzędzie — miejsce, w którym się uczysz</h2>
+      <p>Regularnie, według zasady „AI asystuje, człowiek decyduje": research wspiera AI, ale zdanie i osąd są ludzkie.</p>
+    </div>
+    <div class="grid g2">
+      <div class="live-card">
+        <div class="tag">Co tydzień</div>
+        <h3>Łamigłówki architektoniczne</h3>
+        <p>Realny scenariusz, pytanie „co byś zrobił?", a potem odsłona: jak podejść, jaki wzorzec, jakie kompromisy i czego łatwo nie zauważyć. Ćwiczysz myślenie, nie tylko czytasz.</p>
+        <span class="soon">Wkrótce</span>
+      </div>
+      <div class="live-card">
+        <div class="tag">Z życia</div>
+        <h3>Antywzorce — „dlaczego to się posypało"</h3>
+        <p>Prawdziwe przykłady złych decyzji architektonicznych i ich konsekwencji. Najlepiej uczą historie porażek — i tego, jak było je widać z wyprzedzeniem.</p>
+        <span class="soon">Wkrótce</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- O MNIE -->
+<section id="omnie">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">O mnie</div>
+      <h2>Narzędzie zbudowane przez praktykującego architekta</h2>
+    </div>
+    <div class="about">
+      <div>
+        <p>Nazywam się <strong>[Twoje imię i nazwisko]</strong>. Od ponad 20 lat pracuję jako architekt korporacyjny i architekt rozwiązań w dużych, regulowanych organizacjach, a wcześniej jako programista. Przez ten czas zaprojektowałem, przeglądałem i ratowałem dziesiątki systemów — i widziałem, gdzie projekty się sypią.</p>
+        <p>Architekt-Mentor powstał z prostej obserwacji: osoby wchodzące w rolę architekta najczęściej nie mają problemu z technologią, tylko z <em>procesem</em> — od czego zacząć, o co dopytać, czego nie pominąć. To narzędzie zamyka tę lukę: przekazuje sposób myślenia, którego zwykle uczysz się dopiero latami przy doświadczonym mentorze.</p>
+        <p>To nie jest kolejna nakładka na model. Rubryka w środku to destylat mojej praktyki — i rozwijam ją dalej.</p>
+        <span class="placeholder-note">Uzupełnij: imię i nazwisko, ewentualnie zdjęcie i link do LinkedIn. Nie podawaj nazwy pracodawcy (zakaz konkurencji).</span>
+      </div>
+      <aside class="creds">
+        <div class="eyebrow">W skrócie</div>
+        <ul>
+          <li>20+ lat: architekt korporacyjny i rozwiązań</li>
+          <li>Doświadczenie w dużych, regulowanych systemach</li>
+          <li>Wcześniej: programista</li>
+          <li>Praktyk, nie tylko teoretyk projektowania</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="news">
+  <div class="wrap">
+    <h2>Jedna łamigłówka i jeden antywzorzec — co tydzień</h2>
+    <p>Krótko, konkretnie, z osądem seniora. Bez spamu.</p>
+    <form id="newsForm">
+      <input type="email" id="newsEmail" placeholder="Twój e-mail" required aria-label="E-mail">
+      <button class="btn btn-white" type="submit">Zapisz mnie</button>
+    </form>
+    <div id="newsMsg" aria-live="polite"></div>
+    <div class="small">Możesz zrezygnować w każdej chwili.</div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="wrap">
+    <h2>Masz brief? Zobacz, co z niego wyjdzie.</h2>
+    <p>Pierwszy szkic HLD w kilkanaście sekund. Za darmo, bez rejestracji.</p>
+    <a class="btn btn-primary" href="/generator.html">Otwórz generator</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand" style="color:#fff">Architekt<span style="color:#8FB8E0">-Mentor</span></div>
+    <a href="/generator.html">Generator</a>
+    <a href="#jak">Jak działa</a>
+    <a href="#omnie">O mnie</a>
+    <span class="sp">© <span id="yr"></span> Architekt-Mentor</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById("yr").textContent = new Date().getFullYear();
+
+  // Newsletter — na razie obsługa po stronie przeglądarki.
+  // DO PODŁĄCZENIA: ustaw action formularza na dostawcę (MailerLite / Buttondown / ConvertKit / Formspree)
+  // albo własny endpoint /api/subscribe. Bez tego adresy NIE są nigdzie zapisywane.
+  document.getElementById("newsForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var email = document.getElementById("newsEmail").value.trim();
+    var msg = document.getElementById("newsMsg");
+    if(!email){ return; }
+    // TODO: wyślij `email` do dostawcy newslettera.
+    msg.textContent = "Dzięki! (Uwaga: podłącz dostawcę newslettera, żeby adres został realnie zapisany.)";
+    document.getElementById("newsEmail").value = "";
+  });
+</script>
+</body>
+</html>
