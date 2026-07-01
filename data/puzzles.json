@@ -1,0 +1,19 @@
+[
+  {
+    "id": "2026-w27-dual-write",
+    "week": "Tydzień 27 / 2026",
+    "date": "2026-07-01",
+    "title": "Zamówienie zapisane, ale magazyn go nie widzi",
+    "difficulty": "Średni",
+    "tags": ["spójność danych", "systemy rozproszone", "kolejki"],
+    "scenario": "Budujesz serwis zamówień. Po złożeniu zamówienia trzeba zrobić dwie rzeczy: **(1)** zapisać zamówienie w bazie danych oraz **(2)** opublikować zdarzenie `ZamówienieZłożone` na kolejce, którą konsumują magazyn i serwis powiadomień.\n\nZespół napisał to najprościej: w jednej metodzie serwisu najpierw `INSERT` do bazy, a zaraz po nim `publish()` na kolejkę.\n\nNa demie działa idealnie. Ale na produkcji zdarza się dwojako źle: czasem klient dostaje potwierdzenie, a magazyn **nigdy** nie dostaje zamówienia. A czasem odwrotnie — magazyn dostaje zdarzenie o zamówieniu, którego **nie ma** w bazie.",
+    "question": "Dlaczego to się dzieje? Jak zapewnić, żeby baza i kolejka były spójne? Jaki wzorzec byś zastosował — i dlaczego „najpierw jedno, potem drugie” nie wystarcza?",
+    "hints": [
+      "Co się stanie, jeśli `publish()` rzuci wyjątek już PO udanym `INSERT`?",
+      "A jeśli aplikacja (albo sieć) padnie w mikrosekundzie MIĘDZY `INSERT` a `publish()`?",
+      "Czy zamiana kolejności — najpierw `publish()`, potem `INSERT` — rozwiązuje problem, czy tylko odwraca objaw?",
+      "Czy Twoja transakcja bazodanowa obejmuje kolejkę? Czy broker w ogóle wie o niej cokolwiek?"
+    ],
+    "analysis": "### To jest klasyczny problem „podwójnego zapisu” (dual write)\n\nPiszesz do **dwóch niezależnych systemów** (baza + broker), które nie współdzielą jednej transakcji. Cokolwiek się wydarzy między nimi — wyjątek, timeout, restart poda, awaria sieci — zostawia Cię w stanie niespójnym. I uwaga: **zamiana kolejności nic nie daje**, tylko przenosi ryzyko na drugą stronę.\n\n### Czego NIE robić\n\n- **Transakcja rozproszona / 2PC** — teoretycznie spina oba systemy, ale w praktyce jest ciężka, wolna, słabo wspierana przez brokery i krucha operacyjnie. Senior jej tu unika.\n- **„Dodam try/catch i w razie błędu cofnę”** — nie cofniesz opublikowanego zdarzenia, a padnięcie procesu i tak Cię ominie.\n\n### Rozwiązanie: wzorzec Transactional Outbox\n\nSprowadź problem do **jednego atomowego zapisu**:\n\n1. W **tej samej transakcji bazodanowej** co zapis zamówienia, zapisz zdarzenie do tabeli `outbox`. Albo zapiszą się oba, albo żadne — baza tego pilnuje.\n2. **Osobny proces** (relay/publisher albo CDC, np. odczyt logu bazy) czyta niewysłane wiersze z `outbox` i publikuje je na kolejkę z gwarancją **co-najmniej-raz**.\n3. Ponieważ zdarzenie może pójść więcej niż raz, **konsumenci muszą być idempotentni** (np. odrzucają duplikat po `id` zdarzenia).\n\nEfekt: baza i „intencja publikacji” są spójne atomowo, a faktyczna publikacja jest asynchroniczna, ale niezawodna.\n\n### Reguła do zapamiętania (przenośna)\n\n> **Nie istnieje niezawodny „zapis do dwóch miejsc naraz” bez wspólnej transakcji.** Gdy widzisz dual write, sprowadź go do jednego atomowego zapisu (outbox), a resztę zrób asynchronicznie — z gwarancją co-najmniej-raz i idempotentnym odbiorcą.\n\nTen sam wzorzec zadziała wszędzie, gdzie „zapisz u siebie ORAZ powiadom kogoś na zewnątrz”: płatności, integracje, wysyłka maili."
+  }
+]
