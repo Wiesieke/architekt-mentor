@@ -53,7 +53,7 @@ Compact table: Quality attribute | Target/expectation | Status (Known/Assumed).
 
 ## 5. High-Level Architecture
 If a Fork in the road applies, put it FIRST. Then 3-6 sentences (shape and why), then the diagram (or component list if DIAGRAM:no), then one line per component.
-If DIAGRAM:yes, output a VALID Mermaid flowchart in a fenced code block tagged mermaid. Rules: use "flowchart TB" or LR; group with "subgraph"; node labels in quotes; ~6-14 nodes; simple "-->" arrows with short labels; for line breaks inside labels use "<br/>", never "\\n"; no other HTML or styling tricks.
+If DIAGRAM:yes, output a VALID Mermaid flowchart in a fenced code block tagged mermaid. Rules: use "flowchart TB" or LR; group with "subgraph"; node labels in quotes; ~6-14 nodes; simple "-->" arrows with short labels; use short single-line labels; do not include HTML, click directives or styling tricks.
 
 ## 6. Key Architecture Decisions (ADRs)
 ADRs only for genuinely consequential/contested decisions for THIS brief; sensible defaults go one-line under "Default choices (not contested)". Do not manufacture ADRs. Each ADR: Decision / Context / Options considered / Rationale (incl. transferable heuristic) / Consequences. (In skeletal mode, replace with a bulleted "Key decisions you'll need to make".)
