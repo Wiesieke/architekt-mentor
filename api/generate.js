@@ -135,9 +135,16 @@ module.exports = async (req, res) => {
       })
     });
     if (!response.ok) {
-      // Nie ujawniaj odpowiedzi dostawcy ani szczegółów konfiguracji klucza klientowi.
-      if (response.status === 429) return res.status(429).json({ error: "Generator jest zajęty. Spróbuj ponownie za chwilę." });
-      console.error("OpenAI API status:", response.status);
+      // Rozróżnij brak środków od chwilowego limitu, nie ujawniając surowej odpowiedzi API.
+      let errorCode = "";
+      try { errorCode = (await response.json()).error?.code || ""; } catch {}
+      console.error("OpenAI API status/code:", response.status, errorCode);
+      if (response.status === 429) {
+        if (errorCode === "insufficient_quota" || errorCode === "credit_balance_exhausted") {
+          return res.status(503).json({ error: "Generator czeka na aktywację rozliczeń API." });
+        }
+        return res.status(429).json({ error: "Generator jest zajęty. Spróbuj ponownie za chwilę." });
+      }
       return res.status(502).json({ error: "Nie udało się wygenerować szkicu. Spróbuj ponownie." });
     }
     const data = await response.json();
