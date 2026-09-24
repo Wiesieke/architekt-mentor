@@ -94,6 +94,7 @@ function rateLimited(ip) {
 }
 
 module.exports = async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") return res.status(405).json({ error: "Użyj metody POST." });
   if (!process.env.OPENAI_API_KEY) return res.status(503).json({ error: "Generator jest chwilowo niedostępny." });
 
