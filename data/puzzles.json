@@ -1,5 +1,27 @@
 [
   {
+    "id": "2026-w39-anon-managed-platform",
+    "week": "Materiał dodatkowy / 2026",
+    "date": "2026-09-24",
+    "title": "Oferta działa, ale odbiega od założeń. Co zatwierdzasz?",
+    "difficulty": "Zaawansowany",
+    "tags": [
+      "ocena architektury",
+      "chmura",
+      "integracje",
+      "decyzja warunkowa"
+    ],
+    "scenario": "Organizacja wybiera nowy system do obsługi procesów wewnętrznych. W wymaganiach architektonicznych wskazano, że warstwa aplikacyjna ma korzystać z zarządzanych usług chmurowych, a rozwiązanie ma współpracować z istniejącą platformą integracyjną.\n\nDostawca proponuje rozwiązanie hybrydowe: aplikacja działa na maszynach wirtualnych, natomiast część usług danych korzysta z komponentów zarządzanych. W dokumentacji opisano ogólną możliwość integracji, ale potwierdzono tylko wybrany jej fragment. Biznes chce kontynuować postępowanie, bo oferta pokrywa ważne potrzeby funkcjonalne.\n\nJesteś architektem opiniującym ofertę na tym etapie. Nie masz jeszcze pełnego projektu wdrożeniowego ani potwierdzenia wszystkich połączeń.",
+    "question": "Jak oddzielisz ocenę zgodności z wymaganiami od oceny, czy ofertę warto dalej analizować? Jaką rekomendację sformułujesz i jakie dowody musisz otrzymać przed zatwierdzeniem architektury wdrożenia?",
+    "hints": [
+      "Czy „usługi chmurowe” oznaczają to samo co zarządzane uruchamianie aplikacji?",
+      "Które wymagania są obowiązkowe, a które opisują preferowany kierunek?",
+      "Czy ogólne zapewnienie o integracji potwierdza konkretne interfejsy, dane i obsługę błędów?",
+      "Co możesz zaopiniować na podstawie oferty, a do czego konieczny jest pełny HLD?"
+    ],
+    "analysis": "### Rozdziel dwie decyzje\n\n**Dopuszczenie do dalszej oceny** nie jest **zatwierdzeniem architektury wdrożeniowej**. Oferta może być obiecująca funkcjonalnie, a jednocześnie pozostawiać istotne luki architektoniczne. Nie wolno złożyć tych dwóch wniosków w jedno lakoniczne „zgodne”.\n\n### Sprawdź, co faktycznie zaoferowano\n\n1. Zmapuj wymaganie na proponowany komponent i dowód jego spełnienia. Osobno oznacz zgodność, odstępstwo oraz brak danych.\n2. Ustal konsekwencje uruchomienia aplikacji na maszynach wirtualnych: skalowanie, dostępność, aktualizacje, odpowiedzialność operacyjną i koszt utrzymania. Sama obecność usług zarządzanych w innej warstwie nie rozstrzyga o zgodności warstwy aplikacyjnej.\n3. Dla każdej wymaganej integracji poproś o kontrakt, kierunek przepływu, uwierzytelnienie, obsługę błędów, monitoring oraz plan testu. Potwierdzenie jednego połączenia nie potwierdza pozostałych.\n4. Wskaż, które warunki trzeba spełnić jeszcze przed wyborem rozwiązania, a które można zweryfikować w HLD i testach. Jeżeli wymaganie jest obowiązkowe, jego formalną ocenę pozostaw właściwemu procesowi zakupowemu.\n\n### Jak może brzmieć opinia architekta\n\n> „Rozwiązanie można analizować dalej pod warunkiem jednoznacznego rozstrzygnięcia odstępstwa w sposobie uruchomienia aplikacji oraz wykazania wymaganych integracji. Obecny materiał nie stanowi podstawy do bezwarunkowego zatwierdzenia architektury wdrożenia”.\n\nTo przykład konstrukcji opinii, a nie automatyczna decyzja dla każdego postępowania. Warunki powinny mieć właściciela, termin i sprawdzalny sposób zamknięcia. W HLD oczekuj wariantu docelowego, modelu odpowiedzialności, NFR, przepływów danych i planu testów end-to-end.\n\n### Reguła do zapamiętania\n\n> Gdy materiał opisuje możliwość zamiast dowodu, nazwij lukę wprost. Rekomendacja warunkowa pomaga kontynuować pracę tylko wtedy, gdy określa warunki i moment ponownej oceny."
+  },
+  {
     "id": "2026-w27-dual-write",
     "week": "Tydzień 27 / 2026",
     "date": "2026-07-01",
@@ -40,27 +62,5 @@
       "Co zwrócisz klientowi, gdy operator pobrał środki, ale odpowiedź nie dotarła?"
     ],
     "analysis": "### Najpierw nazwij problem\n\nTimeout mówi, że **nie znasz wyniku**. Nie dowodzi, że operator nie pobrał środków. Ponowienie operacji zmieniającej stan bez trwałej identyfikacji próby może uruchomić ją drugi raz. Sam odczyt statusu zamówienia nie wystarczy: dwa żądania mogą zobaczyć „nieopłacone” jednocześnie.\n\n### Zaprojektuj próbę płatności jako trwały byt\n\n1. Nadaj każdej logicznej próbie stabilny **klucz idempotencji** i zapisz ją w bazie z unikalnym ograniczeniem. Ponowienie tej samej próby używa tego samego klucza; nowa próba wymaga świadomej decyzji i nowego klucza. Zwiąż klucz z parametrami, np. kwotą, walutą i zamówieniem, aby nie przyjąć pod nim innej operacji.\n2. Jeżeli operator wspiera idempotencję, wyślij do niego stabilny klucz zgodnie z jego kontraktem. Sprawdź zakres i czas ważności tej gwarancji; własny klucz w API nie zabezpiecza automatycznie wywołania po stronie operatora.\n3. Dla powtórnego żądania zwróć zapisany wynik albo stan „w toku / nieznany”. Po timeoutcie **uzgodnij stan** przez odpytywanie operatora lub wiarygodne powiadomienie. Potwierdzenia obsługuj idempotentnie, także gdy nadejdą ponownie lub poza kolejnością.\n4. Zdefiniuj, kiedy wolno rozpocząć nową próbę, oraz proces obsługi wyjątków i ewentualnego zwrotu. Monitoruj przypadki „wynik nieznany” i rozbieżności między zamówieniem a operatorem.\n\n### Czego nie obiecywać\n\nNie zakładaj globalnej gwarancji „dokładnie raz” na całej ścieżce. Możesz zapewnić, że to samo żądanie ma stabilną tożsamość i bezpieczne ponowienia **w granicach kontraktu własnego systemu i operatora**. Jeśli operator nie wspiera kluczy idempotencji ani sprawdzania stanu po identyfikatorze próby, pokaż to jako istotne ograniczenie projektu.\n\n### Reguła do zapamiętania\n\n> Gdy odpowiedź z zewnętrznej operacji zaginie, traktuj wynik jako nieznany: najpierw uzgodnij stan, a ponowienie oprzyj na trwałej tożsamości operacji."
-  },
-  {
-    "id": "2026-w39-anon-managed-platform",
-    "week": "Materiał dodatkowy / 2026",
-    "date": "2026-09-24",
-    "title": "Oferta działa, ale odbiega od założeń. Co zatwierdzasz?",
-    "difficulty": "Zaawansowany",
-    "tags": [
-      "ocena architektury",
-      "chmura",
-      "integracje",
-      "decyzja warunkowa"
-    ],
-    "scenario": "Organizacja wybiera nowy system do obsługi procesów wewnętrznych. W wymaganiach architektonicznych wskazano, że warstwa aplikacyjna ma korzystać z zarządzanych usług chmurowych, a rozwiązanie ma współpracować z istniejącą platformą integracyjną.\n\nDostawca proponuje rozwiązanie hybrydowe: aplikacja działa na maszynach wirtualnych, natomiast część usług danych korzysta z komponentów zarządzanych. W dokumentacji opisano ogólną możliwość integracji, ale potwierdzono tylko wybrany jej fragment. Biznes chce kontynuować postępowanie, bo oferta pokrywa ważne potrzeby funkcjonalne.\n\nJesteś architektem opiniującym ofertę na tym etapie. Nie masz jeszcze pełnego projektu wdrożeniowego ani potwierdzenia wszystkich połączeń.",
-    "question": "Jak oddzielisz ocenę zgodności z wymaganiami od oceny, czy ofertę warto dalej analizować? Jaką rekomendację sformułujesz i jakie dowody musisz otrzymać przed zatwierdzeniem architektury wdrożenia?",
-    "hints": [
-      "Czy „usługi chmurowe” oznaczają to samo co zarządzane uruchamianie aplikacji?",
-      "Które wymagania są obowiązkowe, a które opisują preferowany kierunek?",
-      "Czy ogólne zapewnienie o integracji potwierdza konkretne interfejsy, dane i obsługę błędów?",
-      "Co możesz zaopiniować na podstawie oferty, a do czego konieczny jest pełny HLD?"
-    ],
-    "analysis": "### Rozdziel dwie decyzje\n\n**Dopuszczenie do dalszej oceny** nie jest **zatwierdzeniem architektury wdrożeniowej**. Oferta może być obiecująca funkcjonalnie, a jednocześnie pozostawiać istotne luki architektoniczne. Nie wolno złożyć tych dwóch wniosków w jedno lakoniczne „zgodne”.\n\n### Sprawdź, co faktycznie zaoferowano\n\n1. Zmapuj wymaganie na proponowany komponent i dowód jego spełnienia. Osobno oznacz zgodność, odstępstwo oraz brak danych.\n2. Ustal konsekwencje uruchomienia aplikacji na maszynach wirtualnych: skalowanie, dostępność, aktualizacje, odpowiedzialność operacyjną i koszt utrzymania. Sama obecność usług zarządzanych w innej warstwie nie rozstrzyga o zgodności warstwy aplikacyjnej.\n3. Dla każdej wymaganej integracji poproś o kontrakt, kierunek przepływu, uwierzytelnienie, obsługę błędów, monitoring oraz plan testu. Potwierdzenie jednego połączenia nie potwierdza pozostałych.\n4. Wskaż, które warunki trzeba spełnić jeszcze przed wyborem rozwiązania, a które można zweryfikować w HLD i testach. Jeżeli wymaganie jest obowiązkowe, jego formalną ocenę pozostaw właściwemu procesowi zakupowemu.\n\n### Jak może brzmieć opinia architekta\n\n> „Rozwiązanie można analizować dalej pod warunkiem jednoznacznego rozstrzygnięcia odstępstwa w sposobie uruchomienia aplikacji oraz wykazania wymaganych integracji. Obecny materiał nie stanowi podstawy do bezwarunkowego zatwierdzenia architektury wdrożenia”.\n\nTo przykład konstrukcji opinii, a nie automatyczna decyzja dla każdego postępowania. Warunki powinny mieć właściciela, termin i sprawdzalny sposób zamknięcia. W HLD oczekuj wariantu docelowego, modelu odpowiedzialności, NFR, przepływów danych i planu testów end-to-end.\n\n### Reguła do zapamiętania\n\n> Gdy materiał opisuje możliwość zamiast dowodu, nazwij lukę wprost. Rekomendacja warunkowa pomaga kontynuować pracę tylko wtedy, gdy określa warunki i moment ponownej oceny."
   }
 ]
