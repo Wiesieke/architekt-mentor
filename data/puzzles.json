@@ -5,7 +5,11 @@
     "date": "2026-07-01",
     "title": "Zamówienie zapisane, ale magazyn go nie widzi",
     "difficulty": "Średni",
-    "tags": ["spójność danych", "systemy rozproszone", "kolejki"],
+    "tags": [
+      "spójność danych",
+      "systemy rozproszone",
+      "kolejki"
+    ],
     "scenario": "Budujesz serwis zamówień. Po złożeniu zamówienia trzeba zrobić dwie rzeczy: **(1)** zapisać zamówienie w bazie danych oraz **(2)** opublikować zdarzenie `ZamówienieZłożone` na kolejce, którą konsumują magazyn i serwis powiadomień.\n\nZespół napisał to najprościej: w jednej metodzie serwisu najpierw `INSERT` do bazy, a zaraz po nim `publish()` na kolejkę.\n\nNa demie działa idealnie. Ale na produkcji zdarza się dwojako źle: czasem klient dostaje potwierdzenie, a magazyn **nigdy** nie dostaje zamówienia. A czasem odwrotnie — magazyn dostaje zdarzenie o zamówieniu, którego **nie ma** w bazie.",
     "question": "Dlaczego to się dzieje? Jak zapewnić, żeby baza i kolejka były spójne? Jaki wzorzec byś zastosował — i dlaczego „najpierw jedno, potem drugie” nie wystarcza?",
     "hints": [
@@ -15,5 +19,26 @@
       "Czy Twoja transakcja bazodanowa obejmuje kolejkę? Czy broker w ogóle wie o niej cokolwiek?"
     ],
     "analysis": "### To jest klasyczny problem „podwójnego zapisu” (dual write)\n\nPiszesz do **dwóch niezależnych systemów** (baza + broker), które nie współdzielą jednej transakcji. Cokolwiek się wydarzy między nimi — wyjątek, timeout, restart poda, awaria sieci — zostawia Cię w stanie niespójnym. I uwaga: **zamiana kolejności nic nie daje**, tylko przenosi ryzyko na drugą stronę.\n\n### Czego NIE robić\n\n- **Transakcja rozproszona / 2PC** — teoretycznie spina oba systemy, ale w praktyce jest ciężka, wolna, słabo wspierana przez brokery i krucha operacyjnie. Senior jej tu unika.\n- **„Dodam try/catch i w razie błędu cofnę”** — nie cofniesz opublikowanego zdarzenia, a padnięcie procesu i tak Cię ominie.\n\n### Rozwiązanie: wzorzec Transactional Outbox\n\nSprowadź problem do **jednego atomowego zapisu**:\n\n1. W **tej samej transakcji bazodanowej** co zapis zamówienia, zapisz zdarzenie do tabeli `outbox`. Albo zapiszą się oba, albo żadne — baza tego pilnuje.\n2. **Osobny proces** (relay/publisher albo CDC, np. odczyt logu bazy) czyta niewysłane wiersze z `outbox` i publikuje je na kolejkę z gwarancją **co-najmniej-raz**.\n3. Ponieważ zdarzenie może pójść więcej niż raz, **konsumenci muszą być idempotentni** (np. odrzucają duplikat po `id` zdarzenia).\n\nEfekt: baza i „intencja publikacji” są spójne atomowo, a faktyczna publikacja jest asynchroniczna, ale niezawodna.\n\n### Reguła do zapamiętania (przenośna)\n\n> **Nie istnieje niezawodny „zapis do dwóch miejsc naraz” bez wspólnej transakcji.** Gdy widzisz dual write, sprowadź go do jednego atomowego zapisu (outbox), a resztę zrób asynchronicznie — z gwarancją co-najmniej-raz i idempotentnym odbiorcą.\n\nTen sam wzorzec zadziała wszędzie, gdzie „zapisz u siebie ORAZ powiadom kogoś na zewnątrz”: płatności, integracje, wysyłka maili."
+  },
+  {
+    "id": "2026-w39-retry-idempotency",
+    "week": "Tydzień 39 / 2026",
+    "date": "2026-09-24",
+    "title": "Klient ponowił płatność — czy pobierzesz pieniądze drugi raz?",
+    "difficulty": "Średni",
+    "tags": [
+      "płatności",
+      "idempotencja",
+      "integracja API"
+    ],
+    "scenario": "Projektujesz API przyjmujące płatności za zamówienia. Aplikacja wysyła żądanie `POST /payments`. Serwer przekazuje je do operatora płatności i zapisuje wynik. Czasem operator pobiera środki, ale odpowiedź do aplikacji ginie wskutek timeoutu. Aplikacja ponawia żądanie.\\n\\nZespół proponuje po prostu ponawiać każde żądanie po błędzie, a przed ponowieniem sprawdzać, czy zamówienie ma status „opłacone”. W pierwszych testach wszystko działa. W produkcji zdarzają się jednak dwa równoczesne żądania dla tego samego zamówienia oraz opóźnione potwierdzenia od operatora.",
+    "question": "Jak zaprojektujesz ponowienia, żeby nie zainicjować drugiej płatności? Co zrobisz, gdy pierwsze wywołanie ma nieznany wynik?",
+    "hints": [
+      "Czy odczyt statusu i wywołanie operatora są jedną operacją atomową?",
+      "Jak rozpoznasz ponowienie tego samego żądania, a jak nową, świadomą próbę zapłaty?",
+      "Czy operator wspiera klucz idempotencji i jak długo go przechowuje?",
+      "Co zwrócisz klientowi, gdy operator pobrał środki, ale odpowiedź nie dotarła?"
+    ],
+    "analysis": "### Najpierw nazwij problem\\n\\nTimeout mówi, że **nie znasz wyniku**. Nie dowodzi, że operator nie pobrał środków. Ponowienie operacji zmieniającej stan bez trwałej identyfikacji próby może uruchomić ją drugi raz. Sam odczyt statusu zamówienia nie wystarczy: dwa żądania mogą zobaczyć „nieopłacone” jednocześnie.\\n\\n### Zaprojektuj próbę płatności jako trwały byt\\n\\n1. Nadaj każdej logicznej próbie stabilny **klucz idempotencji** i zapisz ją w bazie z unikalnym ograniczeniem. Ponowienie tej samej próby używa tego samego klucza; nowa próba wymaga świadomej decyzji i nowego klucza. Zwiąż klucz z parametrami, np. kwotą, walutą i zamówieniem, aby nie przyjąć pod nim innej operacji.\\n2. Jeżeli operator wspiera idempotencję, wyślij do niego stabilny klucz zgodnie z jego kontraktem. Sprawdź zakres i czas ważności tej gwarancji; własny klucz w API nie zabezpiecza automatycznie wywołania po stronie operatora.\\n3. Dla powtórnego żądania zwróć zapisany wynik albo stan „w toku / nieznany”. Po timeoutcie **uzgodnij stan** przez odpytywanie operatora lub wiarygodne powiadomienie. Potwierdzenia obsługuj idempotentnie, także gdy nadejdą ponownie lub poza kolejnością.\\n4. Zdefiniuj, kiedy wolno rozpocząć nową próbę, oraz proces obsługi wyjątków i ewentualnego zwrotu. Monitoruj przypadki „wynik nieznany” i rozbieżności między zamówieniem a operatorem.\\n\\n### Czego nie obiecywać\\n\\nNie zakładaj globalnej gwarancji „dokładnie raz” na całej ścieżce. Możesz zapewnić, że to samo żądanie ma stabilną tożsamość i bezpieczne ponowienia **w granicach kontraktu własnego systemu i operatora**. Jeśli operator nie wspiera kluczy idempotencji ani sprawdzania stanu po identyfikatorze próby, pokaż to jako istotne ograniczenie projektu.\\n\\n### Reguła do zapamiętania\\n\\n> Gdy odpowiedź z zewnętrznej operacji zaginie, traktuj wynik jako nieznany: najpierw uzgodnij stan, a ponowienie oprzyj na trwałej tożsamości operacji."
   }
 ]
