@@ -1,5 +1,4 @@
-// api/generate.js — funkcja serverless (Vercel, Node). Trzyma klucz po stronie serwera.
-// Klucz NIE jest w kodzie — czytany ze zmiennej środowiskowej ANTHROPIC_API_KEY.
+// Generator HLD — Vercel Function. Klucz OpenAI pozostaje wyłącznie po stronie serwera.
 
 const SYSTEM_PROMPT = `# ROLE
 You are a senior software and solutions architect with 20+ years of experience, acting as a MENTOR to a less-experienced architect. Your job is NOT to dump an answer. Your job is to turn a rough business brief into a credible first-draft High-Level Design (HLD) — and to teach the process while doing it, the way a good senior would during a design review.
@@ -70,72 +69,89 @@ End with a closing MENTOR NOTE (blockquote): the handoff.
 # TONE
 Calm, precise, mentoring; encouraging but candid; clarity over jargon.`;
 
-// ---- Guardrails (chronią Twój rachunek) ----
-const ALLOWED_MODELS = new Set(["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8"]);
-const MAX_BRIEF_CHARS = 30000;    // limit długości briefu w ZNAKACH (było 6000 — za mało)
-const MODEL_MAX_OUT = {           // sufit tokenów WYJŚCIA per model (bezpieczny dla API)
-  "claude-haiku-4-5": 8000,
-  "claude-sonnet-4-6": 16000,
-  "claude-opus-4-8": 16000
-};
-const DEFAULT_MODEL = "claude-sonnet-4-6";
 
-// ---- Prosty limit zapytań (best-effort, w pamięci instancji) ----
-const WINDOW_MS = 60_000, LIMIT = 8;
+// Model oraz limity wyjścia są ustalone na serwerze, niezależnie od żądania klienta.
+const MODEL = "gpt-5-mini";
+const MAX_BRIEF_CHARS = 12000;
+const OUTPUT_TOKENS = { skeletal: 3500, full: 9000 };
+const WINDOW_MS = 60000;
+const LIMIT = 8;
 const hits = new Map();
+
+// Ograniczenie pomocnicze dla pojedynczej instancji. Globalny limit ustaw w Vercel Firewall.
 function rateLimited(ip) {
   const now = Date.now();
-  const arr = (hits.get(ip) || []).filter(t => now - t < WINDOW_MS);
-  if (arr.length >= LIMIT) { hits.set(ip, arr); return true; }
-  arr.push(now); hits.set(ip, arr); return false;
+  const recent = (hits.get(ip) || []).filter(t => now - t < WINDOW_MS);
+  if (recent.length >= LIMIT) { hits.set(ip, recent); return true; }
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 2000) {
+    for (const [key, times] of hits) {
+      if (times[times.length - 1] < now - WINDOW_MS) hits.delete(key);
+    }
+  }
+  return false;
 }
 
 module.exports = async (req, res) => {
-  if (req.method !== "POST") { res.status(405).json({ error: "Użyj metody POST." }); return; }
+  if (req.method !== "POST") return res.status(405).json({ error: "Użyj metody POST." });
+  if (!process.env.OPENAI_API_KEY) return res.status(503).json({ error: "Generator jest chwilowo niedostępny." });
 
-  const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
-  if (rateLimited(ip)) { res.status(429).json({ error: "Za dużo żądań — odczekaj chwilę." }); return; }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    res.status(500).json({ error: "Serwer nie ma ustawionej zmiennej ANTHROPIC_API_KEY." }); return;
-  }
+  const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
+  if (rateLimited(ip)) return res.status(429).json({ error: "Za dużo żądań — odczekaj chwilę." });
+  if (Number(req.headers["content-length"]) > 65000) return res.status(413).json({ error: "Brief jest za długi." });
 
   let body = req.body;
-  if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
-  body = body || {};
-
-  const brief = String(body.brief || "").trim();
+  if (typeof body === "string") {
+    try { body = JSON.parse(body); }
+    catch { return res.status(400).json({ error: "Niepoprawne dane wejściowe." }); }
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body) || typeof body.brief !== "string") {
+    return res.status(400).json({ error: "Podaj brief jako tekst." });
+  }
+  const brief = body.brief.trim();
+  if (!brief) return res.status(400).json({ error: "Pusty brief." });
+  if (brief.length > MAX_BRIEF_CHARS) return res.status(400).json({ error: "Brief za długi (limit " + MAX_BRIEF_CHARS + " znaków)." });
   const mode = body.mode === "full" ? "full" : "skeletal";
   const diagram = body.diagram === "no" ? "no" : "yes";
-  const model = ALLOWED_MODELS.has(body.model) ? body.model : DEFAULT_MODEL;
-  const ceiling = MODEL_MAX_OUT[model] || 8000;
-  let maxTokens = parseInt(body.maxTokens, 10) || 6000;
-  maxTokens = Math.min(Math.max(maxTokens, 500), ceiling);
-
-  if (!brief) { res.status(400).json({ error: "Pusty brief." }); return; }
-  if (brief.length > MAX_BRIEF_CHARS) { res.status(400).json({ error: "Brief za długi (limit " + MAX_BRIEF_CHARS + " znaków)." }); return; }
-
-  const userMessage = `BRIEF:\n${brief}\n\nMODE: ${mode}\nDIAGRAM: ${diagram}`;
+  const userMessage = "BRIEF:\n" + brief + "\n\nMODE: " + mode + "\nDIAGRAM: " + diagram;
 
   try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json"
+        "Authorization": "Bearer " + process.env.OPENAI_API_KEY,
+        "Content-Type": "application/json"
       },
+      signal: AbortSignal.timeout(90000),
       body: JSON.stringify({
-        model, max_tokens: maxTokens, temperature: 0.3,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userMessage }]
+        model: MODEL,
+        instructions: SYSTEM_PROMPT,
+        input: [{ role: "user", content: userMessage }],
+        max_output_tokens: OUTPUT_TOKENS[mode],
+        reasoning: { effort: "low" },
+        store: false
       })
     });
-    const data = await r.json();
-    if (!r.ok) { res.status(r.status).json({ error: (data.error && data.error.message) || "Błąd API." }); return; }
-    const text = (data.content || []).map(b => b.text || "").join("\n");
-    res.status(200).json({ text, usage: data.usage || null });
-  } catch (e) {
-    res.status(500).json({ error: String(e.message || e) });
+    if (!response.ok) {
+      // Nie ujawniaj odpowiedzi dostawcy ani szczegółów konfiguracji klucza klientowi.
+      if (response.status === 429) return res.status(429).json({ error: "Generator jest zajęty. Spróbuj ponownie za chwilę." });
+      console.error("OpenAI API status:", response.status);
+      return res.status(502).json({ error: "Nie udało się wygenerować szkicu. Spróbuj ponownie." });
+    }
+    const data = await response.json();
+    if (data.status !== "completed") {
+      console.error("OpenAI response status:", data.status, data.incomplete_details?.reason);
+      return res.status(502).json({ error: "Generowanie nie zostało ukończone. Spróbuj ponownie." });
+    }
+    const result = (data.output || []).filter(item => item.type === "message")
+      .flatMap(item => item.content || []).filter(part => part.type === "output_text")
+      .map(part => part.text || "").join("\n").trim();
+    if (!result) return res.status(502).json({ error: "Model nie zwrócił tekstu. Spróbuj ponownie." });
+    return res.status(200).json({ text: result, usage: data.usage || null });
+  } catch (error) {
+    console.error("Generator request failed:", error?.name || "Error");
+    const timedOut = error?.name === "TimeoutError" || error?.name === "AbortError";
+    return res.status(timedOut ? 504 : 502).json({ error: timedOut ? "Generowanie trwało zbyt długo. Spróbuj ponownie." : "Generator jest chwilowo niedostępny." });
   }
 };
