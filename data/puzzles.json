@@ -19,7 +19,36 @@
       "Czy ogólne zapewnienie o integracji potwierdza konkretne interfejsy, dane i obsługę błędów?",
       "Co możesz zaopiniować na podstawie oferty, a do czego konieczny jest pełny HLD?"
     ],
-    "analysis": "### Rozdziel dwie decyzje\n\n**Dopuszczenie do dalszej oceny** nie jest **zatwierdzeniem architektury wdrożeniowej**. Oferta może być obiecująca funkcjonalnie, a jednocześnie pozostawiać istotne luki architektoniczne. Nie wolno złożyć tych dwóch wniosków w jedno lakoniczne „zgodne”.\n\n### Sprawdź, co faktycznie zaoferowano\n\n1. Zmapuj wymaganie na proponowany komponent i dowód jego spełnienia. Osobno oznacz zgodność, odstępstwo oraz brak danych.\n2. Ustal konsekwencje uruchomienia aplikacji na maszynach wirtualnych: skalowanie, dostępność, aktualizacje, odpowiedzialność operacyjną i koszt utrzymania. Sama obecność usług zarządzanych w innej warstwie nie rozstrzyga o zgodności warstwy aplikacyjnej.\n3. Dla każdej wymaganej integracji poproś o kontrakt, kierunek przepływu, uwierzytelnienie, obsługę błędów, monitoring oraz plan testu. Potwierdzenie jednego połączenia nie potwierdza pozostałych.\n4. Wskaż, które warunki trzeba spełnić jeszcze przed wyborem rozwiązania, a które można zweryfikować w HLD i testach. Jeżeli wymaganie jest obowiązkowe, jego formalną ocenę pozostaw właściwemu procesowi zakupowemu.\n\n### Jak może brzmieć opinia architekta\n\n> „Rozwiązanie można analizować dalej pod warunkiem jednoznacznego rozstrzygnięcia odstępstwa w sposobie uruchomienia aplikacji oraz wykazania wymaganych integracji. Obecny materiał nie stanowi podstawy do bezwarunkowego zatwierdzenia architektury wdrożenia”.\n\nTo przykład konstrukcji opinii, a nie automatyczna decyzja dla każdego postępowania. Warunki powinny mieć właściciela, termin i sprawdzalny sposób zamknięcia. W HLD oczekuj wariantu docelowego, modelu odpowiedzialności, NFR, przepływów danych i planu testów end-to-end.\n\n### Reguła do zapamiętania\n\n> Gdy materiał opisuje możliwość zamiast dowodu, nazwij lukę wprost. Rekomendacja warunkowa pomaga kontynuować pracę tylko wtedy, gdy określa warunki i moment ponownej oceny."
+    "analysis": "### Rozdziel dwie decyzje\n\n**Dopuszczenie do dalszej oceny** nie jest **zatwierdzeniem architektury wdrożeniowej**. Oferta może być obiecująca funkcjonalnie, a jednocześnie pozostawiać istotne luki architektoniczne. Nie wolno złożyć tych dwóch wniosków w jedno lakoniczne „zgodne”.\n\n### Sprawdź, co faktycznie zaoferowano\n\n1. Zmapuj wymaganie na proponowany komponent i dowód jego spełnienia. Osobno oznacz zgodność, odstępstwo oraz brak danych.\n2. Ustal konsekwencje uruchomienia aplikacji na maszynach wirtualnych: skalowanie, dostępność, aktualizacje, odpowiedzialność operacyjną i koszt utrzymania. Sama obecność usług zarządzanych w innej warstwie nie rozstrzyga o zgodności warstwy aplikacyjnej.\n3. Dla każdej wymaganej integracji poproś o kontrakt, kierunek przepływu, uwierzytelnienie, obsługę błędów, monitoring oraz plan testu. Potwierdzenie jednego połączenia nie potwierdza pozostałych.\n4. Wskaż, które warunki trzeba spełnić jeszcze przed wyborem rozwiązania, a które można zweryfikować w HLD i testach. Jeżeli wymaganie jest obowiązkowe, jego formalną ocenę pozostaw właściwemu procesowi zakupowemu.\n\n### Jak może brzmieć opinia architekta\n\n> „Rozwiązanie można analizować dalej pod warunkiem jednoznacznego rozstrzygnięcia odstępstwa w sposobie uruchomienia aplikacji oraz wykazania wymaganych integracji. Obecny materiał nie stanowi podstawy do bezwarunkowego zatwierdzenia architektury wdrożenia”.\n\nTo przykład konstrukcji opinii, a nie automatyczna decyzja dla każdego postępowania. Warunki powinny mieć właściciela, termin i sprawdzalny sposób zamknięcia. W HLD oczekuj wariantu docelowego, modelu odpowiedzialności, NFR, przepływów danych i planu testów end-to-end.\n\n### Reguła do zapamiętania\n\n> Gdy materiał opisuje możliwość zamiast dowodu, nazwij lukę wprost. Rekomendacja warunkowa pomaga kontynuować pracę tylko wtedy, gdy określa warunki i moment ponownej oceny.",
+    "coach": {
+      "criteria": [
+        {
+          "id": "decisions",
+          "label": "Rozdzielenie decyzji",
+          "expected": "Odróżnia dopuszczenie oferty do dalszej oceny od zatwierdzenia architektury wdrożenia; nie wydaje bezwarunkowej zgody."
+        },
+        {
+          "id": "deviation",
+          "label": "Odstępstwo i wymagania",
+          "expected": "Rozpoznaje, że maszyny wirtualne dla warstwy aplikacyjnej mogą naruszać wymaganie zarządzanych usług; odróżnia wymóg obowiązkowy od preferencji i nie zastępuje oceny formalnej."
+        },
+        {
+          "id": "integration",
+          "label": "Dowody integracji",
+          "expected": "Żąda weryfikowalnych informacji o konkretnych interfejsach, przepływach danych, uwierzytelnieniu, obsłudze błędów i testach integracji."
+        },
+        {
+          "id": "conditions",
+          "label": "Warunki rekomendacji",
+          "expected": "Formułuje opinię warunkową z konkretnymi warunkami, właścicielem, terminem i sprawdzalnym sposobem zamknięcia."
+        },
+        {
+          "id": "next",
+          "label": "Moment ponownej oceny",
+          "expected": "Wskazuje, co sprawdzić przed wyborem oferty, a co w HLD i testach, oraz kiedy ponownie ocenić architekturę."
+        }
+      ]
+    }
   },
   {
     "id": "2026-w27-dual-write",

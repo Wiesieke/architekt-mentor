@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Łamigłówki architektoniczne — Architekt-Mentor</title>
-<meta name="description" content="Cotygodniowe łamigłówki architektoniczne: realny scenariusz, Twoja odpowiedź, a potem analiza seniora — wzorzec, kompromisy i przenośna reguła.">
+<meta name="description" content="Łamigłówki architektoniczne: scenariusz, własna odpowiedź, pytanie naprowadzające i ocena według kryteriów.">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 <style>
   :root{
     --ink:#1F2A44; --ink-soft:#51607A; --paper:#FBFCFE; --board:#F3F6FB;
@@ -78,6 +79,17 @@
   .btn:focus-visible{outline:2px solid var(--accent-deep); outline-offset:2px}
   .btn.sm{padding:9px 18px; font-size:14px}
 
+  .coach-note{font-size:13px; color:var(--ink-soft); margin:8px 0 12px}
+  .coach-status{font-size:14px; min-height:1.4em; margin:12px 0; color:var(--ink-soft)}
+  .coach-status.err{color:#B23A2E}
+  .coach-box{margin:16px 0; padding:18px; border-radius:10px; border:1px solid #CFE0F2; background:var(--accent-light)}
+  .coach-box h3{margin:0 0 8px; color:var(--accent-deep); font-size:17px}
+  .coach-box p{margin:7px 0}
+  .coach-score{font-size:23px; font-weight:700; color:var(--accent-deep)}
+  .coach-criteria{list-style:none; padding:0; margin:14px 0}
+  .coach-criteria li{padding:10px 0; border-top:1px solid #CFE0F2}
+  .coach-criteria strong{color:var(--accent-deep)}
+  .coach-criteria small{display:block; margin-top:3px; font-size:13px}
   #reveal{display:none; margin-top:26px; padding-top:8px; border-top:2px solid var(--accent)}
   .cta{margin-top:24px; padding:18px; background:var(--board); border-radius:10px; display:flex; gap:14px; align-items:center; flex-wrap:wrap}
   .cta p{margin:0; color:var(--ink-soft); font-size:15px}
@@ -104,7 +116,7 @@
     <div class="wrap">
       <div class="eyebrow">Nowa co tydzień</div>
       <h1>Łamigłówki architektoniczne</h1>
-      <p>Realny scenariusz, Twoja odpowiedź, a potem analiza seniora: jak podejść, jaki wzorzec, jakie kompromisy i czego łatwo nie zauważyć. Najpierw pomyśl — dopiero potem odsłoń rozwiązanie.</p>
+      <p>Przećwicz decyzję architektoniczną. W nowej łamigłówce senior odniesie się do Twojej odpowiedzi, zada pytanie naprowadzające i oceni poprawioną wersję według kryteriów.</p>
     </div>
   </header>
 
@@ -125,7 +137,8 @@
   const plist = document.getElementById("plist");
   let puzzles = [], current = null;
 
-  function md(t){ return window.marked.parse(t || "", { breaks:false }); }
+  function md(t){ return DOMPurify.sanitize(window.marked.parse(t || "", { breaks:false })); }
+  function esc(t){ return String(t ?? "").replace(/[&<>"\x27]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c])); }
 
   function renderList(){
     plist.innerHTML = "";
@@ -133,7 +146,7 @@
       const li = document.createElement("li");
       const b = document.createElement("button");
       b.className = (current && current.id === p.id) ? "sel" : "";
-      b.innerHTML = `<span class="pt">${p.title}</span><span class="pm">${p.week} · ${p.difficulty}</span>`;
+      b.innerHTML = `<span class="pt">${esc(p.title)}</span><span class="pm">${esc(p.week)} · ${esc(p.difficulty)}</span>`;
       b.addEventListener("click", () => selectPuzzle(p));
       li.appendChild(b); plist.appendChild(li);
     });
@@ -142,17 +155,18 @@
   function selectPuzzle(p){
     current = p;
     renderList();
-    const tags = (p.tags||[]).map(t => `<span>${t}</span>`).join("");
-    const hints = (p.hints||[]).map(h => `<li>${h}</li>`).join("");
+    const tags = (p.tags||[]).map(t => `<span>${esc(t)}</span>`).join("");
+    const hints = (p.hints||[]).map(h => `<li>${esc(h)}</li>`).join("");
     panel.innerHTML = `
-      <div class="meta"><span class="diff">${p.difficulty}</span>${tags}<span>${p.week}</span></div>
-      <h2 class="title">${p.title}</h2>
+      <div class="meta"><span class="diff">${esc(p.difficulty)}</span>${tags}<span>${esc(p.week)}</span></div>
+      <h2 class="title">${esc(p.title)}</h2>
       <div class="block">${md(p.scenario)}</div>
-      <div class="q"><span class="eyebrow">Zadanie</span><p>${p.question}</p></div>
-      <label class="fld" for="ans">Twoja odpowiedź (dla siebie — nie jest nigdzie wysyłana)</label>
-      <textarea id="ans" placeholder="Zanim spojrzysz na rozwiązanie, spróbuj sam. Jak byś to rozwiązał? Jaki wzorzec?"></textarea>
+      <div class="q"><span class="eyebrow">Zadanie</span><p>${esc(p.question)}</p></div>
+      <label class="fld" for="ans">${p.coach ? "Twoja odpowiedź — decyzja i uzasadnienie" : "Twoja odpowiedź (dla siebie — nie jest nigdzie wysyłana)"}</label>
+      <textarea id="ans" maxlength="4000" placeholder="Jaką decyzję podejmiesz? Co trzeba sprawdzić i dlaczego?"></textarea>
+      ${p.coach ? `<p class="coach-note">Po kliknięciu „Sprawdź odpowiedź” tekst trafi do Anthropic w celu oceny. Nie zapisujemy go na serwerze. Nie wpisuj danych poufnych.</p><button class="btn" id="coachBtn">Sprawdź odpowiedź</button><div class="coach-status" id="coachStatus" role="status" aria-live="polite"></div><div id="coachResult" aria-live="polite"></div>` : ""}
       ${hints ? `<details class="hints"><summary>Podpowiedzi — kliknij, jeśli utkniesz</summary><ul>${hints}</ul></details>` : ""}
-      <button class="btn" id="revealBtn">Pokaż analizę seniora</button>
+      <button class="btn sm" id="revealBtn">Pokaż analizę seniora${p.coach ? " bez oceny" : ""}</button>
       <div id="reveal">
         <div class="block">${md(p.analysis)}</div>
         <div class="cta">
@@ -160,12 +174,86 @@
           <a class="btn sm" href="/generator.html">Otwórz generator HLD</a>
         </div>
       </div>`;
+    if (p.coach) initCoach(p);
     document.getElementById("revealBtn").addEventListener("click", (e) => {
       document.getElementById("reveal").style.display = "block";
       e.target.style.display = "none";
       document.getElementById("reveal").scrollIntoView({ behavior:"smooth", block:"start" });
     });
     window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  function initCoach(p){
+    let stage = "hint";
+    const button = document.getElementById("coachBtn");
+    const answer = document.getElementById("ans");
+    const status = document.getElementById("coachStatus");
+    const container = document.getElementById("coachResult");
+    button.addEventListener("click", async () => {
+      const value = answer.value.trim();
+      if(value.length < 40){ status.textContent = "Napisz co najmniej 40 znaków, by ocena miała sens."; status.className = "coach-status err"; return; }
+      if(value.length > 4000){ status.textContent = "Odpowiedź jest za długa (maksymalnie 4000 znaków)."; status.className = "coach-status err"; return; }
+      button.disabled = true;
+      status.className = "coach-status";
+      status.textContent = stage === "hint" ? "Senior czyta Twoją odpowiedź…" : "Senior ocenia uzupełnioną odpowiedź…";
+      try {
+        const response = await fetch("/api/evaluate-puzzle", {
+          method:"POST", headers:{"content-type":"application/json"},
+          body:JSON.stringify({puzzleId:p.id, stage, answer:value})
+        });
+        const data = await response.json();
+        if(!response.ok) throw new Error(data.error || "Błąd oceny.");
+        container.replaceChildren();
+        const box = document.createElement("section");
+        box.className = "coach-box";
+        const heading = document.createElement("h3");
+        heading.textContent = stage === "hint" ? "Pytanie od seniora" : "Ocena Twojej odpowiedzi";
+        box.appendChild(heading);
+        if(stage === "hint"){
+          const positive = document.createElement("p");
+          positive.textContent = data.positive;
+          const question = document.createElement("p");
+          const strong = document.createElement("strong");
+          strong.textContent = data.question;
+          question.appendChild(strong);
+          box.append(positive, question);
+          container.appendChild(box);
+          status.textContent = "Uzupełnij odpowiedź powyżej, a potem sprawdź wynik.";
+          button.textContent = "Oceń poprawioną odpowiedź";
+          stage = "score";
+        } else {
+          const score = document.createElement("div");
+          score.className = "coach-score";
+          score.textContent = data.score + "/" + data.maxScore + " punktów";
+          box.appendChild(score);
+          const list = document.createElement("ul");
+          list.className = "coach-criteria";
+          for(const criterion of data.criteria){
+            const li = document.createElement("li");
+            const title = document.createElement("strong");
+            title.textContent = criterion.label + ": " + criterion.points + "/2";
+            const reason = document.createElement("small");
+            reason.textContent = criterion.reason;
+            li.append(title, reason);
+            list.appendChild(li);
+          }
+          box.appendChild(list);
+          const summary = document.createElement("p");
+          summary.textContent = data.overall;
+          const next = document.createElement("p");
+          next.textContent = "Co dalej: " + data.nextStep;
+          box.append(summary, next);
+          container.appendChild(box);
+          status.textContent = "To ocena pomocnicza. Porównaj ją z pełną analizą seniora poniżej.";
+          button.remove();
+          const reveal = document.getElementById("revealBtn");
+          reveal.textContent = "Pokaż pełną analizę seniora";
+        }
+      } catch(error) {
+        status.textContent = error.message || "Ocena jest chwilowo niedostępna.";
+        status.className = "coach-status err";
+      } finally { button.disabled = false; }
+    });
   }
 
   fetch("data/puzzles.json")
@@ -176,7 +264,7 @@
       selectPuzzle(puzzles[0]);
     })
     .catch(err => {
-      panel.innerHTML = '<div class="error">Nie udało się wczytać łamigłówek ('+err.message+').<br>Uwaga: strona czyta plik <code>data/puzzles.json</code> — działa po wdrożeniu na serwer (Vercel) lub przez <code>vercel dev</code>, a nie przy otwarciu pliku bezpośrednio z dysku.</div>';
+      panel.innerHTML = '<div class="error">Nie udało się wczytać łamigłówek ('+esc(err.message)+').<br>Uwaga: strona czyta plik <code>data/puzzles.json</code> — działa po wdrożeniu na serwer (Vercel) lub przez <code>vercel dev</code>, a nie przy otwarciu pliku bezpośrednio z dysku.</div>';
     });
 </script>
 </body>
