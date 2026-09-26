@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Architekt-Mentor — generator HLD</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -99,24 +100,12 @@
     </div>
     <div class="settings">
       <div class="field">
-        <label for="model">Model</label>
-        <select id="model">
-          <option value="claude-sonnet-4-6">Sonnet 4.6</option>
-          <option value="claude-haiku-4-5">Haiku 4.5 (tanio)</option>
-          <option value="claude-opus-4-8">Opus 4.8 (max)</option>
-        </select>
-      </div>
-      <div class="field">
         <label for="mode">Tryb</label>
         <select id="mode"><option value="skeletal">Szkielet</option><option value="full">Pełny</option></select>
       </div>
       <div class="field">
         <label for="diagram">Diagram</label>
         <select id="diagram"><option value="yes">Tak</option><option value="no">Nie</option></select>
-      </div>
-      <div class="field">
-        <label for="maxTokens">Max tokens</label>
-        <input id="maxTokens" type="number" value="6000" min="500" max="16000" step="1000" style="width:90px">
       </div>
     </div>
   </header>
@@ -143,7 +132,7 @@
   </main>
 
 <script>
-mermaid.initialize({ startOnLoad:false, theme:"neutral", securityLevel:"loose", flowchart:{ useMaxWidth:true } });
+mermaid.initialize({ startOnLoad:false, theme:"neutral", securityLevel:"strict", flowchart:{ useMaxWidth:true } });
 const $ = id => document.getElementById(id);
 const briefEl=$("brief"), preview=$("preview"), statusEl=$("status"), genBtn=$("genBtn");
 const pdfBtn=$("pdfBtn"), docxBtn=$("docxBtn"), mdBtn=$("mdBtn");
@@ -157,7 +146,7 @@ async function renderMarkdown(raw){
   const stripped=raw.replace(/```mermaid\s*([\s\S]*?)```/g,(_,c)=>{ blocks.push(c.trim()); return `\n\n%%MERMAID${blocks.length-1}%%\n\n`; });
   let html=window.marked.parse(stripped,{breaks:false});
   html=html.replace(/(?:<p>)?\s*%%MERMAID(\d+)%%\s*(?:<\/p>)?/g,(_,i)=>`<div class="diagram"><pre class="mermaid">${escapeHtml(blocks[+i])}</pre></div>`);
-  preview.innerHTML=html;
+  preview.innerHTML=DOMPurify.sanitize(html);
   try{ await mermaid.run({ querySelector:"#preview .mermaid" }); }
   catch(e){ document.querySelectorAll("#preview .mermaid").forEach(el=>{ if(!el.querySelector("svg")) el.innerHTML=`<div class="render-error">Błąd składni Mermaid.\n${escapeHtml(String(e.message||e))}</div>`; }); }
 }
@@ -174,10 +163,8 @@ async function generate(){
       headers:{ "content-type":"application/json" },
       body:JSON.stringify({
         brief,
-        model:$("model").value,
         mode:$("mode").value,
-        diagram:$("diagram").value,
-        maxTokens:parseInt($("maxTokens").value,10)||4000
+        diagram:$("diagram").value
       })
     });
     const data=await res.json();
