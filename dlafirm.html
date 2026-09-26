@@ -204,9 +204,10 @@
             </div>
           </div>
           <div class="fg"><label for="msg">Krótki opis potrzeby</label><textarea id="msg" placeholder="Nad czym pracujecie, jaki jest kontekst, czego oczekujecie."></textarea></div>
-          <button class="btn" type="submit">Otwórz wiadomość e-mail</button>
-          <div id="formMsg" aria-live="polite"></div>
-          <p>Formularz otwiera Twój program pocztowy. Sprawdź i wyślij w nim przygotowaną wiadomość.</p>
+          <div aria-hidden="true" style="position:absolute;left:-10000px"><label for="website">Strona internetowa</label><input id="website" tabindex="-1" autocomplete="off"></div>
+          <button class="btn" type="submit">Wyślij zapytanie</button>
+          <div id="formMsg" role="status" aria-live="polite"></div>
+          <p>Wiadomość zostanie wysłana do właściciela strony. Nie wpisuj danych poufnych. Możesz też napisać bezpośrednio na <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a>.</p>
         </form>
       </div>
     </div>
@@ -235,27 +236,40 @@
     });
   });
 
-  // Formularz zapytania — stopgap przez mailto (działa bez backendu).
-  // Formularz otwiera klienta poczty z przygotowaną wiadomością.
-  var TWOJ_EMAIL = "architektura@sensinte.com";
-  document.getElementById("enquiry").addEventListener("submit", function(e){
+  document.getElementById("enquiry").addEventListener("submit", async function(e){
     e.preventDefault();
-    var name=document.getElementById("name").value.trim();
-    var company=document.getElementById("company").value.trim();
-    var email=document.getElementById("email").value.trim();
-    var svc=document.getElementById("svc").value;
-    var msg=document.getElementById("msg").value.trim();
-    var out=document.getElementById("formMsg");
-    if(!name||!email){ out.textContent="Uzupełnij imię i e-mail."; return; }
-    var body =
-      "Imię i nazwisko: "+name+"\n"+
-      "Firma: "+company+"\n"+
-      "E-mail: "+email+"\n"+
-      "Usługa: "+svc+"\n\n"+
-      "Opis:\n"+msg;
-    var href = "mailto:"+TWOJ_EMAIL+"?subject="+encodeURIComponent("Zapytanie: "+svc+" — "+name)+"&body="+encodeURIComponent(body);
-    window.location.href = href;
-    out.textContent = "Sprawdź i wyślij wiadomość w programie pocztowym.";
+    var form = e.currentTarget;
+    var button = form.querySelector('button[type="submit"]');
+    var out = document.getElementById("formMsg");
+    var payload = {
+      name: document.getElementById("name").value.trim(),
+      company: document.getElementById("company").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      service: document.getElementById("svc").value,
+      message: document.getElementById("msg").value.trim(),
+      website: document.getElementById("website").value
+    };
+    if(payload.message.length < 10 || payload.message.length > 3000){
+      out.textContent = "Opisz potrzebę w 10–3000 znakach.";
+      return;
+    }
+    button.disabled = true;
+    out.textContent = "Wysyłanie wiadomości…";
+    try {
+      var response = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      var result = await response.json();
+      if(!response.ok) throw new Error(result.error || "Wysyłka nie powiodła się.");
+      out.textContent = "Wiadomość wysłana. Dziękujemy za kontakt.";
+      form.reset();
+    } catch(error) {
+      out.textContent = error.message || "Wysyłka nie powiodła się. Napisz na architektura@sensinte.com.";
+    } finally {
+      button.disabled = false;
+    }
   });
 </script>
 </body>
