@@ -184,7 +184,7 @@
       <div class="sec-head" style="text-align:center; margin-left:auto; margin-right:auto">
         <div class="eyebrow">Zapytanie</div>
         <h2>Powiedz, czego potrzebujecie</h2>
-        <p>Odpowiadamy zwykle w ciągu 1–2 dni roboczych. Bez zobowiązań.</p>
+        <p>Odpowiadamy zwykle w ciągu 1–2 dni roboczych. Bez zobowiązań. Możesz też napisać bezpośrednio na <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a>.</p>
       </div>
       <div class="form-wrap">
         <form id="enquiry">
@@ -204,8 +204,9 @@
             </div>
           </div>
           <div class="fg"><label for="msg">Krótki opis potrzeby</label><textarea id="msg" placeholder="Nad czym pracujecie, jaki jest kontekst, czego oczekujecie."></textarea></div>
-          <button class="btn" type="submit">Wyślij zapytanie</button>
+          <button class="btn" type="submit">Otwórz wiadomość e-mail</button>
           <div id="formMsg" aria-live="polite"></div>
+          <p>Formularz otwiera Twój program pocztowy. Sprawdź i wyślij w nim przygotowaną wiadomość.</p>
         </form>
       </div>
     </div>
@@ -217,6 +218,7 @@
       <a href="/">Strona główna</a>
       <a href="/generator.html">Generator</a>
       <a href="/lamiglowki.html">Łamigłówki</a>
+      <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a>
       <span class="sp">© <span id="yr"></span> Architekt-Mentor</span>
     </div>
   </footer>
@@ -234,9 +236,8 @@
   });
 
   // Formularz zapytania — stopgap przez mailto (działa bez backendu).
-  // DO ZMIANY: wpisz swój adres w TWÓJ_EMAIL. Docelowo podłącz Formspree
-  // albo własny endpoint /api/enquiry, żeby zbierać zapytania bez otwierania klienta poczty.
-  var TWOJ_EMAIL = "TWÓJ_EMAIL";
+  // Formularz otwiera klienta poczty z przygotowaną wiadomością.
+  var TWOJ_EMAIL = "architektura@sensinte.com";
   document.getElementById("enquiry").addEventListener("submit", function(e){
     e.preventDefault();
     var name=document.getElementById("name").value.trim();
@@ -254,7 +255,7 @@
       "Opis:\n"+msg;
     var href = "mailto:"+TWOJ_EMAIL+"?subject="+encodeURIComponent("Zapytanie: "+svc+" — "+name)+"&body="+encodeURIComponent(body);
     window.location.href = href;
-    out.textContent = "Otwieram Twój program pocztowy z gotowym zapytaniem…";
+    out.textContent = "Sprawdź i wyślij wiadomość w programie pocztowym.";
   });
 </script>
 </body>
