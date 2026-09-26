@@ -39,7 +39,7 @@ vercel env add ANTHROPIC_API_KEY   # wklej klucz; wybierz Production (i Preview)
 vercel --prod                # wdrożenie produkcyjne
 ```
 
-To wszystko. Nie potrzebujesz `package.json` — funkcja używa wbudowanego `fetch` (Node 18+) i nie ma zależności.
+Projekt zawiera `package.json`, ponieważ formularz kontaktowy korzysta z biblioteki Nodemailer do wysyłki przez SMTP.
 
 ---
 
@@ -94,3 +94,17 @@ vercel dev        # uruchamia front + funkcję lokalnie pod http://localhost:300
 - Twardy dzienny cap liczby generacji (ochrona kosztu darmowego narzędzia).
 - Prosty licznik użycia / log (ile generacji, jakie modele) — przyda się do decyzji o monetyzacji.
 - Dopiero potem: konta, zapisywanie projektów, płatności.
+
+## Formularz kontaktowy dla firm
+
+Formularz na `/dlafirm.html` wysyła dane do `/api/enquiry` na Vercel. Funkcja wysyła wiadomość przez SMTP w LH.pl, z adresem odwiedzającego w `Reply-To`. Dane logowania nie są przesyłane do przeglądarki ani do repozytorium.
+
+Do uruchomienia ustaw w projekcie Vercel `project-ead46` zmienne **Production**:
+
+- `LH_SMTP_HOST` — nazwa serwera SMTP z LH.pl, np. `mail-serwerXXXXX.lh.pl` dla hostingu współdzielonego albo `cXXXXX.lh.pl` dla Cloud Server.
+- `LH_SMTP_USER` — adres nadawcy w domenie sensinte.com. Zalecana osobna skrzynka `formularz@sensinte.com`; można też użyć `architektura@sensinte.com`.
+- `LH_SMTP_PASSWORD` — hasło skrzynki nadawczej. Dodaj jako sekret tylko w panelu Vercel; **nigdy nie podawaj hasła w rozmowie ani w repozytorium**.
+
+Następnie wdróż ponownie projekt, aby funkcja odczytała nowe zmienne, i wyślij próbne zapytanie z formularza. Bez kompletu zmiennych funkcja zwraca 503 oraz adres do bezpośredniego kontaktu. Do czasu zakończenia konfiguracji nie scalaj PR włączającego nowy formularz.
+
+Ograniczenia ochrony: ukryte pole przechwytuje proste boty, a pomocniczy limit 3 zgłoszeń/15 minut/IP działa w pamięci pojedynczej instancji Vercel. Nie jest globalną gwarancją; przy większym ruchu dołóż wspólny limit i weryfikację antybotową po stronie serwera. Nie loguj treści zapytań.
