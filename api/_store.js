@@ -21,7 +21,7 @@ async function storeWithConsent(record) {
     if (response.status === 503) {
       try {
         const data = await response.json();
-        const codes = new Set(['db_auth', 'db_not_found', 'table_not_found', 'db_connect', 'db_error', 'mysql_driver_missing', 'storage_error']);
+        const codes = new Set(['db_login', 'db_grant', 'db_not_found', 'table_not_found', 'db_connect', 'db_error', 'mysql_driver_missing', 'storage_error']);
         if (codes.has(data?.code)) return { saved: false, storageCode: data.code };
       } catch {
         // The host may return an HTML error page.
