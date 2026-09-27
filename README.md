@@ -108,3 +108,22 @@ Do uruchomienia ustaw w projekcie Vercel `project-ead46` zmienne **Production**:
 Następnie wdróż ponownie projekt, aby funkcja odczytała nowe zmienne, i wyślij próbne zapytanie z formularza. Bez kompletu zmiennych funkcja zwraca 503 oraz adres do bezpośredniego kontaktu. Do czasu zakończenia konfiguracji nie scalaj PR włączającego nowy formularz.
 
 Ograniczenia ochrony: ukryte pole przechwytuje proste boty, a pomocniczy limit 3 zgłoszeń/15 minut/IP działa w pamięci pojedynczej instancji Vercel. Nie jest globalną gwarancją; przy większym ruchu dołóż wspólny limit i weryfikację antybotową po stronie serwera. Nie loguj treści zapytań.
+
+
+## Opcjonalny zapis briefów/HLD i odpowiedzi na łamigłówki (przygotowane, nieaktywne do konfiguracji)
+
+Zapis jest dobrowolny: pola wyboru są domyślnie odznaczone. Bez ich zaznaczenia treści nadal są przetwarzane przez dotychczasowy model AI, ale aplikacja nie próbuje ich zapisać w bazie. Przy zapisie HLD przechowujemy brief, wynik, model i opcje; przy łamigłówce pierwszą odpowiedź z pytaniem naprowadzającym oraz poprawioną odpowiedź z oceną. Etapy mają wspólny losowy identyfikator próby. Nie zapisujemy w tych tabelach adresu IP, adresu e-mail ani identyfikatora konta. Serwery dostawców mogą prowadzić własne dzienniki techniczne.
+
+Baza `serwer428682_architektmentor` jest oddzielna od WordPressa. Vercel **nie łączy się bezpośrednio z MySQL**. Wysyła żądanie HTTPS do `storage-bridge/save.php` na LH.pl z tajnym tokenem; PHP zapisuje dane do lokalnej bazy przez PDO z zapytaniami parametryzowanymi. Endpoint ma tylko zapis, bez publicznego odczytu. Błąd zapisu nie odbiera użytkownikowi wygenerowanego wyniku.
+
+### Uruchomienie na LH.pl
+
+1. W phpMyAdmin wybierz bazę `serwer428682_architektmentor` i uruchom `storage-bridge/schema.sql`. **Sprawdź wybraną bazę przed importem.** Nie uruchamiaj go w bazie WordPressa.
+2. Utwórz pod HTTPS odrębny katalog lub subdomenę na LH.pl z PHP 8.2 lub nowszym. Wgraj `save.php` oraz `.htaccess` do tego katalogu. W tym samym katalogu stwórz `config.local.php` na podstawie `config.example.php`; wpisz host MySQL z panelu LH.pl (`sql189.lh.pl`), nazwę bazy i jej indywidualnego użytkownika, hasło bazy oraz osobny losowy token o długości przynajmniej 32 znaków. Prawdziwy `config.local.php` **nie trafia do repozytorium**. Zabezpiecz dostęp do niego przed HTTP (403).
+3. Ustaw w Vercel Preview i Production dwa sekrety: `LH_STORAGE_URL` (pełny adres HTTPS zakończony `/save.php`) i `LH_STORAGE_TOKEN` (ten sam losowy token). Hasła MySQL nie wpisuj do Vercel. Po zmianie sekretów wdrożenie musi zostać odświeżone.
+4. Wgraj `cleanup.php` do katalogu i skonfiguruj w LH.pl **codzienne zadanie cron z interpreterem PHP**, uruchamiające ten plik. Zapisy mają termin ważności 90 dni, a cron fizycznie usuwa przeterminowane rekordy. Bez działającego crona nie należy deklarować automatycznego usuwania ani włączać funkcji.
+5. Przed scaleniem zmian sprawdź, że żądanie bez tokenu zwraca 401, pliki konfiguracyjne nie są dostępne przez WWW, zapis za zgodą pojawia się w obu tabelach, zapis bez zgody nie tworzy rekordu, a po błędzie przechowywania wynik wciąż dociera do użytkownika. Dodaj do informacji o prywatności strony opis celu, zakresu, odbiorców, terminu i sposobu żądania usunięcia. Identyfikator zapisu pokazywany na stronie ułatwia jego odnalezienie do ręcznego usunięcia w phpMyAdmin.
+
+Stan testów 28.09.2026: uwierzytelniony test połączenia z MySQL przeszedł (`SELECT 1`), a zapis fikcyjnego HLD przez pośrednik PHP zwrócił 201. Nadal wymagane są test z podglądu Vercel, test zapisu odpowiedzi na łamigłówkę, harmonogram usuwania oraz informacja o prywatności. Po zmianie sekretu Vercel potrzebne jest nowe wdrożenie.
+
+Wskazówka: w LH.pl zdalne połączenie z MySQL może pozostać wyłączone; pośrednik PHP uruchamia się na serwerze bazy. Nie publikuj prawdziwego pliku konfiguracyjnego ani tokenu w GitHubie czy w rozmowie.

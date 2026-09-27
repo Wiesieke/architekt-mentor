@@ -71,6 +71,7 @@ End with a closing MENTOR NOTE (blockquote): the handoff.
 Calm, precise, mentoring; encouraging but candid; clarity over jargon.`;
 
 // ---- Guardrails (chronią Twój rachunek) ----
+const { storeWithConsent } = require("./_store");
 const ALLOWED_MODELS = new Set(["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8"]);
 const MAX_BRIEF_CHARS = 30000;    // limit długości briefu w ZNAKACH (było 6000 — za mało)
 const MODEL_MAX_OUT = {           // sufit tokenów WYJŚCIA per model (bezpieczny dla API)
@@ -134,7 +135,8 @@ module.exports = async (req, res) => {
     const data = await r.json();
     if (!r.ok) { res.status(r.status).json({ error: (data.error && data.error.message) || "Błąd API." }); return; }
     const text = (data.content || []).map(b => b.text || "").join("\n");
-    res.status(200).json({ text, usage: data.usage || null });
+    const storage = await storeWithConsent({ consent: body.saveHld === true, type: "hld", brief, hld: text, model, mode, diagram });
+    res.status(200).json({ text, usage: data.usage || null, ...storage });
   } catch (e) {
     res.status(500).json({ error: String(e.message || e) });
   }

@@ -1,5 +1,6 @@
-// Formative feedback for one public architecture puzzle. No answers are stored.
+// Formative feedback for one public architecture puzzle. Optional storage requires explicit user choice.
 const puzzles = require("../data/puzzles.json");
+const { storeWithConsent, randomUUID } = require("./_store");
 const MODEL = "claude-haiku-4-5";
 const LIMIT = 5, WINDOW_MS = 60_000;
 const attempts = new Map();
@@ -40,6 +41,9 @@ module.exports = async (req, res) => {
   const answer = body.answer.trim();
   if (answer.length < 40 || answer.length > 4000) return res.status(400).json({ error: "Odpowiedź powinna mieć od 40 do 4000 znaków." });
 
+  const saveAnswer = body.saveAnswer === true;
+  const attemptId = typeof body.attemptId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.attemptId)
+    ? body.attemptId : randomUUID();
   const criteria = puzzle.coach.criteria;
   const instructions = [
     "Jesteś doświadczonym mentorem architektury. Oceniasz rozumowanie, a nie zgodność słów z wzorcem.",
@@ -86,7 +90,9 @@ module.exports = async (req, res) => {
       if (!criteria.some(c => c.id === result.focusId) || typeof result.positive !== "string" || typeof result.question !== "string" || !result.question.trim()) {
         return res.status(502).json({ error: "Nie udało się odczytać wskazówki. Spróbuj ponownie." });
       }
-      return res.status(200).json({ positive: result.positive.slice(0, 700), question: result.question.slice(0, 700) });
+      const feedback = { positive: result.positive.slice(0, 700), question: result.question.slice(0, 700) };
+      const storage = await storeWithConsent({ consent: saveAnswer, type: "puzzle", attemptId, puzzleId: puzzle.id, stage: "hint", answer, feedback });
+      return res.status(200).json({ ...feedback, attemptId, ...storage });
     }
     if (!Array.isArray(result.criteria) || result.criteria.length !== criteria.length ||
         typeof result.overall !== "string" || typeof result.nextStep !== "string") {
@@ -101,13 +107,15 @@ module.exports = async (req, res) => {
     const scored = criteria.map(c => ({
       label: c.label, points: byId.get(c.id).points, reason: byId.get(c.id).reason.slice(0, 700)
     }));
-    return res.status(200).json({
+    const feedback = {
       score: scored.reduce((sum, c) => sum + c.points, 0),
       maxScore: criteria.length * 2,
       criteria: scored,
       overall: result.overall.slice(0, 900),
       nextStep: result.nextStep.slice(0, 700)
-    });
+    };
+    const storage = await storeWithConsent({ consent: saveAnswer, type: "puzzle", attemptId, puzzleId: puzzle.id, stage: "score", answer, feedback });
+    return res.status(200).json({ ...feedback, attemptId, ...storage });
   } catch (error) {
     console.error("Puzzle coach request failed:", error?.name || "Error");
     return res.status(502).json({ error: "Ocena jest chwilowo niedostępna. Spróbuj ponownie." });

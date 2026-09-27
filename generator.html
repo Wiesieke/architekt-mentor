@@ -130,6 +130,7 @@
       <textarea id="brief" spellcheck="false" placeholder="Opisz w paru zdaniach, co ma powstać — np. 'Aplikacja dla kurierów do odbioru zleceń i potwierdzania dostaw.'"></textarea>
       <div class="toolbar">
         <button id="genBtn">Generuj HLD</button>
+        <div style="font-size:12px;line-height:1.4;max-width:270px"><label><input type="checkbox" id="saveHld"> Zapisz brief i wynik na 90 dni, aby rozwijać narzędzie. Nie wpisuj danych poufnych.</label><br><a href="/informacja-o-danych.html" target="_blank" rel="noopener">Jak przetwarzamy dane?</a></div>
         <span id="status" class="status">Wpisz brief i kliknij Generuj (Ctrl/Cmd+Enter).</span>
       </div>
     </section>
@@ -180,7 +181,8 @@ async function generate(){
         model:$("model").value,
         mode:$("mode").value,
         diagram:$("diagram").value,
-        maxTokens:parseInt($("maxTokens").value,10)||4000
+        maxTokens:parseInt($("maxTokens").value,10)||4000,
+        saveHld:$("saveHld").checked
       })
     });
     const data=await res.json();
@@ -190,7 +192,8 @@ async function generate(){
     await renderMarkdown(data.text);
     setExportsEnabled(true);
     const u=data.usage||{};
-    setStatus(`Gotowe. Tokeny: wejście ${u.input_tokens??"?"}, wyjście ${u.output_tokens??"?"}.`,"");
+    const storageNote = data.saved === true ? ` Zapisano (ID: ${data.recordId}).` : data.saved === false ? ` Nie udało się zapisać (kod: ${data.storageCode || "unknown"}); pobierz wynik na swoje urządzenie.` : " Wynik nie został zapisany.";
+    setStatus(`Gotowe. Tokeny: wejście ${u.input_tokens??"?"}, wyjście ${u.output_tokens??"?"}.` + storageNote, data.saved === false ? "err" : "");
   }catch(e){
     preview.innerHTML='<p class="placeholder">—</p>';
     setStatus("Błąd: "+String(e.message||e),"err");

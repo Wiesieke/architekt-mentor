@@ -167,7 +167,7 @@
       <div class="q"><span class="eyebrow">Zadanie</span><p>${esc(p.question)}</p></div>
       <label class="fld" for="ans">${p.coach ? "Twoja odpowiedź — decyzja i uzasadnienie" : "Twoja odpowiedź (dla siebie — nie jest nigdzie wysyłana)"}</label>
       <textarea id="ans" maxlength="4000" placeholder="Jaką decyzję podejmiesz? Co trzeba sprawdzić i dlaczego?"></textarea>
-      ${p.coach ? `<p class="coach-note">Po kliknięciu „Sprawdź odpowiedź” tekst trafi do Anthropic w celu oceny. Nie zapisujemy go na serwerze. Nie wpisuj danych poufnych.</p><button class="btn" id="coachBtn">Sprawdź odpowiedź</button><div class="coach-status" id="coachStatus" role="status" aria-live="polite"></div><div id="coachResult" aria-live="polite"></div>` : ""}
+      ${p.coach ? `<p class="coach-note">Po kliknięciu „Sprawdź odpowiedź” tekst trafi do Anthropic w celu oceny. Możesz wybrać zapis odpowiedzi i oceny przez 90 dni. Nie wpisuj danych poufnych.</p><label style="display:block;margin:0 0 4px;font-size:13px"><input type="checkbox" id="saveAnswer"> Zapisz bez zakładania konta odpowiedź i ocenę, aby rozwijać narzędzie (90 dni).</label><p style="font-size:13px;margin:0 0 12px"><a href="/informacja-o-danych.html" target="_blank" rel="noopener">Jak przetwarzamy dane?</a></p><button class="btn" id="coachBtn">Sprawdź odpowiedź</button><div class="coach-status" id="coachStatus" role="status" aria-live="polite"></div><div id="coachResult" aria-live="polite"></div>` : ""}
       ${hints ? `<details class="hints"><summary>Podpowiedzi — kliknij, jeśli utkniesz</summary><ul>${hints}</ul></details>` : ""}
       <button class="btn sm" id="revealBtn">Pokaż analizę seniora${p.coach ? " bez oceny" : ""}</button>
       <div id="reveal">
@@ -188,6 +188,7 @@
 
   function initCoach(p){
     let stage = "hint";
+    let attemptId = null;
     const button = document.getElementById("coachBtn");
     const answer = document.getElementById("ans");
     const status = document.getElementById("coachStatus");
@@ -202,10 +203,12 @@
       try {
         const response = await fetch("/api/evaluate-puzzle", {
           method:"POST", headers:{"content-type":"application/json"},
-          body:JSON.stringify({puzzleId:p.id, stage, answer:value})
+          body:JSON.stringify({puzzleId:p.id, stage, answer:value, attemptId, saveAnswer:document.getElementById("saveAnswer").checked})
         });
         const data = await response.json();
         if(!response.ok) throw new Error(data.error || "Błąd oceny.");
+        attemptId = data.attemptId || attemptId;
+        const storageNote = data.saved === true ? " Zapisano (ID: " + data.recordId + ")." : data.saved === false ? " Nie udało się zapisać; zachowaj odpowiedź u siebie." : "";
         container.replaceChildren();
         const box = document.createElement("section");
         box.className = "coach-box";
@@ -221,7 +224,7 @@
           question.appendChild(strong);
           box.append(positive, question);
           container.appendChild(box);
-          status.textContent = "Uzupełnij odpowiedź powyżej, a potem sprawdź wynik.";
+          status.textContent = "Uzupełnij odpowiedź powyżej, a potem sprawdź wynik." + storageNote;
           button.textContent = "Oceń poprawioną odpowiedź";
           stage = "score";
         } else {
@@ -247,7 +250,7 @@
           next.textContent = "Co dalej: " + data.nextStep;
           box.append(summary, next);
           container.appendChild(box);
-          status.textContent = "To ocena pomocnicza. Porównaj ją z pełną analizą seniora poniżej.";
+          status.textContent = "To ocena pomocnicza. Porównaj ją z pełną analizą seniora poniżej." + storageNote;
           button.remove();
           const reveal = document.getElementById("revealBtn");
           reveal.textContent = "Pokaż pełną analizę seniora";
