@@ -37,6 +37,9 @@ function validText(mixed $value, int $min, int $max): bool {
 
 if (empty($record['consent']) || !validId($record['id'] ?? null)) reply(400, ['error' => 'Invalid record']);
 try {
+    if (!in_array('mysql', PDO::getAvailableDrivers(), true)) {
+        reply(503, ['error' => 'Storage unavailable', 'code' => 'mysql_driver_missing']);
+    }
     $pdo = new PDO(
         'mysql:host=' . $config['host'] . ';dbname=' . $config['database'] . ';charset=utf8mb4',
         $config['user'], $config['password'],
@@ -59,8 +62,19 @@ try {
         $stmt->execute([$record['id'], $record['attemptId'], $record['puzzleId'], $record['stage'], $record['answer'], $feedback]);
     } else reply(400, ['error' => 'Unknown record type']);
     reply(201, ['ok' => true]);
+} catch (PDOException $error) {
+    // Only a fixed category is returned. SQL messages can include the submitted data.
+    $driverCode = (int)($error->errorInfo[1] ?? 0);
+    $category = match ($driverCode) {
+        1044, 1045 => 'db_auth',
+        1049 => 'db_not_found',
+        1146 => 'table_not_found',
+        2002, 2003, 2005 => 'db_connect',
+        default => 'db_error',
+    };
+    error_log('Mentor storage PDO failure category: ' . $category);
+    reply(503, ['error' => 'Storage unavailable', 'code' => $category]);
 } catch (Throwable $error) {
-    // Never return SQL details, submitted content or credentials to callers.
     error_log('Mentor storage write failed: ' . get_class($error));
-    reply(503, ['error' => 'Storage unavailable']);
+    reply(503, ['error' => 'Storage unavailable', 'code' => 'storage_error']);
 }
