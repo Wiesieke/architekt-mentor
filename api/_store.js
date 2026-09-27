@@ -4,7 +4,10 @@ async function storeWithConsent(record) {
   if (record.consent !== true) return { saved: null };
   const url = process.env.LH_STORAGE_URL;
   const token = process.env.LH_STORAGE_TOKEN;
-  if (!url || !token || !/^https:\/\/[^/?#]+\/[a-z0-9/_-]+\.php$/i.test(url)) return { saved: false };
+  if (!url || !token) return { saved: false, storageCode: 'missing_settings' };
+  if (!/^https:\/\/[^/?#]+\/[a-z0-9/_-]+\.php$/i.test(url)) {
+    return { saved: false, storageCode: 'invalid_url' };
+  }
   const id = randomUUID();
   try {
     const response = await fetch(url, {
@@ -13,10 +16,11 @@ async function storeWithConsent(record) {
       body: JSON.stringify({ ...record, id }),
       signal: AbortSignal.timeout(6000)
     });
-    return response.status === 201 ? { saved: true, recordId: id } : { saved: false };
-  } catch {
-    // Generating/assessing content must still work if optional storage fails.
-    return { saved: false };
+    if (response.status === 201) return { saved: true, recordId: id };
+    // Status only: never expose response bodies, tokens, submitted content or SQL errors.
+    return { saved: false, storageCode: 'http_' + response.status };
+  } catch (error) {
+    return { saved: false, storageCode: error?.name === 'TimeoutError' ? 'timeout' : 'connection' };
   }
 }
 
