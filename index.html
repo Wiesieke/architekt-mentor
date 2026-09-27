@@ -31,6 +31,8 @@
   nav .links{margin-left:auto; display:flex; gap:22px; align-items:center}
   nav .links a{color:var(--ink-soft); font-size:14px; font-weight:500}
   nav .links a:hover{color:var(--accent-deep)}
+  @media (max-width:900px){nav .wrap{height:auto; min-height:60px; padding-top:10px; padding-bottom:10px; flex-wrap:wrap}nav .links{margin-left:0; width:100%; flex-wrap:wrap; gap:8px 16px}}
+  @media (max-width:620px){nav .links a[href="#jak"],nav .links a[href="#roznica"],nav .links a[href="#omnie"]{display:none}}
   .btn{display:inline-block; font-weight:600; border-radius:7px; padding:11px 22px; font-size:15px; cursor:pointer; border:0}
   .btn-primary{background:var(--accent); color:#fff}
   .btn-primary:hover{background:var(--accent-deep)}
@@ -136,6 +138,8 @@
       <a href="#jak">Jak działa</a>
       <a href="#roznica">Czym się różni</a>
       <a href="#zywy">Wiedza</a>
+      <a href="/architektura-w-ruchu.html">W ruchu</a>
+      <a href="/podstawy-architektury.html">Podstawy</a>
       <a href="/dlafirm.html">Dla firm</a>
       <a href="#omnie">O mnie</a>
       <a class="btn btn-primary btn-sm" href="/generator.html">Otwórz generator</a>
@@ -242,6 +246,18 @@
         <p>Prawdziwe przykłady złych decyzji architektonicznych i ich konsekwencji. Najlepiej uczą historie porażek — i tego, jak było je widać z wyprzedzeniem.</p>
         <a class="btn btn-primary btn-sm" href="/antywzorce.html">Czytaj antywzorce →</a>
       </div>
+      <div class="live-card">
+        <div class="tag">Wybrane zmiany</div>
+        <h3>Architektura w ruchu</h3>
+        <p>Nowe rozwiązania i praktyki, ale bez gonienia za modą: co się zmieniło, kiedy to ma znaczenie i jakie pytania warto zadać przed wdrożeniem. Każdy materiał ma datę i źródło.</p>
+        <a class="btn btn-primary btn-sm" href="/architektura-w-ruchu.html">Zobacz nowości →</a>
+      </div>
+      <div class="live-card">
+        <div class="tag">Fundamenty</div>
+        <h3>Podstawy architektury</h3>
+        <p>Od opisu problemu i modeli C4 po ADR, TOGAF, ArchiMate oraz wzorce integracji i odporności. Krótki przewodnik z przykładami i odnośnikami do źródeł.</p>
+        <a class="btn btn-primary btn-sm" href="/podstawy-architektury.html">Poznaj podstawy →</a>
+      </div>
     </div>
   </div>
 </section>
@@ -331,6 +347,8 @@
   <div class="wrap">
     <div class="brand" style="color:#fff">Architekt<span style="color:#8FB8E0">-Mentor</span></div>
     <a href="/generator.html">Generator</a>
+    <a href="/architektura-w-ruchu.html">W ruchu</a>
+    <a href="/podstawy-architektury.html">Podstawy</a>
     <a href="#jak">Jak działa</a>
     <a href="#omnie">O mnie</a>
     <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a>
