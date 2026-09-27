@@ -18,6 +18,15 @@ async function storeWithConsent(record) {
     });
     if (response.status === 201) return { saved: true, recordId: id };
     // Status only: never expose response bodies, tokens, submitted content or SQL errors.
+    if (response.status === 503) {
+      try {
+        const data = await response.json();
+        const codes = new Set(['db_auth', 'db_not_found', 'table_not_found', 'db_connect', 'db_error', 'mysql_driver_missing', 'storage_error']);
+        if (codes.has(data?.code)) return { saved: false, storageCode: data.code };
+      } catch {
+        // The host may return an HTML error page.
+      }
+    }
     return { saved: false, storageCode: 'http_' + response.status };
   } catch (error) {
     return { saved: false, storageCode: error?.name === 'TimeoutError' ? 'timeout' : 'connection' };
