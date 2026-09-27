@@ -189,7 +189,7 @@ async function generate(){
     await renderMarkdown(data.text);
     setExportsEnabled(true);
     const u=data.usage||{};
-    const storageNote = data.saved === true ? ` Zapisano (ID: ${data.recordId}).` : data.saved === false ? " Nie udało się zapisać; pobierz wynik na swoje urządzenie." : " Wynik nie został zapisany.";
+    const storageNote = data.saved === true ? ` Zapisano (ID: ${data.recordId}).` : data.saved === false ? ` Nie udało się zapisać (kod: ${data.storageCode || "unknown"}); pobierz wynik na swoje urządzenie.` : " Wynik nie został zapisany.";
     setStatus(`Gotowe. Tokeny: wejście ${u.input_tokens??"?"}, wyjście ${u.output_tokens??"?"}.` + storageNote, data.saved === false ? "err" : "");
   }catch(e){
     preview.innerHTML='<p class="placeholder">—</p>';
