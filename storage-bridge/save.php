@@ -66,7 +66,8 @@ try {
     // Only a fixed category is returned. SQL messages can include the submitted data.
     $driverCode = (int)($error->errorInfo[1] ?? 0);
     $category = match ($driverCode) {
-        1044, 1045 => 'db_auth',
+        1044 => 'db_grant',
+        1045 => 'db_login',
         1049 => 'db_not_found',
         1146 => 'table_not_found',
         2002, 2003, 2005 => 'db_connect',
