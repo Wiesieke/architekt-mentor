@@ -35,7 +35,8 @@ function validText(mixed $value, int $min, int $max): bool {
     return is_string($value) && strlen($value) >= $min && strlen($value) <= $max;
 }
 
-if (empty($record['consent']) || !validId($record['id'] ?? null)) reply(400, ['error' => 'Invalid record']);
+$healthCheck = ($record['type'] ?? null) === 'health';
+if (!$healthCheck && (empty($record['consent']) || !validId($record['id'] ?? null))) reply(400, ['error' => 'Invalid record']);
 try {
     if (!in_array('mysql', PDO::getAvailableDrivers(), true)) {
         reply(503, ['error' => 'Storage unavailable', 'code' => 'mysql_driver_missing']);
@@ -45,6 +46,10 @@ try {
         $config['user'], $config['password'],
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false]
     );
+    if ($healthCheck) {
+        $pdo->query('SELECT 1');
+        reply(200, ['ok' => true]);
+    }
     if (($record['type'] ?? '') === 'hld') {
         if (!validText($record['brief'] ?? null, 1, 120000) || !validText($record['hld'] ?? null, 1, 150000) ||
             !validText($record['model'] ?? null, 1, 60) ||
