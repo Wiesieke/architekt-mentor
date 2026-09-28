@@ -1,4 +1,4 @@
 import { defineConfig } from 'astro/config';
 
-// Prototype only: the branch preview intentionally contains two new pages.
+// Static magazine. Existing Vercel /api functions remain at the repository root.
 export default defineConfig({ output: 'static' });
