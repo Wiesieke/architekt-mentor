@@ -9,11 +9,13 @@ import adr from '../content/articles/en/adr.html?raw';
 import ramy from '../content/articles/en/ramy.html?raw';
 import wzorce from '../content/articles/en/wzorce.html?raw';
 import checklista from '../content/articles/en/checklista.html?raw';
+import slo from '../content/articles/en/slo-error-budget.html?raw';
 import type { Article } from './articles';
 
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'slo-error-budget', plSlug:'slo-budzet-bledow', title:'SLOs and error budgets: from measurement to decisions', description:'Define an SLI for a user journey, calculate an error budget and use it to guide an architecture decision.', topic:'Reliability', published:'2026-09-28', body:slo },
   { section:'architecture-in-motion', slug:'postgresql-19-beta4', plSlug:'postgresql-19-beta4', title:'PostgreSQL 19 Beta 4: features removed before release', description:'Which features were removed from PostgreSQL 19 Beta 4, and what does that mean for a migration decision?', topic:'Databases', published:'2026-09-28', eventDate:'2026-09-24', body:postgresql },
   { section:'architecture-in-motion', slug:'otel-k8s', plSlug:'otel-k8s', title:'OpenTelemetry: Kubernetes attributes processor reaches 1.0', description:'Stable Kubernetes attributes and the migration questions behind consistent telemetry.', topic:'Observability', eventDate:'2026-09-16', body:otel },
   { section:'architecture-in-motion', slug:'platform-contracts', plSlug:'platforma', title:'A self-service platform also needs contracts between teams', description:'Why an internal platform needs clear ownership and interfaces alongside templates.', topic:'Platform engineering', eventDate:'2026-09-01', body:platforma },
