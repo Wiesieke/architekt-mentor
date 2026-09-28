@@ -1,9 +1,15 @@
-# English edition
+# Bilingual ArchitectMentor
 
-The Polish site keeps its existing URLs. The English editorial edition lives under `/en/` and contains the homepage, both article archives and the English versions of all 11 current articles. Interactive exercises, the HLD and ADR tools, the business form and the data notice currently remain in Polish; English navigation links only to translated pages or the contact email.
+English is the primary edition at `/en/`. The Polish homepage is `/pl/`; established Polish article, exercise and tool URLs stay where they are. Only `/` selects a language automatically: Vercel Routing Middleware reads the country header and sends PL visitors to `/pl/`, and everyone else to `/en/` with a temporary redirect. An explicit language URL always remains stable, so a reader's choice takes precedence over the country guess. Local/static fallback at `/` goes to English.
 
-`astro.config.mjs` uses `pl` as the default locale without a URL prefix. `Studio.astro` renders the language switch, page language, canonical and reciprocal `hreflang` links for translated pairs. The switch on a Polish page without a translation opens the English homepage. In previews, the site still has `noindex,nofollow`.
+The site has two full editorial editions: 11 articles, four anti-patterns and four exercises in each language. English also has the ADR editor, HLD generator, business enquiry form and data notice. The English exercise posts `locale: 'en'` to `/api/evaluate-puzzle`; the server supplies translated scenarios and criteria from `data/puzzle-coach-en.json`. The English HLD client posts `locale: 'en'` to `/api/generate`. The English contact form translates its displayed service name to the existing server's accepted value.
 
-When adding an editorial article, create the Polish content in `src/content/articles/`, its English counterpart in `src/content/articles/en/`, and add both entries in `src/data/articles.ts` and `src/data/articles-en.ts`. The English entry has its own URL slug and a `plSlug` pointing to its Polish counterpart. Keep the event date separate from the publication date; do not invent a publication date for historical content. Check sources and terminology before publishing a translation. The sitemap uses both lists and `hreflang` appears only on real pairs.
+`Studio.astro` renders the document language, switch, self canonical and reciprocal `hreflang` for actual translated pairs. The two homepages also point to `/` as `x-default`. Vercel production builds are indexable and publish both editions in `/sitemap.xml`; previews are noindex. To check this locally, use `VERCEL_ENV=production npm run build`. A normal local build emulates a preview.
 
-If an article is published in only one language, avoid creating an empty translation or a language alternate for it. Extend the English edition to exercises and tools only when the forms, validation, AI output, privacy text and download formats all use the selected language.
+## Weekly publishing
+
+Publish the Polish and English versions together where the translation is ready. For articles, add content under `src/content/articles/` and `src/content/articles/en/`, then update `src/data/articles.ts` and `src/data/articles-en.ts`. English slugs may differ; `plSlug` links each pair. Keep technology event dates separate from publication dates, verify primary sources, and mark interpretation clearly.
+
+For new exercises, update `data/puzzles.json`, `src/data/puzzles-en.ts` and, if AI coaching is available, `data/puzzle-coach-en.json` with matching criterion IDs. For anti-patterns, update `data/antywzorce.json` and `src/data/antipatterns-en.ts`. Update both weekly homepage lists: `src/data/editions.ts` for Polish and `src/pages/en/index.astro` for English. Add routes to the sitemap when a new route type appears. Check both language links, the mentor output language, forms, downloaded files, and Vercel preview before publishing.
+
+Never invent a translation or attach `hreflang` to a page that has no real counterpart. Preserve anonymity and clearly mark fictional examples.
