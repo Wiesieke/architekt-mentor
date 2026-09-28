@@ -3,7 +3,7 @@ import Studio from '../../layouts/Studio.astro';
 import patterns from '../../../data/antywzorce.json';
 const items = [...patterns].sort((a,b) => b.date.localeCompare(a.date));
 ---
-<Studio title="Antywzorce architektoniczne" description="Praktyczne antywzorce architektury IT: objawy, konsekwencje, sposoby naprawy i pytania do projektu.">
+<Studio translationUrl="/en/anti-patterns/" title="Antywzorce architektoniczne" description="Praktyczne antywzorce architektury IT: objawy, konsekwencje, sposoby naprawy i pytania do projektu.">
  <div class="container archive"><div class="eyebrow">Magazyn · ucz się na decyzjach</div><h1>Antywzorce</h1><p>Rozpoznaj sytuacje, w których pozorny skrót komplikuje system. Przykłady są fikcyjne lub maksymalnie uogólnione.</p><div class="cards">{items.map(item => <article><small>{item.date}</small><h2><a href={`/antywzorce/${item.id}/`}>{item.title}</a></h2><p>{item.summary}</p><a href={`/antywzorce/${item.id}/`}>Czytaj antywzorzec →</a></article>)}</div></div>
 </Studio>
 <style>

@@ -1,0 +1,53 @@
+---
+import Studio from '../../layouts/Studio.astro';
+---
+<Studio locale="en" translationUrl="/dlafirm/" title="For business" description="Architecture reviews, HLD drafts and focused consultations. Discuss your project with an architect.">
+  <div class="container business">
+    <div class="eyebrow">For business</div>
+    <h1>Need an architecture review?</h1>
+    <p class="lead">Describe your challenge, its scope and expected result. I will suggest a useful starting point and type of collaboration.</p>
+    <div class="offer-grid">
+      <article><span>01 / HLD</span><h2>HLD in 5 days</h2><p>A draft solution based on your brief. The first pass organises assumptions; an architect checks decisions, risks and open questions.</p><a href="#enquiry" data-svc="HLD in 5 days">Send an enquiry →</a></article>
+      <article><span>02 / Review</span><h2>Architecture review</h2><p>Review an existing system or proposal: dependencies, qualities, constraints and paths for change.</p><a href="#enquiry" data-svc="Architecture review">Send an enquiry →</a></article>
+      <article><span>03 / Discussion</span><h2>Consultation</h2><p>Discuss one architectural decision, alternatives and how to verify the choice before proceeding.</p><a href="#enquiry" data-svc="Consultation">Send an enquiry →</a></article>
+    </div>
+    <section id="enquiry" class="contact">
+      <div><div class="eyebrow">Contact</div><h2>Tell me what you need</h2><p>Your message goes directly to <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a>. Do not include confidential information. We usually reply within 1–2 business days.</p><p><a href="/en/data-notice/">Data notice</a></p></div>
+      <form id="enquiry-form">
+        <div class="form-grid"><label>Name <input id="name" name="name" required maxlength="120" autocomplete="name" /></label><label>Company <input id="company" name="company" maxlength="120" autocomplete="organization" /></label><label>Email <input id="email" name="email" type="email" required maxlength="254" autocomplete="email" /></label><label>Service <select id="svc" name="service"><option>HLD in 5 days</option><option>Architecture review</option><option>Consultation</option><option>Not sure yet — advise me</option></select></label></div>
+        <label>Brief description <textarea id="msg" name="message" required minlength="10" maxlength="3000" rows="6" placeholder="What are you working on, what is the context and what outcome do you need?"></textarea></label>
+        <div class="honeypot" aria-hidden="true"><label>Website <input id="website" name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <button class="button" type="submit">Send an enquiry</button>
+        <p id="formMsg" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </div>
+</Studio>
+<script>
+  const form = document.querySelector<HTMLFormElement>('#enquiry-form');
+  const feedback = document.querySelector<HTMLElement>('#formMsg');
+  const service = document.querySelector<HTMLSelectElement>('#svc');
+  document.querySelectorAll<HTMLAnchorElement>('[data-svc]').forEach(link => link.addEventListener('click', () => { if(service) service.value=link.dataset.svc ?? service.value; }));
+  form?.addEventListener('submit', async event => {
+    event.preventDefault();
+    if(!form || !feedback || !form.reportValidity()) return;
+    const button=form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const input=(key:string) => String((form.elements.namedItem(key) as HTMLInputElement | HTMLTextAreaElement)?.value ?? '').trim();
+    const serviceMap:Record<string,string>={"HLD in 5 days":"HLD w 5 dni","Architecture review":"Przegląd architektury","Consultation":"Konsultacja","Not sure yet — advise me":"Nie wiem jeszcze — doradźcie"};
+    const payload={name:input('name'),company:input('company'),email:input('email'),service:serviceMap[input('service')] ?? input('service'),message:input('message'),website:input('website')};
+    if(payload.message.length < 10 || payload.message.length > 3000){feedback.textContent='Describe your need in 10–3000 characters.';return;}
+    if(button) button.disabled=true;
+    feedback.textContent='Sending message…';
+    try{
+      const response=await fetch('/api/enquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const result=await response.json();
+      if(!response.ok) throw new Error(result.error || 'Message could not be sent.');
+      feedback.textContent='Message sent. Thank you for getting in touch.';
+      form.reset();
+    }catch(error){feedback.textContent=error instanceof Error ? error.message : 'Could not send the message. Email architektura@sensinte.com.';}
+    finally{if(button) button.disabled=false;}
+  });
+</script>
+<style>
+  .business{padding:66px 0 100px}.business h1{font-size:clamp(38px,5vw,60px);max-width:17ch;margin:16px 0}.lead{max-width:65ch;color:var(--muted);font-size:18px}.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:44px 0 90px}.offer-grid article{background:#fff;border:1px solid var(--line);padding:26px;border-radius:12px;display:flex;flex-direction:column;min-height:270px}.offer-grid span{font-size:11px;color:var(--teal);font-weight:800;letter-spacing:.1em}.offer-grid h2{font-size:23px;margin:26px 0 10px}.offer-grid p{color:var(--muted);font-size:14px}.offer-grid a{margin-top:auto;color:var(--teal);font-size:13px;font-weight:800}.contact{display:grid;grid-template-columns:.75fr 1.25fr;gap:60px;scroll-margin-top:125px}.contact h2{font-size:35px;margin:14px 0}.contact p{color:var(--muted)}.contact a{color:var(--teal)}form{background:#fff;border:1px solid var(--line);border-radius:13px;padding:30px}form label{display:block;font-weight:700;font-size:13px;margin-bottom:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}form input,form select,form textarea{display:block;width:100%;margin-top:7px;padding:11px 13px;border:1px solid #bdd0c9;background:white;border-radius:7px;color:var(--ink)}form textarea{resize:vertical}.honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}#formMsg{font-size:13px;color:var(--teal);min-height:1.3em;margin:12px 0 0}@media(max-width:780px){.offer-grid,.contact{grid-template-columns:1fr}.offer-grid{margin-bottom:64px}.offer-grid article{min-height:0}.contact{gap:18px}}@media(max-width:520px){.business{padding-top:40px}.form-grid{grid-template-columns:1fr}form{padding:20px}}
+</style>

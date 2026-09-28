@@ -5,7 +5,7 @@ const items = [...puzzles].sort((a,b) => b.date.localeCompare(a.date));
 const latest = items.find(item => item.coach)!;
 const puzzleUrl = (id: string) => id === latest.id ? '/lamiglowka/' : `/lamiglowki/${id}/`;
 ---
-<Studio title="Łamigłówki architektoniczne" description="Archiwum praktycznych łamigłówek: scenariusz, decyzja, pytania i analiza seniora." active="practice">
+<Studio translationUrl="/en/practice/archive/" title="Łamigłówki architektoniczne" description="Archiwum praktycznych łamigłówek: scenariusz, decyzja, pytania i analiza seniora." active="practice">
   <div class="container archive"><div class="eyebrow">Ćwicz decyzje</div><h1>Łamigłówki architektoniczne</h1><p>Wybierz scenariusz. W wybranych ćwiczeniach dostępne są pytanie mentora i ocena odpowiedzi. W każdym możesz przeczytać analizę seniora.</p>
     <div class="cards">{items.map(item => <article><small>{item.date} · {item.difficulty}</small><h2><a href={puzzleUrl(item.id)}>{item.title}</a></h2><p>{item.scenario.split(/\n\n+/)[0]}</p><a href={puzzleUrl(item.id)}>Otwórz ćwiczenie →</a></article>)}</div>
   </div>

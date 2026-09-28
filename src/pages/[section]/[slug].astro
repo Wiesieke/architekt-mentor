@@ -1,6 +1,7 @@
 ---
 import Studio from '../../layouts/Studio.astro';
 import { articles, articleUrl, type Article } from '../../data/articles';
+import { englishUrlForPolishArticle } from '../../data/articles-en';
 
 export function getStaticPaths() {
   return articles.map(article => ({ params: { section: article.section, slug: article.slug }, props: { article } }));
@@ -17,7 +18,7 @@ const schema = {
 };
 const format = (value: string) => new Intl.DateTimeFormat('pl-PL', {dateStyle:'long',timeZone:'UTC'}).format(new Date(`${value}T12:00:00Z`));
 ---
-<Studio title={article.title} description={article.description} published={article.published}>
+<Studio title={article.title} description={article.description} published={article.published} translationUrl={englishUrlForPolishArticle(article.section, article.slug)}>
   <div class="article-page"><div class="container article-wrap">
     <a class="back" href={`/${article.section}/`}>← {sectionTitle}</a>
     <header><div class="eyebrow">{sectionTitle} · {article.topic}</div><h1>{article.title}</h1><p>{article.description}</p>

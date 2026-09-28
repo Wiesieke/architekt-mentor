@@ -1,0 +1,7 @@
+---
+import EnglishPuzzleExercise from '../../../components/EnglishPuzzleExercise.astro';
+import { englishPuzzles, latestEnglishPuzzle } from '../../../data/puzzles-en';
+export function getStaticPaths(){return englishPuzzles.filter(p => p.id !== latestEnglishPuzzle.id).map(p => ({params:{id:p.id},props:{puzzle:p}}));}
+const { puzzle } = Astro.props as {puzzle:(typeof englishPuzzles)[number]};
+---
+<EnglishPuzzleExercise puzzle={puzzle} />

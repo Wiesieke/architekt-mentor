@@ -128,7 +128,7 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model, max_tokens: maxTokens, temperature: 0.3,
-        system: SYSTEM_PROMPT,
+        system: SYSTEM_PROMPT + (body.locale === "en" ? "\n# ENGLISH EDITION OVERRIDE\nRespond entirely in English, including headings and mentor notes, regardless of the brief's language. Standard architecture terms remain unchanged." : ""),
         messages: [{ role: "user", content: userMessage }]
       })
     });

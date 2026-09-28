@@ -1,30 +1,30 @@
 ---
-import Studio from '../../layouts/Studio.astro';
+import Studio from '../../../layouts/Studio.astro';
 ---
-<Studio translationUrl="/en/tools/hld/" title="Generator HLD" description="Zamień brief w roboczy szkic architektury HLD: założenia, pytania, decyzje i diagram." active="tools">
+<Studio locale="en" translationUrl="/narzedzia/hld/" title="HLD generator" description="Turn a brief into a draft high-level design with assumptions, open questions, decisions and a diagram." active="tools">
   <div class="container hld-page">
-    <a class="back" href="/narzedzia/">← Wszystkie narzędzia</a>
-    <div class="eyebrow">Od briefu do projektu rozwiązania</div>
-    <h1>Generator HLD</h1>
-    <p class="intro">Opisz potrzebę biznesową. Otrzymasz szkic HLD z założeniami i pytaniami, które trzeba rozstrzygnąć przed zatwierdzeniem projektu.</p>
-    <p class="note">Brief jest wysyłany do usługi AI. Nie wpisuj danych poufnych ani danych innych osób. Wynik wymaga weryfikacji architekta.</p>
+    <a class="back" href="/en/tools/">← All tools</a>
+    <div class="eyebrow">From brief to solution design</div>
+    <h1>HLD generator</h1>
+    <p class="intro">Describe a business need to receive a draft HLD with assumptions and questions to resolve before design approval.</p>
+    <p class="note">Your brief is sent to an AI provider. Do not enter confidential information or other people’s personal data. An architect must review the result.</p>
     <div class="settings">
       <label>Model <select id="model"><option value="claude-sonnet-4-6">Sonnet 4.6</option><option value="claude-haiku-4-5">Haiku 4.5</option><option value="claude-opus-4-8">Opus 4.8</option></select></label>
-      <label>Zakres <select id="mode"><option value="skeletal">Szkielet</option><option value="full">Pełny</option></select></label>
-      <label>Diagram <select id="diagram"><option value="yes">Tak</option><option value="no">Nie</option></select></label>
-      <label>Limit tokenów odpowiedzi <input id="maxTokens" type="number" value="6000" min="500" max="16000" step="1000" /></label>
+      <label>Scope <select id="mode"><option value="skeletal">Outline</option><option value="full">Full</option></select></label>
+      <label>Diagram <select id="diagram"><option value="yes">Yes</option><option value="no">No</option></select></label>
+      <label>Response token limit <input id="maxTokens" type="number" value="6000" min="500" max="16000" step="1000" /></label>
     </div>
     <div class="workspace">
-      <section class="pane" aria-label="Brief biznesowy">
-        <h2>Brief biznesowy</h2>
-        <textarea id="brief" spellcheck="false" maxlength="30000" aria-label="Brief biznesowy" placeholder="Co ma powstać? Jaki jest cel, odbiorcy, ograniczenia i systemy, z którymi rozwiązanie będzie współpracować?"></textarea>
-        <div class="toolbar"><label class="consent"><input type="checkbox" id="saveHld" /> Zapisz brief i wynik na 90 dni, aby rozwijać narzędzie.</label><a href="/informacja-o-danych.html">Jak przetwarzamy dane?</a></div>
-        <button id="genBtn" class="button" type="button">Generuj HLD</button>
-        <p id="status" class="status" role="status" aria-live="polite">Wpisz brief i kliknij „Generuj HLD”.</p>
+      <section class="pane" aria-label="Business brief">
+        <h2>Business brief</h2>
+        <textarea id="brief" spellcheck="false" maxlength="30000" aria-label="Business brief" placeholder="What are you building? Describe the goal, users, constraints and systems it must integrate with."></textarea>
+        <div class="toolbar"><label class="consent"><input type="checkbox" id="saveHld" /> Save the brief and result for 90 days to improve the tool.</label><a href="/en/data-notice/">How is my data used?</a></div>
+        <button id="genBtn" class="button" type="button">Generate HLD</button>
+        <p id="status" class="status" role="status" aria-live="polite">Enter a brief and select “Generate HLD”.</p>
       </section>
-      <section class="pane result" aria-label="Wynik HLD">
-        <div class="result-head"><h2>Wynik</h2><div class="exports"><button id="pdfBtn" disabled type="button">PDF</button><button id="docxBtn" disabled type="button">DOCX</button><button id="mdBtn" disabled type="button">MD</button></div></div>
-        <article id="preview"><p class="placeholder">Tu pojawi się szkic HLD.</p></article>
+      <section class="pane result" aria-label="HLD result">
+        <div class="result-head"><h2>Result</h2><div class="exports"><button id="pdfBtn" disabled type="button">PDF</button><button id="docxBtn" disabled type="button">DOCX</button><button id="mdBtn" disabled type="button">MD</button></div></div>
+        <article id="preview"><p class="placeholder">Your draft HLD will appear here.</p></article>
       </section>
     </div>
   </div>
@@ -34,7 +34,7 @@ import Studio from '../../layouts/Studio.astro';
 <script is:inline src="https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js"></script>
 <script is:inline src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
 <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script is:inline src="/scripts/hld.js"></script>
+<script is:inline src="/scripts/hld-en.js"></script>
 <style>
   .hld-page{padding-top:38px;padding-bottom:85px}.back{font-size:13px;font-weight:700;color:var(--teal)}h1{font-size:clamp(38px,5vw,58px);margin:16px 0}.intro{max-width:70ch;color:var(--muted)}.note{max-width:85ch;padding:13px 17px;background:var(--mint);border:1px solid #bcd8cd;border-radius:8px;font-size:13px}.settings{display:flex;flex-wrap:wrap;gap:15px;margin:23px 0}.settings label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:800}.settings select,.settings input{padding:9px;border:1px solid #bdcec9;border-radius:7px;background:#fff;color:var(--ink);max-width:205px}.workspace{display:grid;grid-template-columns:minmax(0,42%) minmax(0,58%);background:white;border:1px solid var(--line);border-radius:12px;overflow:hidden}.pane{padding:22px;min-width:0}.pane+.pane{border-left:1px solid var(--line)}.pane h2{font-size:19px;margin:0 0 16px}.pane textarea{display:block;width:100%;min-height:310px;padding:13px;border:1px solid #bdcec9;border-radius:7px;resize:vertical;color:var(--ink)}.toolbar{font-size:12px;color:var(--muted);margin:15px 0;display:grid;gap:6px}.toolbar a{color:var(--teal)}.consent{display:flex;align-items:start;gap:8px}.consent input{margin-top:4px}.status{font-size:12px;margin:13px 0 0;color:var(--muted)}.status.err,.render-error{color:#a43834}.status.run{color:var(--teal)}.result-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.result-head h2{margin:0}.exports{display:flex;gap:5px}.exports button{background:#fff;border:1px solid var(--line);border-radius:5px;color:var(--teal);padding:5px 8px;font-size:12px}.exports button:disabled{opacity:.45;cursor:not-allowed}#preview{max-width:100%;overflow:auto;line-height:1.6;font-size:14px}#preview :global(h1){font-size:26px}#preview :global(h2){font-size:20px;margin-top:24px}#preview :global(h3){font-size:16px}#preview :global(table){border-collapse:collapse;width:100%}#preview :global(td),#preview :global(th){border:1px solid var(--line);padding:7px;text-align:left}#preview :global(blockquote){padding:8px 15px;background:var(--mint);border-left:4px solid var(--teal)}#preview :global(pre){overflow:auto}#preview :global(svg){max-width:100%;height:auto}.diagram{padding:14px;border:1px solid var(--line);overflow:auto}@media(max-width:820px){.workspace{grid-template-columns:1fr}.pane+.pane{border-left:0;border-top:1px solid var(--line)}.pane textarea{min-height:220px}}
 </style>

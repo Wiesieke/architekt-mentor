@@ -4,7 +4,7 @@ import { articles, articleUrl } from '../../data/articles';
 const items = articles.filter(a => a.section === 'architektura-w-ruchu');
 const format = (value: string) => new Intl.DateTimeFormat('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'}).format(new Date(`${value}T12:00:00Z`));
 ---
-<Studio title="Architektura w ruchu" description="Zmiany technologiczne, które mają znaczenie dla architektury IT. Sprawdzone daty, źródła pierwotne i praktyczne pytania do projektu.">
+<Studio title="Architektura w ruchu" description="Zmiany technologiczne, które mają znaczenie dla architektury IT. Sprawdzone daty, źródła pierwotne i praktyczne pytania do projektu." translationUrl="/en/architecture-in-motion/">
   <div class="container archive"><div class="eyebrow">Magazyn · rozwój technologii</div><h1>Architektura w ruchu</h1><p>Co się zmieniło, kiedy i co warto sprawdzić w swojej architekturze? Oddzielamy informację o wydarzeniu od wniosku dla projektu.</p>
     <div class="cards">{items.map(item => <article><div class="meta">{item.topic}{item.eventDate && <> · Wydarzenie: <time datetime={item.eventDate}>{format(item.eventDate)}</time></>}</div><h2><a href={articleUrl(item)}>{item.title}</a></h2><p>{item.description}</p><a class="read" href={articleUrl(item)}>Czytaj artykuł →</a></article>)}</div>
   </div>

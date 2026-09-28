@@ -4,7 +4,7 @@ import { articles, articleUrl } from '../../data/articles';
 const items = articles.filter(a => a.section === 'podstawy-architektury');
 const item = items.find(a => a.slug === 'bulkhead')!;
 ---
-<Studio title="Podstawy architektury IT" description="Architektura korporacyjna i rozwiązań: praktyczne podstawy, wzorce, ramy, opis architektury, C4 i ADR.">
+<Studio title="Podstawy architektury IT" description="Architektura korporacyjna i rozwiązań: praktyczne podstawy, wzorce, ramy, opis architektury, C4 i ADR." translationUrl="/en/foundations/">
  <div class="container archive"><div class="eyebrow">Magazyn · wiedza trwała</div><h1>Podstawy architektury</h1><p>Praktyczne wzorce i metody, które pomagają nazwać ryzyko, porównać rozwiązania i uzasadnić decyzję.</p>
  <article class="featured"><span>WZORZEC · ODPORNOŚĆ</span><h2><a href={articleUrl(item)}>{item.title}</a></h2><p>{item.description}</p><a href={articleUrl(item)}>Przeczytaj artykuł →</a></article>
  <h2 class="archive-title">Pozostałe materiały</h2><div class="cards">{items.filter(a => a !== item).map(article => <article><span>{article.topic}</span><h3><a href={articleUrl(article)}>{article.title}</a></h3><p>{article.description}</p><a href={articleUrl(article)}>Przeczytaj →</a></article>)}</div>
