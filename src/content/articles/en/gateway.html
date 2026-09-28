@@ -1,0 +1,4 @@
+<p>Gateway API v1.6, released on 30 June and covered by Kubernetes on 3 August, moved <code>TCPRoute</code> and <code>UDPRoute</code> to the Standard channel at API version <code>v1</code>. This provides a shared model for describing layer 4 routing by port and protocol.</p>
+<h3>Why does this matter to an architect?</h3><p>For services using raw TCP or UDP, it may be time to reassess dependence on extensions from one controller vendor. Check support in your specific implementation and the migration from older definitions separately: “Standard” does not mean every installation is ready to change.</p>
+<h3>Question for your project</h3><p>Does the current controller support this version of the resources, and how will we migrate without interrupting existing connections?</p>
+<div class="source">Source: <a href="https://kubernetes.io/blog/2026/08/03/gateway-api-v1-6-release/" target="_blank" rel="noopener noreferrer">Kubernetes SIG Network — Gateway API v1.6 ↗</a></div>

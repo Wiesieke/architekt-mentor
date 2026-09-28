@@ -3,6 +3,7 @@ import { articles, articleUrl } from '../data/articles';
 import { latestEditionDate } from '../data/editions';
 import patterns from '../../data/antywzorce.json';
 import puzzles from '../../data/puzzles.json';
+import { englishArticles, englishArticleUrl } from '../data/articles-en';
 
 export const GET: APIRoute = () => {
   // Preview sites remain out of the index. Publish the map only after migration.
@@ -20,6 +21,10 @@ export const GET: APIRoute = () => {
       {path:'/architektura-w-ruchu/'},
       {path:'/podstawy-architektury/'},
       {path:'/antywzorce/'},
+      {path:'/en/'},
+      {path:'/en/architecture-in-motion/'},
+      {path:'/en/foundations/'},
+      ...englishArticles.map(a => ({path:englishArticleUrl(a), modified:a.published})),
       ...articles.map(a => ({path:articleUrl(a), modified:a.published})),
       ...patterns.map(p => ({path:`/antywzorce/${p.id}/`, modified:p.date})),
     ] : [];
