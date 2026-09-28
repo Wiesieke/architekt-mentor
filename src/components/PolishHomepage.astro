@@ -2,7 +2,9 @@
 import Studio from '../layouts/Studio.astro';
 import { editions, latestEditionDate } from '../data/editions';
 import SponsorSlot from './SponsorSlot.astro';
+import { articles, articleUrl } from '../data/articles';
 
+const featuredArticle = articles.filter(article => article.published).sort((a, b) => b.published!.localeCompare(a.published!))[0];
 const editionStart = new Date(`${latestEditionDate}T12:00:00Z`);
 const editionEnd = new Date(editionStart);
 editionEnd.setUTCDate(editionEnd.getUTCDate() + 6);
@@ -17,7 +19,7 @@ const currentEditionCount = editions.filter(item => item.published === latestEdi
         <div class="hero-label"><span class="pulse"></span> Magazyn architektury IT</div>
         <h1>Lepsza architektura zaczyna się od <em>lepszych pytań.</em></h1>
         <p>Architektura korporacyjna i architektura rozwiązań w praktyce. Ćwicz decyzje na konkretnych scenariuszach, poznawaj wzorce i sprawdzaj, co zmienia się w technologiach.</p>
-        <a class="hero-latest" href="/architektura-w-ruchu/postgresql-19-beta4/"><span>NOWY ARTYKUŁ · W RUCHU</span><strong>Co wycofano z PostgreSQL 19 Beta 4?</strong><b aria-hidden="true">↗</b></a>
+        <a class="hero-latest" href={articleUrl(featuredArticle)}><span>NAJNOWSZY ARTYKUŁ · {featuredArticle.section === 'podstawy-architektury' ? 'PODSTAWY' : 'W RUCHU'}</span><strong>{featuredArticle.title}</strong><b aria-hidden="true">↗</b></a>
         <div class="hero-actions"><a class="button warm" href="/lamiglowka/">Rozwiąż łamigłówkę <span aria-hidden="true">↗</span></a><a class="hero-link" href="#sciezki">Poznaj ścieżki <span aria-hidden="true">↓</span></a></div>
         <div class="hero-trust"><span>01&nbsp; Praktyczne scenariusze</span><span>02&nbsp; Ocena według kryteriów</span><span>03&nbsp; Wiedza do zastosowania</span></div>
       </div>
