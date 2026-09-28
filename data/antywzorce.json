@@ -1,5 +1,17 @@
 [
   {
+    "id": "2026-09-wspolna-pula-zaleznosci",
+    "date": "2026-09-28",
+    "title": "Jedna pula dla wszystkich zależności",
+    "summary": "Wspólna pula połączeń i pracowników pozwala wolnej funkcji zająć zasoby potrzebne krytycznej ścieżce. Wzrost limitu bez izolacji odsuwa przeciążenie, ale nie usuwa wspólnej granicy awarii.",
+    "tags": [
+      "odporność",
+      "bulkhead",
+      "zarządzanie obciążeniem"
+    ],
+    "content": "**Przykład fikcyjny.** Nie opisuje konkretnej organizacji ani incydentu.\n\n## Sytuacja\n\nAplikacja obsługuje zamówienia i generuje raporty. Wywołania do obu zewnętrznych usług przechodzą przez tę samą pulę połączeń i kolejkę. Gdy raportowanie zwalnia, jego żądania zajmują pracowników. Zamówienia zaczynają czekać, chociaż ich własna zależność działa poprawnie.\n\n## Gdzie powstaje antywzorzec\n\nKonfiguracja zakłada, że współdzielenie zasobów jest bezkosztowe. Niska ważność raportów nie ma odzwierciedlenia w limitach technicznych. Każde spowolnienie jednej zależności zużywa budżet czasu i współbieżności pozostałych. Podwojenie wspólnej puli może na chwilę zmniejszyć kolejkę, ale przy kolejnym skoku ruchu problem wraca.\n\n## Sygnały ostrzegawcze\n\n- Krytyczne i pomocnicze wywołania korzystają z tej samej nieograniczonej kolejki.\n- Jeden timeout obejmuje operacje o różnych celach jakościowych.\n- Metryki pokazują tylko łączną liczbę połączeń, bez rozróżnienia zależności.\n- Przy awarii dostawcy zwiększa się limit i liczbę ponowień, bez testu wpływu na inne funkcje.\n\n## Lepsza decyzja\n\n1. Nazwij funkcje, które muszą działać podczas awarii innych zależności, i przypisz im budżety czasu.\n2. Wprowadź osobne limity współbieżności, pule lub kolejki tam, gdzie izolacja odpowiada tej granicy. Dobierz pojemność do pomiarów, nie do arbitralnej liczby.\n3. Ustal zachowanie po wyczerpaniu limitu: odrzuć nowe żądanie, odłóż pracę lub pokaż częściowy wynik. Zachowaj czytelny sygnał dla użytkownika.\n4. Monitoruj nasycenie każdego segmentu i ćwicz spowolnienie jednej zależności pod obciążeniem.\n\nIzolacja ma koszt: wolne zasoby jednej puli nie muszą być dostępne dla drugiej. Ten koszt porównaj z ceną wspólnej awarii. Nie każdy mały system wymaga wielu pul; decyzję uzasadniają priorytety i pomiary.\n\n## Reguła do zapamiętania\n\n> Gdy różne funkcje muszą przetrwać różne awarie, wspólna pula zasobów wymaga świadomego uzasadnienia."
+  },
+  {
     "id": "2026-09-anon-temporary-file-integration",
     "date": "2026-09-24",
     "title": "Integracja przejściowa bez decyzji o wyjściu",
