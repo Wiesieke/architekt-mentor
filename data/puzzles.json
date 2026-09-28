@@ -1,5 +1,56 @@
 [
   {
+    "id": "2026-w40-izolacja-zasobow",
+    "week": "Tydzień 40 / 2026",
+    "date": "2026-09-28",
+    "title": "Raport blokuje składanie zamówień. Co izolujesz?",
+    "difficulty": "Średni",
+    "tags": [
+      "odporność",
+      "bulkhead",
+      "limity zasobów",
+      "degradacja"
+    ],
+    "scenario": "Przykład fikcyjny. Aplikacja sklepu korzysta z dwóch zewnętrznych usług: obliczania ceny dostawy i generowania raportów dla sprzedawców. Oba wywołania używają tej samej puli 40 połączeń wychodzących oraz tej samej kolejki pracowników.\n\nPo spowolnieniu usługi raportowej żądania czekają po 20 sekund i zajmują większość puli. Klienci nie mogą dokończyć zamówienia, choć usługa ceny dostawy odpowiada poprawnie. Zespół proponuje podwoić pulę i dodać trzy ponowienia każdego wywołania. Nie znasz jeszcze rozkładu ruchu ani uzgodnionego czasu odpowiedzi dla obu funkcji.",
+    "question": "Jak ograniczysz wpływ raportów na zamówienia? Jakie limity, zachowanie przy przeciążeniu i pomiary ustalisz przed zmianą liczby połączeń?",
+    "hints": [
+      "Które zasoby naprawdę są współdzielone i mogą się wyczerpać?",
+      "Czy raport i zamówienie mają tę samą ważność oraz dopuszczalny czas odpowiedzi?",
+      "Co stanie się z liczbą prób, gdy każde wolne żądanie zostanie ponowione trzy razy?",
+      "Jak potwierdzisz, że izolacja działa podczas awarii jednego dostawcy?"
+    ],
+    "analysis": "### Zacznij od granicy awarii\n\nProblemem nie jest wyłącznie wolny dostawca raportów. Wspólna pula i kolejka przenoszą jego spowolnienie na krytyczną ścieżkę zamówienia. Ustal budżet czasu żądania, liczbę równoległych wywołań i udział ruchu każdej funkcji; sprawdź też, czy oba wywołania rzeczywiście używają tych samych pracowników.\n\n### Decyzja architektoniczna\n\n1. Rozdziel pule połączeń lub limity współbieżności dla raportów i obliczania dostawy. Raporty mogą mieć mniejszy limit oraz osobną kolejkę; zasoby zamówień muszą pozostać dostępne nawet przy zablokowanej usłudze raportowej.\n2. Dodaj krótki, uzasadniony timeout i ograniczoną kolejkę. Po osiągnięciu limitu raport przyjmij do wykonania później albo zwróć czytelny komunikat o niedostępności. Nie trzymaj żądań bez końca.\n3. Nie włączaj automatycznie trzech ponowień. Powtórzenia mogą zwielokrotnić ruch w czasie awarii; dopuszczaj je tylko dla bezpiecznych operacji, z limitem i odstępem.\n4. Zdefiniuj osobne cele jakościowe: czas realizacji zamówienia i czas dostępności raportu. Zmierz nasycenie pul, długość kolejek, timeouty, odrzucenia i opóźnienia użytkownika.\n5. Przetestuj spowolnienie raportów przy realistycznym obciążeniu. Kryterium sukcesu: raporty mogą się opóźnić, ale ścieżka zamówienia zachowuje uzgodniony poziom usługi.\n\nSama większa wspólna pula może odsunąć moment awarii, ale nie ustanawia granicy między obciążeniami. Konkretne limity dobierz na podstawie ruchu i testów; bez tych danych nie ma uczciwej liczby „40 czy 80”.\n\n### Reguła do zapamiętania\n\n> Izolacja zasobów pozwala poświęcić funkcję o niższym priorytecie, zanim jej awaria zablokuje funkcję krytyczną.",
+    "coach": {
+      "criteria": [
+        {
+          "id": "shared",
+          "label": "Wspólna granica awarii",
+          "expected": "Wskazuje wspólną pulę połączeń i kolejkę jako mechanizm przenoszący spowolnienie raportów na zamówienia."
+        },
+        {
+          "id": "isolation",
+          "label": "Izolacja zasobów",
+          "expected": "Proponuje osobne pule, kolejki lub limity współbieżności dla raportów i krytycznej ścieżki zamówienia."
+        },
+        {
+          "id": "overload",
+          "label": "Przeciążenie i degradacja",
+          "expected": "Określa timeout, ograniczenie kolejki i zachowanie po osiągnięciu limitu; raporty mogą się opóźnić bez blokowania zamówień."
+        },
+        {
+          "id": "retries",
+          "label": "Ponowienia",
+          "expected": "Nie proponuje bezwarunkowych ponowień; uwzględnia wzrost obciążenia i bezpieczeństwo powtórzenia operacji."
+        },
+        {
+          "id": "evidence",
+          "label": "Pomiar i test",
+          "expected": "Proponuje osobne cele jakościowe, pomiary nasycenia oraz test awarii raportów przy reprezentatywnym ruchu; nie zgaduje liczby połączeń."
+        }
+      ]
+    }
+  },
+  {
     "id": "2026-w39-anon-managed-platform",
     "week": "Materiał dodatkowy / 2026",
     "date": "2026-09-24",
