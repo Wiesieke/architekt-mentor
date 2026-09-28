@@ -20,6 +20,36 @@
       "Jak potwierdzisz, że izolacja działa podczas awarii jednego dostawcy?"
     ],
     "analysis": "### Zacznij od granicy awarii\n\nProblemem nie jest wyłącznie wolny dostawca raportów. Wspólna pula i kolejka przenoszą jego spowolnienie na krytyczną ścieżkę zamówienia. Ustal budżet czasu żądania, liczbę równoległych wywołań i udział ruchu każdej funkcji; sprawdź też, czy oba wywołania rzeczywiście używają tych samych pracowników.\n\n### Decyzja architektoniczna\n\n1. Rozdziel pule połączeń lub limity współbieżności dla raportów i obliczania dostawy. Raporty mogą mieć mniejszy limit oraz osobną kolejkę; zasoby zamówień muszą pozostać dostępne nawet przy zablokowanej usłudze raportowej.\n2. Dodaj krótki, uzasadniony timeout i ograniczoną kolejkę. Po osiągnięciu limitu raport przyjmij do wykonania później albo zwróć czytelny komunikat o niedostępności. Nie trzymaj żądań bez końca.\n3. Nie włączaj automatycznie trzech ponowień. Powtórzenia mogą zwielokrotnić ruch w czasie awarii; dopuszczaj je tylko dla bezpiecznych operacji, z limitem i odstępem.\n4. Zdefiniuj osobne cele jakościowe: czas realizacji zamówienia i czas dostępności raportu. Zmierz nasycenie pul, długość kolejek, timeouty, odrzucenia i opóźnienia użytkownika.\n5. Przetestuj spowolnienie raportów przy realistycznym obciążeniu. Kryterium sukcesu: raporty mogą się opóźnić, ale ścieżka zamówienia zachowuje uzgodniony poziom usługi.\n\nSama większa wspólna pula może odsunąć moment awarii, ale nie ustanawia granicy między obciążeniami. Konkretne limity dobierz na podstawie ruchu i testów; bez tych danych nie ma uczciwej liczby „40 czy 80”.\n\n### Reguła do zapamiętania\n\n> Izolacja zasobów pozwala poświęcić funkcję o niższym priorytecie, zanim jej awaria zablokuje funkcję krytyczną.",
+    "related": [
+      {
+        "type": "ANTYWZORZEC",
+        "title": "Jedna pula dla wszystkich zależności",
+        "description": "Zobacz, jak rozpoznać źródło problemu",
+        "href": "/antywzorce/2026-09-wspolna-pula-zaleznosci/"
+      },
+      {
+        "type": "WZORZEC",
+        "title": "Bulkhead: izolacja zasobów",
+        "description": "Poznaj rozwiązanie i jego koszt",
+        "href": "/podstawy-architektury/bulkhead/"
+      }
+    ],
+    "decisionRecord": {
+      "status": "Przykład do dyskusji — nie jest zatwierdzoną decyzją projektu",
+      "context": "Zamówienia i raporty korzystają ze wspólnej puli 40 połączeń oraz kolejki pracowników. Spowolnienie raportów blokuje zamówienia. Nie znamy jeszcze natężenia ruchu ani uzgodnionych celów jakościowych.",
+      "decision": "Rozdzielić limity współbieżności i kolejki raportów od krytycznej ścieżki zamówienia. Określić timeout i zachowanie po osiągnięciu limitu; nie dodawać bezwarunkowych ponowień. Wartości liczbowe dobrać po pomiarach.",
+      "rationale": "Awaria lub opóźnienie raportowania nie powinny wyczerpywać zasobów potrzebnych do dokończenia zamówienia.",
+      "consequences": [
+        "Raporty mogą czekać dłużej albo zostać odrzucone, gdy osiągną swój limit.",
+        "Oddzielne pule zwiększają liczbę parametrów operacyjnych i mogą pozostawiać niewykorzystane zasoby."
+      ],
+      "verification": "Przy reprezentatywnym obciążeniu spowolnić usługę raportową; obserwować nasycenie pul, długość kolejek, timeouty i czas realizacji zamówień. Sukces ocenić według uzgodnionych celów jakościowych.",
+      "openQuestions": [
+        "Jaki czas odpowiedzi jest akceptowalny dla zamówień i raportów?",
+        "Jakie są rzeczywiste natężenie ruchu i budżety zasobów?",
+        "Czy raporty można wykonywać asynchronicznie i bezpiecznie ponawiać?"
+      ]
+    },
     "coach": {
       "criteria": [
         {

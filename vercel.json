@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    { "source": "/generator.html", "destination": "/narzedzia/hld/", "permanent": true },
+    { "source": "/dlafirm.html", "destination": "/dlafirm/", "permanent": true },
+    { "source": "/informacja-o-danych.html", "destination": "/informacja-o-danych/", "permanent": true },
+    { "source": "/lamiglowki.html", "destination": "/lamiglowka/", "permanent": true },
+    { "source": "/antywzorce.html", "destination": "/antywzorce/", "permanent": true }
+  ]
+}

@@ -1,0 +1,18 @@
+---
+import Studio from '../../layouts/Studio.astro';
+---
+<Studio title="Narzędzia architekta" description="Praktyczne narzędzia ArchitectMentor: szkic HLD z briefu oraz zapis pojedynczej decyzji w formacie ADR." active="tools">
+  <div class="container tools-page">
+    <div class="eyebrow">Od ćwiczenia do dokumentu</div>
+    <h1>Narzędzia architekta</h1>
+    <p class="intro">Wybierz zakres pracy: zapisz jedną decyzję jako ADR albo przygotuj pierwszy szkic całego rozwiązania w generatorze HLD.</p>
+    <div class="tools-grid">
+      <article class="tool-card"><span class="tool-label">JEDNA DECYZJA</span><h2>Formularz ADR</h2><p>Zapisz kontekst, rozważone warianty, wybór i jego konsekwencje. Pobierz plik Markdown, który możesz omówić i poprawić w swoim zespole.</p><div class="tool-meta">Bez AI · bez wysyłania treści</div><a class="button" href="/narzedzia/adr/">Utwórz ADR <span aria-hidden="true">→</span></a></article>
+      <article class="tool-card"><span class="tool-label">CAŁE ROZWIĄZANIE</span><h2>Generator HLD</h2><p>Opisz potrzebę w krótkim briefie i otrzymaj roboczy szkic architektury. Zweryfikuj założenia i pytania otwarte przed użyciem w projekcie.</p><div class="tool-meta">Narzędzie AI · szkic do weryfikacji</div><a class="button secondary" href="/narzedzia/hld/">Otwórz generator HLD <span aria-hidden="true">→</span></a></article>
+    </div>
+    <p class="follow">Chcesz najpierw przećwiczyć sposób myślenia? <a href="/lamiglowka/">Rozwiąż łamigłówkę</a> i zobacz przykładowy ADR po analizie.</p>
+  </div>
+</Studio>
+<style>
+  .tools-page{padding-top:74px;padding-bottom:105px}.tools-page h1{font-size:clamp(38px,5vw,59px);margin:20px 0}.intro{max-width:65ch;color:#536577;font-size:18px}.tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:43px}.tool-card{display:flex;flex-direction:column;align-items:flex-start;background:#fff;border:1px solid #dce4df;border-radius:14px;padding:34px}.tool-label{color:#136d73;font-size:11px;font-weight:800;letter-spacing:.12em}.tool-card h2{font-size:27px;margin:16px 0 10px}.tool-card p{color:#536577;font-size:14px;max-width:46ch;line-height:1.7}.tool-meta{font-size:12px;color:#617880;margin:auto 0 22px;padding-top:12px}.tool-card .button{font-size:13px}.follow{margin-top:32px;color:#536577}.follow a{font-weight:700;color:#136d73}@media(max-width:720px){.tools-page{padding-top:38px;padding-bottom:70px}.tools-grid{grid-template-columns:1fr;margin-top:26px}.tool-card{padding:25px}}
+</style>
