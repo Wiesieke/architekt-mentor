@@ -1,0 +1,11 @@
+---
+import Studio from '../../layouts/Studio.astro';
+import patterns from '../../../data/antywzorce.json';
+const items = [...patterns].sort((a,b) => b.date.localeCompare(a.date));
+---
+<Studio title="Antywzorce architektoniczne" description="Praktyczne antywzorce architektury IT: objawy, konsekwencje, sposoby naprawy i pytania do projektu.">
+ <div class="container archive"><div class="eyebrow">Magazyn · ucz się na decyzjach</div><h1>Antywzorce</h1><p>Rozpoznaj sytuacje, w których pozorny skrót komplikuje system. Przykłady są fikcyjne lub maksymalnie uogólnione.</p><div class="cards">{items.map(item => <article><small>{item.date}</small><h2><a href={`/antywzorce/${item.id}/`}>{item.title}</a></h2><p>{item.summary}</p><a href={`/antywzorce/${item.id}/`}>Czytaj antywzorzec →</a></article>)}</div></div>
+</Studio>
+<style>
+ .archive{padding-top:67px;padding-bottom:95px}.archive h1{font-size:clamp(37px,5vw,57px);margin:18px 0}.archive>p{max-width:68ch;color:#536577}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:42px}.cards article{background:#fff;border:1px solid #dce4df;border-radius:12px;padding:30px}.cards small{font-size:11px;color:#136d73;font-weight:800}.cards h2{font-size:23px;margin:13px 0}.cards h2 a{text-decoration:none}.cards h2 a:hover{text-decoration:underline}.cards p{font-size:14px;color:#536577}.cards article>a{font-size:13px;color:#136d73;font-weight:700}@media(max-width:660px){.archive{padding-top:34px}.cards{grid-template-columns:1fr;margin-top:25px}.cards article{padding:22px}}
+</style>
