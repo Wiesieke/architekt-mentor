@@ -1,0 +1,23 @@
+---
+import Studio from '../layouts/Studio.astro';
+---
+<Studio title="Informacja o danych" description="Jak ArchitectMentor przetwarza briefy, wygenerowane HLD, odpowiedzi na łamigłówki i zapytania kontaktowe.">
+  <article class="container data-page">
+    <h1>Informacja o briefach i odpowiedziach</h1>
+    <p class="lead">Dotyczy generatora HLD, łamigłówek ocenianych przez mentora AI oraz formularza kontaktowego na ejsymont.com.</p>
+    <h2>Kto odpowiada za dane?</h2>
+    <p>Wiesław Ejsymont, kontakt: <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a>.</p>
+    <h2>Co dzieje się po użyciu narzędzi?</h2>
+    <p>Brief wpisany do generatora lub odpowiedź na łamigłówkę trafia przez Vercel do modelu Anthropic, aby przygotować HLD albo informację zwrotną. Dzieje się to także wtedy, gdy nie wybierasz zapisu. Nie wpisuj danych poufnych ani danych innych osób.</p>
+    <p>Jeżeli zaznaczysz osobne pole zapisu, przechowujemy w bazie na LH.pl: brief i wygenerowany HLD wraz z modelem i wybranymi opcjami albo odpowiedź na łamigłówkę wraz z pytaniem naprowadzającym lub oceną. Zapis pomaga rozwijać narzędzie. Podstawą dobrowolnego zapisu jest Twoja zgoda, którą możesz wycofać, pisząc na podany adres. Bez zaznaczenia pola narzędzie działa, ale tych treści nie zapisujemy w tej bazie.</p>
+    <p>Formularz kontaktowy przekazuje podane imię, firmę (jeśli ją podasz), adres e-mail, wybraną usługę i treść wiadomości na skrzynkę architektura@sensinte.com. Wysłanie wiadomości nie wymaga zgody na zapis briefu ani odpowiedzi z łamigłówki.</p>
+    <h2>Jak długo i gdzie?</h2>
+    <p>Rekordy briefów i odpowiedzi zapisane za zgodą mają termin usunięcia po 90 dniach. Usługi Vercel, LH.pl i Anthropic mogą prowadzić odrębne dzienniki techniczne na zasadach tych dostawców. W bazie briefów i łamigłówek nie zapisujemy adresu e-mail, adresu IP ani identyfikatora konta użytkownika. Korespondencja z formularza znajduje się w skrzynce pocztowej; termin jej przechowywania zależy od dalszej korespondencji.</p>
+    <h2>Jak poprosić o usunięcie?</h2>
+    <p>Po udanym zapisie narzędzie pokazuje identyfikator rekordu. Wyślij go na <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a>, jeśli chcesz wcześniej usunąć zapis lub wycofać zgodę. Możesz też zwrócić się o dostęp do danych, ich sprostowanie lub ograniczenie przetwarzania oraz złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych.</p>
+    <p><a href="/narzedzia/hld/">Wróć do generatora</a> · <a href="/lamiglowka/">Wróć do łamigłówki</a> · <a href="/dlafirm/#zapytanie">Formularz kontaktowy</a></p>
+  </article>
+</Studio>
+<style>
+  .data-page{max-width:900px;padding-top:55px;padding-bottom:90px}.data-page h1{font-size:clamp(36px,5vw,52px)}.data-page h2{font-size:23px;margin-top:36px}.data-page p{max-width:75ch}.data-page a{color:var(--teal)}.lead{color:var(--muted)}
+</style>
