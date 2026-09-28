@@ -1,35 +1,51 @@
 ---
-interface Props { title: string; description: string; active?: 'home' | 'practice' }
-const { title, description, active = 'home' } = Astro.props;
+interface Props { title: string; description: string; active?: 'home' | 'practice'; locale?: 'pl' | 'en'; published?: string; modified?: string }
+const { title, description, active = 'home', locale = 'pl', published, modified } = Astro.props;
+// Enable indexing only after the full site migration and redirect audit.
+const indexable = import.meta.env.PUBLIC_SITE_INDEXABLE === 'true';
+const canonical = new URL(Astro.url.pathname, 'https://ejsymont.com').href;
+const labels = {
+  pl: { skip: 'Przejdź do treści', practice: 'Ćwicz', learn: 'Ucz się', trends: 'W ruchu', business: 'Dla firm', generator: 'Generator HLD', puzzle: 'Łamigłówka', patterns: 'Antywzorce', basics: 'Podstawy', contact: 'Kontakt', partner: 'Współpraca' },
+  en: { skip: 'Skip to content', practice: 'Practice', learn: 'Learn', trends: 'In motion', business: 'For business', generator: 'HLD generator', puzzle: 'Puzzle', patterns: 'Anti-patterns', basics: 'Foundations', contact: 'Contact', partner: 'Partnerships' },
+}[locale];
 ---
 <!doctype html>
-<html lang="pl">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex,nofollow" />
+    <meta name="robots" content={indexable ? 'index,follow' : 'noindex,nofollow'} />
     <title>{title} | Architekt-Mentor</title>
+    {indexable && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Architekt-Mentor" />
+    <meta property="og:locale" content={locale === 'pl' ? 'pl_PL' : 'en_US'} />
+    <meta property="og:title" content={`${title} | Architekt-Mentor`} />
+    <meta property="og:description" content={description} />
+    {indexable && <meta property="og:url" content={canonical} />}
+    {published && <meta name="date" content={published} />}
+    {modified && <meta name="date.modified" content={modified} />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <a class="skip" href="#main">Przejdź do treści</a>
+    <a class="skip" href="#main">{labels.skip}</a>
     <header class="site-header">
       <div class="container bar">
         <a class="brand" href="/" aria-label="Architekt-Mentor — strona główna"><span class="brand-icon" aria-hidden="true">AM<span class="brand-dot">.</span></span><span class="brand-name">Architekt<span>Mentor</span></span></a>
         <nav aria-label="Nawigacja główna">
-          <a href="/lamiglowka/" aria-current={active === 'practice' ? 'page' : undefined}>Ćwicz</a>
-          <a href="https://ejsymont.com/podstawy-architektury.html">Ucz się</a>
-          <a href="https://ejsymont.com/architektura-w-ruchu.html">W ruchu</a>
-          <a href="https://ejsymont.com/dlafirm.html">Dla firm</a>
+          <a href="/lamiglowka/" aria-current={active === 'practice' ? 'page' : undefined}>{labels.practice}</a>
+          <a href="https://ejsymont.com/podstawy-architektury.html">{labels.learn}</a>
+          <a href="https://ejsymont.com/architektura-w-ruchu.html">{labels.trends}</a>
+          <a href="https://ejsymont.com/dlafirm.html">{labels.business}</a>
         </nav>
-        <a class="header-cta" href="https://ejsymont.com/generator.html">Generator HLD <span aria-hidden="true">↗</span></a>
+        <a class="header-cta" href="https://ejsymont.com/generator.html">{labels.generator} <span aria-hidden="true">↗</span></a>
       </div>
     </header>
     <main id="main"><slot /></main>
-    <footer class="site-footer"><div class="container footer-grid"><div><a class="footer-brand" href="/">Architekt-Mentor</a><p>Praktyka architektury, krok po kroku.<br />Wiesław Ejsymont</p></div><div class="footer-links"><a href="/lamiglowka/">Łamigłówka</a><a href="https://ejsymont.com/antywzorce.html">Antywzorce</a><a href="https://ejsymont.com/podstawy-architektury.html">Podstawy</a><a href="mailto:architektura@sensinte.com">Kontakt</a></div></div><div class="container footer-base">Prototyp portalu · 2026 · <a href="https://ejsymont.com/informacja-o-danych.html">Informacja o danych</a></div></footer>
+    <footer class="site-footer"><div class="container footer-grid"><div><a class="footer-brand" href="/">Architekt-Mentor</a><p>Praktyka architektury, krok po kroku.<br />Wiesław Ejsymont</p></div><div class="footer-links"><a href="/lamiglowka/">{labels.puzzle}</a><a href="https://ejsymont.com/antywzorce.html">{labels.patterns}</a><a href="https://ejsymont.com/podstawy-architektury.html">{labels.basics}</a><a href="mailto:architektura@sensinte.com">{labels.contact}</a><a href="mailto:architektura@sensinte.com?subject=Wsp%C3%B3%C5%82praca%20z%20Architekt-Mentor">{labels.partner}</a></div></div><div class="container footer-base">Prototyp portalu · 2026 · <a href="https://ejsymont.com/informacja-o-danych.html">Informacja o danych</a></div></footer>
   </body>
 </html>
 
