@@ -1,0 +1,14 @@
+---
+import Studio from '../../layouts/Studio.astro';
+import { articles, articleUrl } from '../../data/articles';
+const items = articles.filter(a => a.section === 'architektura-w-ruchu');
+const format = (value: string) => new Intl.DateTimeFormat('pl-PL',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'}).format(new Date(`${value}T12:00:00Z`));
+---
+<Studio title="Architektura w ruchu" description="Zmiany technologiczne, które mają znaczenie dla architektury IT. Sprawdzone daty, źródła pierwotne i praktyczne pytania do projektu.">
+  <div class="container archive"><div class="eyebrow">Magazyn · rozwój technologii</div><h1>Architektura w ruchu</h1><p>Co się zmieniło, kiedy i co warto sprawdzić w swojej architekturze? Oddzielamy informację o wydarzeniu od wniosku dla projektu.</p>
+    <div class="cards">{items.map(item => <article><div class="meta">{item.topic}{item.eventDate && <> · Wydarzenie: <time datetime={item.eventDate}>{format(item.eventDate)}</time></>}</div><h2><a href={articleUrl(item)}>{item.title}</a></h2><p>{item.description}</p><a class="read" href={articleUrl(item)}>Czytaj artykuł →</a></article>)}</div>
+  </div>
+</Studio>
+<style>
+ .archive{padding-top:67px;padding-bottom:95px}.archive h1{font-size:clamp(37px,5vw,57px);margin:18px 0}.archive>p{max-width:68ch;color:#536577}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:42px}.cards article{background:#fff;border:1px solid #dce4df;border-radius:12px;padding:30px}.cards .meta{font-size:11px;color:#136d73;font-weight:800}.cards h2{font-size:23px;margin:13px 0}.cards h2 a{text-decoration:none}.cards h2 a:hover{text-decoration:underline}.cards p{font-size:14px;color:#536577}.read{font-size:13px;color:#136d73;font-weight:700}@media(max-width:660px){.archive{padding-top:34px}.cards{grid-template-columns:1fr;margin-top:25px}.cards article{padding:22px}}
+</style>
