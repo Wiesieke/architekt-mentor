@@ -1,6 +1,6 @@
 # Prototyp magazynu ArchitectMentor w Astro
 
-Ta gałąź pokazuje stronę główną (`/`), łamigłówkę (`/lamiglowka/`), archiwa działów, pięć artykułów (cztery z „Architektury w ruchu”, jeden z „Podstaw”) oraz cztery antywzorce na własnych adresach. Jest przeznaczona do podglądu. Nie scalać jej do `main`: kompilacja Astro zastąpiłaby obecne strony, które nie zostały jeszcze przeniesione.
+Ta gałąź pokazuje stronę główną (`/`), łamigłówkę (`/lamiglowka/`), dział Narzędzia z formularzem ADR, archiwa działów, pięć artykułów (cztery z „Architektury w ruchu”, jeden z „Podstaw”) oraz cztery antywzorce na własnych adresach. Jest przeznaczona do podglądu. Nie scalać jej do `main`: kompilacja Astro zastąpiłaby obecne strony, które nie zostały jeszcze przeniesione.
 
 ## Sprawdzenie lokalne
 
@@ -13,6 +13,8 @@ npm run dev
 Łamigłówka jest wybierana z istniejącego `data/puzzles.json`. Ścieżka: scenariusz → pierwsza decyzja → pytanie mentora → osobne pole na poprawioną odpowiedź i ocena → analiza seniora → przykładowy ADR do pobrania → powiązany antywzorzec i wzorzec. Nazwy pięciu kryteriów oceny są widoczne przed odpowiedzią; pełna analiza i ADR są dostępne także bez użycia AI. Przycisk oceny korzysta z istniejącego endpointu `/api/evaluate-puzzle`, jeśli jest dostępny na wdrożeniu podglądowym. Zapis odpowiedzi pozostaje wyłączony, dopóki użytkownik nie zaznaczy pola. Wynik AI jest pomocniczy.
 
 Przy kolejnej łamigłówce dodaj do najnowszego wpisu opcjonalne `decisionRecord` z polami `status`, `context`, `decision`, `rationale`, `consequences` (lista), `verification` i `openQuestions` (lista) oraz `related` z adresami, tytułami i krótkimi opisami powiązanego antywzorca i wzorca. Opisz fikcyjny przykład, zaznacz niewiadome i nie wpisuj arbitralnych limitów bez danych. Jeśli nie ma ADR, prototyp pokazuje analizę bez niego; jeśli nie ma powiązań, pokazuje ogólne archiwa zamiast linków z poprzedniego ćwiczenia.
+
+Nawigacja prowadzi do `/narzedzia/`: formularz ADR i istniejący generator HLD. Generator HLD nadal ma widoczną kartę „Projektuj” na stronie głównej i otwiera dotychczasową wersję produkcyjną. Formularz `/narzedzia/adr/` działa tylko w przeglądarce: trzy pola są wymagane (tytuł, kontekst, decyzja), reszta może pozostać jako pytanie do doprecyzowania. Tworzy projekt ADR jako `.md` bez wywołań API, przechowywania czy wysyłania wpisanych danych. Nie jest to generator AI ani potwierdzenie formalnego zatwierdzenia decyzji. Zanim czytelnik odświeży kartę, powinien pobrać plik.
 
 Pozostałe sekcje prowadzą do aktualnej produkcyjnej witryny. Przed migracją całości trzeba przenieść pozostałe treści i istniejące funkcje `/api`, stronę o danych, stronę oferty, generator HLD i kontakt. Zachowaj stare adresy lub przekieruj je na odpowiedniki; stare fragmenty `#postgresql-19-beta4` itp. nie są przesyłane serwerowi, więc samym przekierowaniem HTTP nie da się skierować każdej kotwicy na osobny artykuł. Można pozostawić stary przewodnik z odsyłaczami do nowych stron. W prototypie ustawiono `noindex,nofollow`.
 
