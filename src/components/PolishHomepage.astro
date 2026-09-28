@@ -8,6 +8,7 @@ const editionEnd = new Date(editionStart);
 editionEnd.setUTCDate(editionEnd.getUTCDate() + 6);
 const formatDate = (date: Date) => new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(date);
 const weekLabel = `${formatDate(editionStart)}–${formatDate(editionEnd)}`;
+const currentEditionCount = editions.filter(item => item.published === latestEditionDate).length;
 ---
 <Studio title="Architektura IT w praktyce: ćwiczenia, wzorce i decyzje" description="Magazyn architektury IT i architektury korporacyjnej. Praktyczne łamigłówki, antywzorce, podstawy i analizy zmian technologicznych." modified={latestEditionDate} showEdition translationUrl="/en/">
   <section class="hero">
@@ -43,7 +44,7 @@ const weekLabel = `${formatDate(editionStart)}–${formatDate(editionEnd)}`;
     </div>
   </div></section>
 
-  <section class="this-week" id="nowe" aria-labelledby="week-title"><div class="container week-grid"><div class="week-intro"><div class="eyebrow">Nowe w magazynie · {weekLabel}</div><h2 id="week-title">Co się zmieniło<br /><em>w tym tygodniu?</em></h2><p>Cztery materiały opublikowane <time datetime={latestEditionDate}>{new Intl.DateTimeFormat('pl-PL', {dateStyle:'long',timeZone:'UTC'}).format(editionStart)}</time>. Daty wydarzeń technologicznych znajdziesz osobno w artykułach.</p><a class="text-link" href="/lamiglowka/">Przejdź do ćwiczenia <span aria-hidden="true">→</span></a></div><div class="week-list">
+  <section class="this-week" id="nowe" aria-labelledby="week-title"><div class="container week-grid"><div class="week-intro"><div class="eyebrow">Nowe w magazynie · {weekLabel}</div><h2 id="week-title">Co się zmieniło<br /><em>w tym tygodniu?</em></h2><p>{currentEditionCount} materiałów opublikowanych <time datetime={latestEditionDate}>{new Intl.DateTimeFormat('pl-PL', {dateStyle:'long',timeZone:'UTC'}).format(editionStart)}</time>. Daty wydarzeń technologicznych znajdziesz osobno w artykułach.</p><a class="text-link" href="/lamiglowka/">Przejdź do ćwiczenia <span aria-hidden="true">→</span></a></div><div class="week-list">
     {editions.filter(item => item.published === latestEditionDate).map(item => <a href={item.href}><span class="week-type">{item.kind} · <time datetime={item.published}>{formatDate(new Date(`${item.published}T12:00:00Z`))}</time></span><strong>{item.title}</strong><small>{item.summary}</small><span class="week-arrow" aria-hidden="true">↗</span></a>)}
   </div></div></section>
   <SponsorSlot />
