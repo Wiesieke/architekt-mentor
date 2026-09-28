@@ -9,6 +9,8 @@ export const GET: APIRoute = () => {
     ? [
       {path:'/', modified:latestEditionDate},
       {path:'/lamiglowka/'},
+      {path:'/narzedzia/'},
+      {path:'/narzedzia/adr/'},
       {path:'/architektura-w-ruchu/'},
       {path:'/podstawy-architektury/'},
       {path:'/antywzorce/'},
