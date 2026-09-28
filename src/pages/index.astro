@@ -1,10 +1,15 @@
 ---
 import Studio from '../layouts/Studio.astro';
-import puzzles from '../../data/puzzles.json';
+import { editions, latestEditionDate } from '../data/editions';
+import SponsorSlot from '../components/SponsorSlot.astro';
 
-const latest = [...puzzles].sort((a,b) => b.date.localeCompare(a.date))[0];
+const editionStart = new Date(`${latestEditionDate}T12:00:00Z`);
+const editionEnd = new Date(editionStart);
+editionEnd.setUTCDate(editionEnd.getUTCDate() + 6);
+const formatDate = (date: Date) => new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(date);
+const weekLabel = `${formatDate(editionStart)}–${formatDate(editionEnd)}`;
 ---
-<Studio title="Architektura, której można się nauczyć" description="Prototyp portalu Architekt-Mentor: ucz się, ćwicz decyzje i twórz szkice HLD.">
+<Studio title="Architektura IT w praktyce: ćwiczenia, wzorce i decyzje" description="Magazyn architektury IT i architektury korporacyjnej. Praktyczne łamigłówki, antywzorce, podstawy i analizy zmian technologicznych." modified={latestEditionDate}>
   <section class="hero">
     <div class="container hero-grid">
       <div class="hero-copy">
@@ -37,11 +42,10 @@ const latest = [...puzzles].sort((a,b) => b.date.localeCompare(a.date))[0];
     </div>
   </div></section>
 
-  <section class="this-week"><div class="container week-grid"><div class="week-intro"><div class="eyebrow">W tym tygodniu</div><h2>Jedna decyzja.<br /><em>Wiele konsekwencji.</em></h2><p>Nowe materiały są krótkie i praktyczne. Każdy prowadzi do pytania, które można zadać we własnym projekcie.</p><a class="text-link" href="/lamiglowka/">Przejdź do ćwiczenia <span aria-hidden="true">→</span></a></div><div class="week-list">
-    <a href="/lamiglowka/"><span class="week-type">ĆWICZENIE · {latest.week}</span><strong>{latest.title}</strong><small>Scenariusz · odpowiedź · kryteria</small><span class="week-arrow" aria-hidden="true">↗</span></a>
-    <a href="https://ejsymont.com/architektura-w-ruchu.html#postgresql-19-beta4"><span class="week-type">W RUCHU · 24.09.2026</span><strong>PostgreSQL 19 Beta 4: funkcje wycofane przed wydaniem</strong><small>Fakty · wniosek · pytanie do projektu</small><span class="week-arrow" aria-hidden="true">↗</span></a>
-    <a href="https://ejsymont.com/podstawy-architektury.html#bulkhead"><span class="week-type">PODSTAWY</span><strong>Bulkhead: izoluj zasoby, które mogą się wyczerpać</strong><small>Wzorzec · przykład · kompromis</small><span class="week-arrow" aria-hidden="true">↗</span></a>
+  <section class="this-week" aria-labelledby="week-title"><div class="container week-grid"><div class="week-intro"><div class="eyebrow">Nowe w magazynie · {weekLabel}</div><h2 id="week-title">Co się zmieniło<br /><em>w tym tygodniu?</em></h2><p>Cztery materiały opublikowane <time datetime={latestEditionDate}>{new Intl.DateTimeFormat('pl-PL', {dateStyle:'long',timeZone:'UTC'}).format(editionStart)}</time>. Daty wydarzeń technologicznych znajdziesz osobno w artykułach.</p><a class="text-link" href="/lamiglowka/">Przejdź do ćwiczenia <span aria-hidden="true">→</span></a></div><div class="week-list">
+    {editions.filter(item => item.published === latestEditionDate).map(item => <a href={item.href}><span class="week-type">{item.kind} · <time datetime={item.published}>{formatDate(new Date(`${item.published}T12:00:00Z`))}</time></span><strong>{item.title}</strong><small>{item.summary}</small><span class="week-arrow" aria-hidden="true">↗</span></a>)}
   </div></div></section>
+  <SponsorSlot />
 
   <section class="about"><div class="container about-grid"><div class="about-mark" aria-hidden="true">WE<span>.</span></div><div><div class="eyebrow">Człowiek za narzędziem</div><h2>Wiedza z praktyki, przekazana prostym językiem.</h2><p>Nazywam się Wiesław Ejsymont. Od ponad 20 lat pracuję przy architekturze rozwiązań i architekturze korporacyjnej. Stworzyłem to miejsce, by pomóc Ci lepiej zadawać pytania, nazywać ryzyka i uzasadniać decyzje.</p><a class="text-link" href="https://ejsymont.com/#omnie">Więcej o mnie <span aria-hidden="true">→</span></a></div></div></section>
 </Studio>
