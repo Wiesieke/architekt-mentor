@@ -7,7 +7,7 @@ const puzzle = [...puzzles].filter(p => p.coach).sort((a,b) => b.date.localeComp
 const paragraphs = puzzle.scenario.split(/\n\n+/);
 const analysis = marked.parse(puzzle.analysis);
 ---
-<Studio title={puzzle.title} description="Praktyczna łamigłówka architektoniczna: odpowiedz, skorzystaj z pytania mentora i porównaj swoje rozumowanie z analizą." active="practice">
+<Studio title={puzzle.title} description="Praktyczna łamigłówka architektoniczna: odpowiedz, skorzystaj z pytania mentora i porównaj swoje rozumowanie z analizą." published={puzzle.date} active="practice">
   <div class="exercise-head"><div class="container"><a class="back" href="/">← Wróć do strony głównej</a><div class="head-grid"><div><div class="eyebrow">Ćwiczenie architektoniczne · {puzzle.week}</div><h1>{puzzle.title}</h1><p>Przeczytaj scenariusz, zapisz decyzję i jej uzasadnienie. Mentor może zadać Ci pytanie naprowadzające przed oceną.</p></div><div class="head-aside"><span>CEL ĆWICZENIA</span><strong>Uzasadnij granicę awarii.</strong><small>Szacowany czas: 8–12 minut</small></div></div></div></div>
   <div class="container exercise-grid" data-puzzle-id={puzzle.id}>
     <aside class="sidebar" aria-label="Etapy ćwiczenia"><div class="sidebar-sticky"><div class="sidebar-label">TWOJA ŚCIEŻKA</div><ol><li class="active" id="step-read"><b>1</b><span>Rozpoznaj sytuację<small>Fakty i niewiadome</small></span></li><li id="step-answer"><b>2</b><span>Opisz decyzję<small>Twoje rozumowanie</small></span></li><li id="step-mentor"><b>3</b><span>Sprawdź z mentorem<small>Pytanie i ocena</small></span></li></ol><div class="sidebar-rule">Dobra odpowiedź pokazuje nie tylko <em>co</em> zrobić, ale <em>dlaczego</em> i jak to sprawdzić.</div></div></aside>
