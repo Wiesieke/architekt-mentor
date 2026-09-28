@@ -1,0 +1,12 @@
+---
+interface Sponsor { name: string; href: string; copy: string }
+interface Props { sponsor?: Sponsor }
+const { sponsor } = Astro.props;
+---
+{sponsor && <aside class="sponsor container" aria-label="Reklama"><span>Materiał sponsorowany · reklama</span><p>{sponsor.copy}</p><a href={sponsor.href} rel="sponsored noopener noreferrer" target="_blank">{sponsor.name} ↗</a></aside>}
+<style>
+  .sponsor{margin-block:30px;padding:22px;border:1px solid #dce4df;border-radius:12px;background:#fff}
+  .sponsor span{font-size:11px;font-weight:800;letter-spacing:.1em;color:#536577;text-transform:uppercase}
+  .sponsor p{margin:12px 0 4px}
+  .sponsor a{color:#136d73;font-weight:700}
+</style>
