@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+<meta name="robots" content="noindex,follow">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Podstawy architektury IT: opis architektury, C4, ADR, TOGAF, ArchiMate oraz wzorce integracji i odporności w praktyce.">
@@ -30,5 +31,10 @@
   <section class="panel" id="checklista"><h2>07 · Pięć pytań przed przeglądem HLD</h2><ol><li>Jaki problem biznesowy rozwiązujemy i po czym poznamy sukces?</li><li>Które fakty są potwierdzone, a które pozostają założeniami?</li><li>Jakie jakości — dostępność, wydajność, bezpieczeństwo, dane i koszt — zmieniają projekt?</li><li>Które decyzje są odwracalne, a które wymagają ADR i świadomej akceptacji ryzyka?</li><li>Jak sprawdzimy najważniejsze założenie zanim wdrożenie stanie się kosztowne?</li></ol><p>Teraz możesz <a href="/lamiglowki.html">przećwiczyć decyzję w łamigłówce</a> albo użyć <a href="/generator.html">generatora HLD</a> do opracowania własnego szkicu. Do generatora nie wklejaj informacji poufnych.</p></section>
 </main>
 <footer><div class="wrap"><span>© 2026 Architekt-Mentor · Wiesław Ejsymont</span><a href="mailto:architektura@sensinte.com">Kontakt: architektura@sensinte.com</a></div></footer>
+<script>
+  const sections = {'opis':'/podstawy-architektury/opis/','c4':'/podstawy-architektury/c4/','adr':'/podstawy-architektury/adr/','ramy':'/podstawy-architektury/ramy/','wzorce':'/podstawy-architektury/wzorce/','bulkhead':'/podstawy-architektury/bulkhead/','checklista':'/podstawy-architektury/checklista/'};
+  const destination = sections[location.hash.slice(1)] || '/podstawy-architektury/';
+  location.replace(destination);
+</script>
 </body>
 </html>
