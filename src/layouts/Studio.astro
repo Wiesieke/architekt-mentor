@@ -2,8 +2,8 @@
 import { editions, latestEditionDate } from '../data/editions';
 interface Props { title: string; description: string; active?: 'home' | 'practice' | 'tools'; locale?: 'pl' | 'en'; translationUrl?: string; published?: string; modified?: string; showEdition?: boolean }
 const { title, description, active = 'home', locale = 'pl', translationUrl, published, modified, showEdition = false } = Astro.props;
-// Enable indexing only after the full site migration and redirect audit.
-const indexable = import.meta.env.PUBLIC_SITE_INDEXABLE === 'true';
+// Production is indexable; previews stay private to search engines.
+const indexable = process.env.VERCEL_ENV === 'production' || import.meta.env.PUBLIC_SITE_INDEXABLE === 'true';
 const canonical = new URL(Astro.url.pathname, 'https://ejsymont.com').href;
 const editionDate = new Intl.DateTimeFormat('pl-PL',{day:'numeric',month:'long',timeZone:'UTC'}).format(new Date(`${latestEditionDate}T12:00:00Z`));
 const editionCount = editions.filter(item => item.published === latestEditionDate).length;
@@ -11,7 +11,7 @@ const labels = {
   pl: { skip: 'Przejdź do treści', practice: 'Ćwicz', tools: 'Narzędzia', learn: 'Ucz się', trends: 'W ruchu', business: 'Dla firm', puzzle: 'Łamigłówka', patterns: 'Antywzorce', basics: 'Podstawy', contact: 'Kontakt', partner: 'Współpraca' },
   en: { skip: 'Skip to content', practice: 'Practice', tools: 'Tools', learn: 'Foundations', trends: 'In motion', business: 'For business', puzzle: 'Exercises', patterns: 'Anti-patterns', basics: 'Foundations', contact: 'Contact', partner: 'Partnerships' },
 }[locale];
-const languageUrl = translationUrl ?? (locale === 'pl' ? '/en/' : '/');
+const languageUrl = translationUrl ?? (locale === 'pl' ? '/en/' : '/pl/');
 ---
 <!doctype html>
 <html lang={locale}>
@@ -22,7 +22,7 @@ const languageUrl = translationUrl ?? (locale === 'pl' ? '/en/' : '/');
     <meta name="robots" content={indexable ? 'index,follow' : 'noindex,nofollow'} />
     <title>{title} | ArchitectMentor</title>
     {indexable && <link rel="canonical" href={canonical} />}
-    {indexable && translationUrl && <><link rel="alternate" hreflang="pl" href={locale === 'pl' ? canonical : new URL(translationUrl, 'https://ejsymont.com').href} /><link rel="alternate" hreflang="en" href={locale === 'en' ? canonical : new URL(translationUrl, 'https://ejsymont.com').href} /></>}
+    {indexable && translationUrl && <><link rel="alternate" hreflang="pl" href={locale === 'pl' ? canonical : new URL(translationUrl, 'https://ejsymont.com').href} /><link rel="alternate" hreflang="en" href={locale === 'en' ? canonical : new URL(translationUrl, 'https://ejsymont.com').href} />{(Astro.url.pathname === '/pl/' || Astro.url.pathname === '/en/') && <link rel="alternate" hreflang="x-default" href="https://ejsymont.com/" />}</>}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ArchitectMentor" />
     <meta property="og:locale" content={locale === 'pl' ? 'pl_PL' : 'en_GB'} />
@@ -39,16 +39,16 @@ const languageUrl = translationUrl ?? (locale === 'pl' ? '/en/' : '/');
     <a class="skip" href="#main">{labels.skip}</a>
     <header class="site-header">
       <div class="container bar">
-        <a class="brand" href={locale === 'en' ? '/en/' : '/'} aria-label={locale === 'en' ? 'ArchitectMentor — home' : 'ArchitectMentor — strona główna'}><span class="brand-icon" aria-hidden="true">AM<span class="brand-dot">.</span></span><span class="brand-name">Architect<span>Mentor</span></span></a>
+        <a class="brand" href={locale === 'en' ? '/en/' : '/pl/'} aria-label={locale === 'en' ? 'ArchitectMentor — home' : 'ArchitectMentor — strona główna'}><span class="brand-icon" aria-hidden="true">AM<span class="brand-dot">.</span></span><span class="brand-name">Architect<span>Mentor</span></span></a>
         <nav aria-label={locale === 'en' ? 'Main navigation' : 'Nawigacja główna'}>
-          {locale === 'pl' ? <><a href="/lamiglowka/" aria-current={active === 'practice' ? 'page' : undefined}>{labels.practice}</a><a href="/narzedzia/" aria-current={active === 'tools' ? 'page' : undefined}>{labels.tools}</a><a href="/podstawy-architektury/">{labels.learn}</a><a href="/architektura-w-ruchu/">{labels.trends}</a><a href="/dlafirm/">{labels.business}</a></> : <><a href="/en/">Home</a><a href="/en/foundations/">{labels.learn}</a><a href="/en/architecture-in-motion/">{labels.trends}</a><a href="mailto:architektura@sensinte.com?subject=ArchitectMentor%20enquiry">{labels.contact}</a></>}
+          {locale === 'pl' ? <><a href="/lamiglowka/" aria-current={active === 'practice' ? 'page' : undefined}>{labels.practice}</a><a href="/narzedzia/" aria-current={active === 'tools' ? 'page' : undefined}>{labels.tools}</a><a href="/podstawy-architektury/">{labels.learn}</a><a href="/architektura-w-ruchu/">{labels.trends}</a><a href="/dlafirm/">{labels.business}</a></> : <><a href="/en/practice/" aria-current={active === 'practice' ? 'page' : undefined}>{labels.practice}</a><a href="/en/tools/" aria-current={active === 'tools' ? 'page' : undefined}>{labels.tools}</a><a href="/en/foundations/">{labels.learn}</a><a href="/en/architecture-in-motion/">{labels.trends}</a><a href="/en/for-business/">{labels.business}</a></>}
         </nav>
         <a class="language-switch" href={languageUrl} lang={locale === 'en' ? 'pl' : 'en'} aria-label={locale === 'en' ? 'Read in Polish' : translationUrl ? 'Read this page in English' : 'English homepage'}>{locale === 'en' ? 'PL' : 'EN'}</a>
       </div>
       {showEdition && <a class="edition-strip" href="#nowe"><span class="edition-dot" aria-hidden="true"></span><strong>Nowe od {editionDate}:</strong> {editionCount} materiały do przeczytania i przećwiczenia <span aria-hidden="true">↓</span></a>}
     </header>
     <main id="main"><slot /></main>
-    <footer class="site-footer"><div class="container footer-grid"><div><a class="footer-brand" href={locale === 'en' ? '/en/' : '/'}>ArchitectMentor</a><p>{locale === 'en' ? 'Practical architecture, one decision at a time.' : 'Praktyka architektury, krok po kroku.'}<br />Wiesław Ejsymont</p></div><div class="footer-links">{locale === 'pl' ? <><a href="/lamiglowka/">{labels.puzzle}</a><a href="/narzedzia/">{labels.tools}</a><a href="/antywzorce/">{labels.patterns}</a><a href="/podstawy-architektury/">{labels.basics}</a><a href="/dlafirm/#zapytanie">{labels.contact}</a><a href="mailto:architektura@sensinte.com?subject=Wsp%C3%B3%C5%82praca%20z%20ArchitectMentor">{labels.partner}</a></> : <><a href="/en/architecture-in-motion/">{labels.trends}</a><a href="/en/foundations/">{labels.basics}</a><a href="mailto:architektura@sensinte.com?subject=ArchitectMentor%20enquiry">{labels.contact}</a></>}</div></div><div class="container footer-base">© 2026 ArchitectMentor{locale === 'pl' && <> · <a href="/informacja-o-danych/">Informacja o danych</a></>}</div></footer>
+    <footer class="site-footer"><div class="container footer-grid"><div><a class="footer-brand" href={locale === 'en' ? '/en/' : '/pl/'}>ArchitectMentor</a><p>{locale === 'en' ? 'Practical architecture, one decision at a time.' : 'Praktyka architektury, krok po kroku.'}<br />Wiesław Ejsymont</p></div><div class="footer-links">{locale === 'pl' ? <><a href="/lamiglowka/">{labels.puzzle}</a><a href="/narzedzia/">{labels.tools}</a><a href="/antywzorce/">{labels.patterns}</a><a href="/podstawy-architektury/">{labels.basics}</a><a href="/dlafirm/#zapytanie">{labels.contact}</a><a href="mailto:architektura@sensinte.com?subject=Wsp%C3%B3%C5%82praca%20z%20ArchitectMentor">{labels.partner}</a></> : <><a href="/en/practice/">{labels.puzzle}</a><a href="/en/tools/">{labels.tools}</a><a href="/en/anti-patterns/">{labels.patterns}</a><a href="/en/foundations/">{labels.basics}</a><a href="/en/for-business/#enquiry">{labels.contact}</a><a href="/en/architecture-in-motion/">{labels.trends}</a></>}</div></div><div class="container footer-base">© 2026 ArchitectMentor · <a href={locale === 'pl' ? '/informacja-o-danych/' : '/en/data-notice/'}>{locale === 'pl' ? 'Informacja o danych' : 'Data notice'}</a></div></footer>
   </body>
 </html>
 

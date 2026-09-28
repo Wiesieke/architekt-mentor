@@ -1,0 +1,60 @@
+---
+import Studio from '../layouts/Studio.astro';
+import { marked } from 'marked';
+import { englishPuzzleUrl, englishPuzzles } from '../data/puzzles-en';
+const { puzzle } = Astro.props as { puzzle:(typeof englishPuzzles)[number] };
+const scenario = marked.parse(puzzle.scenario);
+const analysis = marked.parse(puzzle.analysis);
+const polishUrl = puzzle.id === '2026-w40-izolacja-zasobow' ? '/lamiglowka/' : `/lamiglowki/${puzzle.id}/`;
+const isLatest = englishPuzzleUrl(puzzle.id) === '/en/practice/';
+---
+<Studio locale="en" translationUrl={polishUrl} title={puzzle.title} description={`Architecture exercise: ${puzzle.question}`} published={puzzle.date} active="practice">
+ <div class="exercise-head"><div class="container"><a class="back" href="/en/practice/archive/">← All exercises</a><div class="eyebrow">Decision workshop · {puzzle.week}</div><h1>{puzzle.title}</h1><p>Identify the risk, make a decision and compare your reasoning with a senior architect’s analysis.</p></div></div>
+ <div class="container exercise" data-puzzle-id={puzzle.id}>
+  <article class="panel"><div class="label">01 · SCENARIO · {puzzle.difficulty}</div><div class="body"><div class="markdown" set:html={scenario} /><div class="question"><strong>Your question</strong><p>{puzzle.question}</p></div><details><summary>Guiding questions</summary><ul>{puzzle.hints.map(h => <li>{h}</li>)}</ul></details></div></article>
+  <section class="panel"><div class="label">02 · YOUR DECISION</div><div class="body"><h2>What would you do?</h2><p>Describe your decision, the main trade-off and how you would test it.</p><label for="answer">Your first answer</label><textarea id="answer" maxlength="4000" placeholder="I would start by... because... I would verify this by..."></textarea><p class="small">At least 40 characters are needed for mentor feedback.</p>
+    {puzzle.coach ? <><div class="privacy"><label><input type="checkbox" id="save-answer" /> Save my answer and feedback for 90 days to improve the tool</label><a href="/en/data-notice/">How is my data used?</a></div><p class="small">Your answer is sent to an AI provider to prepare feedback. Do not enter confidential or other people’s personal data.</p><button id="coach-button" class="button" type="button">Ask the mentor a question →</button><p id="coach-status" role="status" aria-live="polite"></p><div id="coach-result" aria-live="polite"></div><section id="revision" hidden><h3>Revise your answer</h3><p>Answer the mentor’s question in this separate field. Your first answer remains above for comparison.</p><button id="copy-answer" type="button" class="text-button">Copy my first answer</button><label for="revised-answer">Your revised answer</label><textarea id="revised-answer" maxlength="4000" placeholder="After the mentor’s question, I would add... and verify..."></textarea><button id="score-button" class="button" type="button">Score my revised answer →</button><p id="score-status" role="status" aria-live="polite"></p><div id="score-result" aria-live="polite"></div></section></> : <p class="small">This archived exercise includes a senior analysis. AI feedback is unavailable for this scenario.</p>}
+  </div></section>
+  <section class="panel" id="senior"><div class="label">03 · SENIOR ANALYSIS</div><div class="body"><h2>Compare your reasoning</h2><p>Read the full analysis at any time, including without AI feedback.</p><button id="reveal" class="button secondary" type="button" aria-expanded="false" aria-controls="analysis">Show analysis ↓</button><div id="analysis" class="markdown analysis" hidden set:html={analysis} /></div></section>
+  {isLatest && <section class="panel"><div class="label">04 · EXAMPLE DECISION RECORD</div><div class="body"><h2>What could an ADR capture?</h2><p>This fictional example is a starting point for discussion, not an approved project decision.</p><dl><dt>Status</dt><dd>Example for discussion</dd><dt>Context</dt><dd>Orders and reports share 40 connections and one worker queue. Slow reports block checkout. Traffic levels and service objectives are not yet known.</dd><dt>Decision</dt><dd>Separate concurrency limits and queues for reporting and the critical checkout path. Set timeouts and behaviour at capacity; avoid unconditional retries. Select numerical limits after measurements.</dd><dt>Consequences</dt><dd>Reports may wait or be rejected. Separate pools add operational parameters and may leave spare capacity unused.</dd><dt>Verification</dt><dd>Slow the reporting service under representative load and measure saturation, queues, timeouts and checkout latency against agreed objectives.</dd><dt>Open questions</dt><dd>What response targets and traffic distribution apply? Can reports run asynchronously?</dd></dl><a href="/en/tools/adr/">Write your own ADR →</a></div></section>}
+  <div class="next"><a href="/en/anti-patterns/">Explore related anti-patterns →</a><a href="/en/foundations/">Review the foundations →</a></div>
+ </div>
+</Studio>
+<script>
+ const root=document.querySelector<HTMLElement>('[data-puzzle-id]');
+ const answer=document.querySelector<HTMLTextAreaElement>('#answer');
+ const revision=document.querySelector<HTMLElement>('#revision');
+ const revised=document.querySelector<HTMLTextAreaElement>('#revised-answer');
+ const save=document.querySelector<HTMLInputElement>('#save-answer');
+ let attemptId:string|null=null;
+ function message(text:string,cls?:string){const p=document.createElement('p');p.textContent=text;if(cls)p.className=cls;return p;}
+ function note(data:{saved?:boolean;recordId?:string}){return data.saved===true ? ` Saved (ID: ${data.recordId}).` : data.saved===false ? ' Saving failed; keep your answer locally.' : '';}
+ async function mentor(stage:'hint'|'score',value:string){
+  const response=await fetch('/api/evaluate-puzzle',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({puzzleId:root?.dataset.puzzleId,locale:'en',stage,answer:value,attemptId,saveAnswer:save?.checked===true})});
+  const data=await response.json();if(!response.ok)throw new Error(data.error||'Feedback is temporarily unavailable.');attemptId=data.attemptId||attemptId;return data;
+ }
+ const hintButton=document.querySelector<HTMLButtonElement>('#coach-button');
+ const hintStatus=document.querySelector<HTMLElement>('#coach-status');
+ const hintResult=document.querySelector<HTMLElement>('#coach-result');
+ hintButton?.addEventListener('click',async()=>{
+  if(!answer||!hintStatus||!hintResult||!revision||!revised||!hintButton)return;
+  const value=answer.value.trim();if(value.length<40){hintStatus.textContent='Please explain your decision in at least 40 characters.';answer.focus();return;}
+  hintButton.disabled=true;hintStatus.textContent='Preparing a question…';
+  try{const data=await mentor('hint',value);hintResult.replaceChildren(message(data.positive||''),message(data.question||'','mentor-question'));hintStatus.textContent='A separate field for your revised answer is now open below.'+note(data);answer.readOnly=true;hintButton.hidden=true;revision.hidden=false;revised.focus();}
+  catch(error){hintStatus.textContent=error instanceof Error?error.message:'Mentor unavailable.';}finally{hintButton.disabled=false;}
+ });
+ document.querySelector('#copy-answer')?.addEventListener('click',()=>{if(answer&&revised){revised.value=answer.value;revised.focus();}});
+ const scoreButton=document.querySelector<HTMLButtonElement>('#score-button');const scoreStatus=document.querySelector<HTMLElement>('#score-status');const scoreResult=document.querySelector<HTMLElement>('#score-result');
+ scoreButton?.addEventListener('click',async()=>{
+  if(!revised||!scoreStatus||!scoreResult||!scoreButton)return;
+  const value=revised.value.trim();if(value.length<40){scoreStatus.textContent='Please write at least 40 characters.';revised.focus();return;}
+  scoreButton.disabled=true;scoreStatus.textContent='Scoring your answer…';
+  try{const data=await mentor('score',value);scoreResult.replaceChildren(message(`${data.score} / ${data.maxScore} points`,'mentor-question'),message(data.overall||''));if(Array.isArray(data.criteria)){const ul=document.createElement('ul');for(const item of data.criteria)ul.append(message(`${item.label}: ${item.points}/2 — ${item.reason}`));scoreResult.append(ul);}scoreResult.append(message(data.nextStep||''));scoreStatus.textContent='Feedback ready. Compare it with the senior analysis below.'+note(data);revised.readOnly=true;scoreButton.hidden=true;}
+  catch(error){scoreStatus.textContent=error instanceof Error?error.message:'Scoring unavailable.';}finally{scoreButton.disabled=false;}
+ });
+ const reveal=document.querySelector<HTMLButtonElement>('#reveal');const analysis=document.querySelector<HTMLElement>('#analysis');
+ reveal?.addEventListener('click',()=>{if(!analysis||!reveal)return;const open=reveal.getAttribute('aria-expanded')!=='true';analysis.hidden=!open;reveal.setAttribute('aria-expanded',String(open));reveal.textContent=open?'Hide analysis ↑':'Show analysis ↓';});
+</script>
+<style>
+ .exercise-head{background:#142b3b;color:#f8f7f2;padding:40px 0 60px}.back{font-size:13px;color:#bce4d2}.exercise-head .eyebrow{color:#bce4d2;margin-top:35px}.exercise-head h1{font-size:clamp(34px,5vw,57px);max-width:18ch;margin:17px 0}.exercise-head p{max-width:65ch;color:#c9d8d8}.exercise{max-width:900px;padding-top:46px;padding-bottom:85px}.panel{background:#fff;border:1px solid #dce4df;border-radius:13px;overflow:hidden;margin-bottom:22px}.label{padding:14px 26px;background:#e8f4ef;color:#136d73;font-size:11px;font-weight:800;letter-spacing:.12em}.body{padding:27px 32px}.body h2{font-size:25px}.body h3{font-size:21px}.body p,.markdown{color:#3d5261;line-height:1.7}.markdown :global(h3){margin-top:27px}.markdown :global(ul),.markdown :global(ol){padding-left:23px}.markdown :global(blockquote){border-left:3px solid #e1a35d;background:#fbf7eb;padding:12px 18px;margin-left:0}.question{padding:17px 20px;border-left:3px solid #e1a35d;background:#fbf7eb;margin:27px 0}.question strong{font-size:12px;text-transform:uppercase;color:#85602f}.question p{font-weight:700;margin:6px 0}.body details{border-top:1px solid #dce4df;padding-top:15px}.body summary{color:#136d73;cursor:pointer;font-weight:800}.body label{display:block;font-weight:700;font-size:13px;margin:22px 0 8px}.body textarea{width:100%;min-height:170px;padding:15px;resize:vertical;border:1px solid #bdcec9;border-radius:8px}.small{font-size:12px}.privacy{padding:12px 17px;background:#f5f8f5;border-radius:8px;margin:18px 0}.privacy label{display:flex;gap:8px;align-items:start;margin:0}.privacy a{font-size:12px;color:#136d73}.body button{margin-top:15px}.body button:disabled{opacity:.6}.text-button{border:0;background:none;color:#136d73;font-size:12px;text-decoration:underline;padding:0}#revision{border-top:1px solid #dce4df;margin-top:23px;padding-top:20px}#coach-status,#score-status{font-size:12px}#coach-result,#score-result{background:#e8f4ef;border-radius:8px;padding:0 17px}#coach-result:not(:empty),#score-result:not(:empty){padding:17px;margin-top:16px}.mentor-question{font-weight:800!important;color:#136d73!important}.analysis{border-top:1px solid #dce4df;margin-top:20px;padding-top:16px}.body dt{font-size:13px;font-weight:800;color:#136d73;margin-top:15px}.body dd{margin:4px 0 0;color:#3d5261}.body>a,.next a{color:#136d73;font-weight:700}.next{display:flex;gap:26px;flex-wrap:wrap}@media(max-width:540px){.body{padding:20px}.exercise{padding-top:24px}.exercise-head{padding-bottom:45px}}[hidden]{display:none!important}
+</style>

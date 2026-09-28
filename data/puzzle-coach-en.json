@@ -1,0 +1,24 @@
+{
+  "2026-w40-izolacja-zasobow": {
+    "scenario": "Fictional shop application. Delivery pricing and seller reporting calls share 40 outbound connections and one worker queue. A reporting slowdown holds workers for 20 seconds and blocks checkout even though delivery pricing is healthy. The team proposes doubling the pool and retrying each call three times. Traffic levels and service objectives are unknown.",
+    "question": "How do you keep reporting delays from blocking orders? What limits, overload behaviour and measurements do you define before changing connection counts?",
+    "criteria": [
+      {"id":"shared","label":"Shared failure boundary","expected":"Identify the shared connection pool and worker queue as the mechanism that spreads reporting delays to checkout."},
+      {"id":"isolation","label":"Resource isolation","expected":"Separate pools, queues or concurrency limits for reporting and the critical checkout path."},
+      {"id":"overload","label":"Overload and degradation","expected":"Specify timeouts, bounded queues and a response at capacity so reports may lag without blocking checkout."},
+      {"id":"retries","label":"Retry safety","expected":"Avoid unconditional retries; consider load amplification and whether repeat operations are safe."},
+      {"id":"evidence","label":"Measurement and test","expected":"Define distinct objectives, saturation metrics and a reporting slowdown test under representative traffic; do not guess a connection count."}
+    ]
+  },
+  "2026-w39-anon-managed-platform": {
+    "scenario": "An anonymised architecture review. The application layer is required to use managed cloud services and connect to an existing integration platform. A supplier offers an application on virtual machines with some managed data services. Only some integration claims are demonstrated. Business stakeholders see functional value; a full implementation design is not available.",
+    "question": "How do you distinguish continued offer evaluation from approval of implementation architecture? What conditions and evidence are needed?",
+    "criteria": [
+      {"id":"decisions","label":"Separate decisions","expected":"Distinguish further evaluation from implementation architecture approval; do not grant unconditional approval."},
+      {"id":"deviation","label":"Requirement deviation","expected":"Identify potential deviation in virtual-machine application hosting, distinguish mandatory requirement from preference, and respect formal procurement review."},
+      {"id":"integration","label":"Integration evidence","expected":"Request verifiable contracts, data flows, authentication, error handling and tests for specific interfaces."},
+      {"id":"conditions","label":"Conditional recommendation","expected":"Specify conditions, owners, deadlines and objective closure evidence."},
+      {"id":"next","label":"Review point","expected":"Differentiate evidence needed before selection from what HLD and tests can verify, and name a reassessment point."}
+    ]
+  }
+}

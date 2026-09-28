@@ -1,0 +1,64 @@
+---
+import Studio from '../../../layouts/Studio.astro';
+---
+<Studio locale="en" translationUrl="/narzedzia/adr/" title="Create an ADR" description="Record an architecture decision, its context, alternatives, consequences and verification. Download Markdown." active="tools">
+  <div class="container adr-page">
+    <a class="back" href="/en/tools/">← All tools</a>
+    <div class="eyebrow">One decision · one record</div><h1>Create an ADR</h1>
+    <p class="intro">An ADR records the reason for a decision and its consequences. Draft the record and review it with the people responsible for the solution.</p>
+    <div class="privacy-note"><strong>This form works locally in your browser.</strong> It does not send or store your content on a server. Download the file before closing or refreshing this page.</div>
+    <form id="adr-form" class="editor" novalidate>
+      <div class="field"><label for="adr-title">Decision title <span aria-hidden="true">*</span></label><p>Name the choice you need to justify.</p><input id="adr-title" name="title" required maxlength="160" placeholder="Example: Separate reporting capacity from order processing" /></div>
+      <div class="field"><label for="adr-context">Context <span aria-hidden="true">*</span></label><p>What problem are you solving? What is known and what needs confirmation?</p><textarea id="adr-context" name="context" required maxlength="6000" rows="5" placeholder="Current situation, goal, constraints and unknowns..."></textarea></div>
+      <div class="field"><label for="adr-options">Options considered</label><p>List alternatives and reasons for rejecting them, if known.</p><textarea id="adr-options" name="options" maxlength="6000" rows="4" placeholder="Option A: ...\nOption B: ..."></textarea></div>
+      <div class="field"><label for="adr-decision">Proposed decision <span aria-hidden="true">*</span></label><p>What do you choose and why? Mark what still needs confirmation.</p><textarea id="adr-decision" name="decision" required maxlength="6000" rows="5" placeholder="I propose... because..."></textarea></div>
+      <div class="field"><label for="adr-consequences">Consequences</label><p>What do you gain and what cost or risk does it introduce?</p><textarea id="adr-consequences" name="consequences" maxlength="6000" rows="4" placeholder="Benefits, costs, trade-offs..."></textarea></div>
+      <details class="more-fields"><summary>Add verification and open questions <span aria-hidden="true">＋</span></summary>
+        <div class="field"><label for="adr-verification">How will you verify the decision?</label><textarea id="adr-verification" name="verification" maxlength="6000" rows="3" placeholder="Test, measure, deadline and owner..."></textarea></div>
+        <div class="field"><label for="adr-questions">Open questions</label><textarea id="adr-questions" name="questions" maxlength="6000" rows="3" placeholder="What data is needed before approval?"></textarea></div>
+      </details>
+      <div class="actions"><button class="button" id="download-adr" type="submit">Download draft ADR (.md) <span aria-hidden="true">↓</span></button><span id="adr-status" role="status" aria-live="polite"></span></div>
+      <p class="footnote">File status: “Draft decision”. Downloading it does not approve a decision in your organisation.</p>
+    </form>
+  </div>
+</Studio>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#adr-form');
+  const status = document.querySelector<HTMLElement>('#adr-status');
+  form?.addEventListener('submit', event => {
+    event.preventDefault();
+    if(!form || !status || !form.reportValidity()) return;
+    const fields = new FormData(form);
+    const value = (name:string) => String(fields.get(name) ?? '').trim().replace(/\r\n?/g,'\n');
+    const missing = ['title','context','decision'].find(name => !value(name));
+    if(missing){
+      status.textContent='Enter a title, context and proposed decision.';
+      (form.elements.namedItem(missing) as HTMLElement)?.focus();
+      return;
+    }
+    const section = (heading:string, content:string) => `## ${heading}\n\n${content || '_To complete before approval._'}\n`;
+    const markdown = [
+      `# ADR: ${value('title')}`, '',
+      'Status: Draft decision', '',
+      section('Context', value('context')),
+      section('Options considered', value('options')),
+      section('Decision and rationale', value('decision')),
+      section('Consequences', value('consequences')),
+      section('Verification', value('verification')),
+      section('Open questions', value('questions')),
+    ].join('\n');
+    const url = URL.createObjectURL(new Blob([markdown], {type:'text/markdown;charset=utf-8'}));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ADR-${new Date().toISOString().slice(0,10)}.md`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    status.textContent = 'The ADR file is ready to download.';
+  });
+</script>
+<style>
+  .adr-page{max-width:860px;padding-top:44px;padding-bottom:95px}.back{display:inline-block;color:#136d73;font-size:13px;font-weight:700;margin-bottom:35px}.adr-page h1{font-size:clamp(37px,5vw,55px);margin:17px 0}.intro{max-width:68ch;color:#536577;font-size:17px}.privacy-note{background:#e8f4ef;border:1px solid #bddbd2;border-radius:9px;padding:16px 19px;margin:26px 0;color:#34545a;font-size:13px;line-height:1.65}.editor{background:#fff;border:1px solid #dce4df;border-radius:14px;padding:clamp(21px,4vw,39px)}.field{margin-bottom:27px}.field label{display:block;font-size:14px;font-weight:800}.field label span{color:#b06030}.field p{color:#617880;font-size:12px;margin:4px 0 9px}.field input,.field textarea{display:block;width:100%;border:1px solid #bdcec9;border-radius:8px;padding:12px 14px;background:#fdfefd;color:#182637}.field textarea{resize:vertical;line-height:1.55}.more-fields{border-top:1px solid #e8ede8;border-bottom:1px solid #e8ede8;padding:16px 0}.more-fields summary{color:#136d73;font-weight:800;cursor:pointer;list-style:none;font-size:13px}.more-fields summary::-webkit-details-marker{display:none}.more-fields summary span{float:right}.more-fields .field:first-of-type{margin-top:25px}.actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:28px}.actions .button{font-size:13px}.actions span{font-size:12px;color:#536577}.footnote{color:#617880;font-size:12px;margin:14px 0 0}@media(max-width:540px){.adr-page{padding-top:27px;padding-bottom:65px}.back{margin-bottom:20px}}
+</style>
