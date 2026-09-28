@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+<meta name="robots" content="noindex,follow">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Architektura w ruchu: wybrane zmiany w technologiach i praktykach architektonicznych z komentarzem, konsekwencjami i źródłami.">
@@ -30,5 +31,10 @@
   <aside class="next"><h2>Co dalej?</h2><p>Jeżeli chcesz uporządkować pojęcia, zacznij od <a href="/podstawy-architektury.html">podstaw architektury</a>. Praktyczne decyzje przećwiczysz w <a href="/lamiglowki.html">łamigłówkach</a>. Nowe materiały będą dopisywane z datą i odnośnikiem do źródła.</p></aside>
 </main>
 <footer><div class="wrap"><span>© 2026 Architekt-Mentor · Wiesław Ejsymont</span><a href="mailto:architektura@sensinte.com">Kontakt: architektura@sensinte.com</a></div></footer>
+<script>
+  const sections = {'postgresql-19-beta4':'/architektura-w-ruchu/postgresql-19-beta4/','otel-k8s':'/architektura-w-ruchu/otel-k8s/','platforma':'/architektura-w-ruchu/platforma/','gateway':'/architektura-w-ruchu/gateway/'};
+  const destination = sections[location.hash.slice(1)] || '/architektura-w-ruchu/';
+  location.replace(destination);
+</script>
 </body>
 </html>

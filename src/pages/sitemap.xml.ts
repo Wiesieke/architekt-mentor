@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { articles, articleUrl } from '../data/articles';
 import { latestEditionDate } from '../data/editions';
 import patterns from '../../data/antywzorce.json';
+import puzzles from '../../data/puzzles.json';
 
 export const GET: APIRoute = () => {
   // Preview sites remain out of the index. Publish the map only after migration.
@@ -9,6 +10,8 @@ export const GET: APIRoute = () => {
     ? [
       {path:'/', modified:latestEditionDate},
       {path:'/lamiglowka/'},
+      {path:'/lamiglowki/'},
+      ...puzzles.filter(p => p.id !== [...puzzles].filter(item => item.coach).sort((a,b) => b.date.localeCompare(a.date))[0].id).map(p => ({path:`/lamiglowki/${p.id}/`,modified:p.date})),
       {path:'/narzedzia/'},
       {path:'/narzedzia/adr/'},
       {path:'/narzedzia/hld/'},

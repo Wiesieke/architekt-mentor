@@ -1,14 +1,15 @@
 ---
 import Studio from '../../layouts/Studio.astro';
 import { articles, articleUrl } from '../../data/articles';
-const item = articles.find(a => a.section === 'podstawy-architektury')!;
+const items = articles.filter(a => a.section === 'podstawy-architektury');
+const item = items.find(a => a.slug === 'bulkhead')!;
 ---
 <Studio title="Podstawy architektury IT" description="Architektura korporacyjna i rozwiązań: praktyczne podstawy, wzorce, ramy, opis architektury, C4 i ADR.">
  <div class="container archive"><div class="eyebrow">Magazyn · wiedza trwała</div><h1>Podstawy architektury</h1><p>Praktyczne wzorce i metody, które pomagają nazwać ryzyko, porównać rozwiązania i uzasadnić decyzję.</p>
  <article class="featured"><span>WZORZEC · ODPORNOŚĆ</span><h2><a href={articleUrl(item)}>{item.title}</a></h2><p>{item.description}</p><a href={articleUrl(item)}>Przeczytaj artykuł →</a></article>
- <div class="legacy"><h2>Więcej podstaw</h2><p>Opis architektury, C4, ADR, ramy i inne wzorce są dostępne w dotychczasowym przewodniku. Będziemy przenosić je na osobne adresy wraz z kolejnymi aktualizacjami.</p><a href="/podstawy-architektury.html">Otwórz pełny przewodnik →</a></div>
+ <h2 class="archive-title">Pozostałe materiały</h2><div class="cards">{items.filter(a => a !== item).map(article => <article><span>{article.topic}</span><h3><a href={articleUrl(article)}>{article.title}</a></h3><p>{article.description}</p><a href={articleUrl(article)}>Przeczytaj →</a></article>)}</div>
  </div>
 </Studio>
 <style>
- .archive{padding-top:67px;padding-bottom:95px}.archive h1{font-size:clamp(37px,5vw,57px);margin:18px 0}.archive>p{max-width:68ch;color:#536577}.featured{background:#fff;border:1px solid #dce4df;border-radius:12px;padding:32px;margin:40px 0 25px;max-width:780px}.featured span{font-size:11px;color:#136d73;letter-spacing:.12em;font-weight:800}.featured h2{font-size:26px}.featured h2 a{text-decoration:none}.featured p,.legacy p{color:#536577}.featured>a,.legacy a{color:#136d73;font-weight:700}.legacy{max-width:720px;padding-top:12px}.legacy h2{font-size:21px}@media(max-width:540px){.archive{padding-top:34px}.featured{padding:22px;margin-top:24px}}
+ .archive{padding-top:67px;padding-bottom:95px}.archive h1{font-size:clamp(37px,5vw,57px);margin:18px 0}.archive>p{max-width:68ch;color:#536577}.featured,.cards article{background:#fff;border:1px solid #dce4df;border-radius:12px;padding:32px}.featured{margin:40px 0 25px;max-width:780px}.featured span,.cards span{font-size:11px;color:#136d73;letter-spacing:.12em;font-weight:800}.featured h2{font-size:26px}.featured h2 a,.cards h3 a{text-decoration:none}.featured p,.cards p{color:#536577}.featured>a,.cards article>a{color:#136d73;font-weight:700}.archive-title{font-size:26px;margin:42px 0 20px}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.cards h3{font-size:22px}@media(max-width:660px){.archive{padding-top:34px}.featured,.cards article{padding:22px}.featured{margin-top:24px}.cards{grid-template-columns:1fr}}
 </style>
