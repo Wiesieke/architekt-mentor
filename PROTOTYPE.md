@@ -1,6 +1,6 @@
 # Prototyp magazynu ArchitectMentor w Astro
 
-Ta gałąź pokazuje stronę główną (`/`), łamigłówkę (`/lamiglowka/`), archiwa obu działów i pięć artykułów na własnych adresach (cztery z „Architektury w ruchu”, jeden z „Podstaw”). Jest przeznaczona do podglądu. Nie scalać jej do `main`: kompilacja Astro zastąpiłaby obecne strony, które nie zostały jeszcze przeniesione.
+Ta gałąź pokazuje stronę główną (`/`), łamigłówkę (`/lamiglowka/`), archiwa działów, pięć artykułów (cztery z „Architektury w ruchu”, jeden z „Podstaw”) oraz cztery antywzorce na własnych adresach. Jest przeznaczona do podglądu. Nie scalać jej do `main`: kompilacja Astro zastąpiłaby obecne strony, które nie zostały jeszcze przeniesione.
 
 ## Sprawdzenie lokalne
 
@@ -10,9 +10,11 @@ npm run build
 npm run dev
 ```
 
-Łamigłówka jest wybierana z istniejącego `data/puzzles.json`. Analiza seniora działa bez AI; przycisk oceny korzysta z istniejącego endpointu `/api/evaluate-puzzle`, jeśli jest dostępny na wdrożeniu podglądowym. Zapis odpowiedzi pozostaje wyłączony, dopóki użytkownik nie zaznaczy pola.
+Łamigłówka jest wybierana z istniejącego `data/puzzles.json`. Ścieżka: scenariusz → pierwsza decyzja → pytanie mentora → osobne pole na poprawioną odpowiedź i ocena → analiza seniora → przykładowy ADR do pobrania → powiązany antywzorzec i wzorzec. Nazwy pięciu kryteriów oceny są widoczne przed odpowiedzią; pełna analiza i ADR są dostępne także bez użycia AI. Przycisk oceny korzysta z istniejącego endpointu `/api/evaluate-puzzle`, jeśli jest dostępny na wdrożeniu podglądowym. Zapis odpowiedzi pozostaje wyłączony, dopóki użytkownik nie zaznaczy pola. Wynik AI jest pomocniczy.
 
-Pozostałe sekcje prowadzą do aktualnej produkcyjnej witryny. Przed migracją całości trzeba przenieść pozostałe treści i istniejące funkcje `/api`, stronę o danych, stronę oferty, antywzorce, generator HLD i kontakt. Zachowaj stare adresy lub przekieruj je na odpowiedniki; stare fragmenty `#postgresql-19-beta4` itp. nie są przesyłane serwerowi, więc samym przekierowaniem HTTP nie da się skierować każdej kotwicy na osobny artykuł. Można pozostawić stary przewodnik z odsyłaczami do nowych stron. W prototypie ustawiono `noindex,nofollow`.
+Przy kolejnej łamigłówce dodaj do najnowszego wpisu opcjonalne `decisionRecord` z polami `status`, `context`, `decision`, `rationale`, `consequences` (lista), `verification` i `openQuestions` (lista) oraz `related` z adresami, tytułami i krótkimi opisami powiązanego antywzorca i wzorca. Opisz fikcyjny przykład, zaznacz niewiadome i nie wpisuj arbitralnych limitów bez danych. Jeśli nie ma ADR, prototyp pokazuje analizę bez niego; jeśli nie ma powiązań, pokazuje ogólne archiwa zamiast linków z poprzedniego ćwiczenia.
+
+Pozostałe sekcje prowadzą do aktualnej produkcyjnej witryny. Przed migracją całości trzeba przenieść pozostałe treści i istniejące funkcje `/api`, stronę o danych, stronę oferty, generator HLD i kontakt. Zachowaj stare adresy lub przekieruj je na odpowiedniki; stare fragmenty `#postgresql-19-beta4` itp. nie są przesyłane serwerowi, więc samym przekierowaniem HTTP nie da się skierować każdej kotwicy na osobny artykuł. Można pozostawić stary przewodnik z odsyłaczami do nowych stron. W prototypie ustawiono `noindex,nofollow`.
 
 ## Magazyn: publikacje, języki i widoczność
 
