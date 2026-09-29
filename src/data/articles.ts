@@ -10,6 +10,7 @@ import ramy from '../content/articles/ramy.html?raw';
 import wzorce from '../content/articles/wzorce.html?raw';
 import checklista from '../content/articles/checklista.html?raw';
 import slo from '../content/articles/slo-budzet-bledow.html?raw';
+import qualityScenarios from '../content/articles/scenariusze-atrybutow-jakosciowych.html?raw';
 
 export interface Article {
   section: 'architektura-w-ruchu' | 'podstawy-architektury';
@@ -22,6 +23,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'scenariusze-atrybutow-jakosciowych', title:'Scenariusz jakościowy: od przymiotnika do miary', description:'Jak zamienić „szybki, bezpieczny i łatwy do zmiany” w sprawdzalne wymaganie, które prowadzi do decyzji architektonicznej.', topic:'Atrybuty jakościowe', published:'2026-09-29', body:qualityScenarios },
   { section:'podstawy-architektury', slug:'slo-budzet-bledow', title:'SLO i budżet błędów: od pomiaru do decyzji', description:'Jak zdefiniować SLI dla ścieżki użytkownika, policzyć budżet błędów i wykorzystać go w decyzji architektonicznej.', topic:'Niezawodność', published:'2026-09-28', body:slo },
   { section:'architektura-w-ruchu', slug:'postgresql-19-beta4', title:'PostgreSQL 19 Beta 4: funkcje wycofane przed wydaniem', description:'Które funkcje PostgreSQL 19 wycofano z bety i co to oznacza dla decyzji o migracji? Fakty, źródła i pytanie do projektu.', topic:'Bazy danych', published:'2026-09-28', eventDate:'2026-09-24', body:postgresql },
   { section:'architektura-w-ruchu', slug:'otel-k8s', title:'OpenTelemetry: stabilny procesor atrybutów Kubernetes', description:'Stabilizacja k8sattributes i znaczenie spójnych atrybutów telemetrii dla architektury i monitoringu.', topic:'Obserwowalność', eventDate:'2026-09-16', body:otel },

@@ -1,6 +1,41 @@
 import patterns from '../../data/antywzorce.json';
 
 const translations: Record<string, { title: string; summary: string; content: string }> = {
+  '2026-09-29-migracja-schematu-jeden-krok': {
+    title: 'One-step schema migration',
+    summary: 'Code, data backfill and removal of the old contract ship together, preventing version coexistence and leaving rollback with an incompatible schema.',
+    content: `**Fictional teaching example.** It does not describe a particular organisation or incident.
+
+## Situation
+
+A team changes the name and meaning of a database column used by several application instances. One deployment adds the new field, rewrites every row, switches the code and drops the old field. The plan assumes every step finishes before traffic resumes.
+
+## Where the anti-pattern appears
+
+The rollout treats code, schema and a multi-million-row backfill as one instant. In practice, instances change gradually, data migration can run for a long time, and one step may need to be reversed independently. Destructive removal prevents the old version from operating and can eliminate a safe rollback path.
+
+## Warning signs
+
+- a migration drops a field or changes its meaning before all consumers have retired;
+- there is no compatibility matrix for code and schema versions;
+- the backfill must complete in one maintenance window and cannot safely resume;
+- rollback covers only the application image, not data written after the change;
+- “the script exited successfully” substitutes for completeness and consistency checks.
+
+## A better decision
+
+1. Expand the schema compatibly with the old version.
+2. Define transition writes explicitly. Dual writes have a cost: name the transformation owner and measure discrepancies.
+3. Backfill in idempotent, resumable batches while measuring locks, load, progress and skipped records.
+4. Switch reads only after measurable exit criteria pass. Rehearse mixed-version operation and rollback.
+5. Remove the old contract in a later deployment after telemetry shows no consumers and the rollback window closes.
+
+## The trade-off
+
+Parallel change takes longer and temporarily adds complexity. In return, it limits blast radius, makes each stage observable and separates a reversible switch from destructive cleanup. Not every table needs elaborate automation, but every destructive change needs an explicit compatibility analysis.
+
+> Destructive cleanup should not be the first step of a change whose success is still unproven.`,
+  },
   '2026-09-wspolna-pula-zaleznosci': {
     title: 'One resource pool for every dependency',
     summary: 'A slow reporting service consumes shared workers and prevents orders from completing.',

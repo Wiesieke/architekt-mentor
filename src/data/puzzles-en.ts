@@ -1,6 +1,36 @@
 import puzzles from '../../data/puzzles.json';
 
-const translations: Record<string, { title:string; scenario:string; question:string; hints:string[]; analysis:string; difficulty:string }> = {
+type EnglishDecisionRecord = { context:string; decision:string; consequences:string; verification:string; openQuestions:string };
+const translations: Record<string, { title:string; scenario:string; question:string; hints:string[]; analysis:string; difficulty:string; decisionRecord?:EnglishDecisionRecord }> = {
+  '2026-09-29-expand-contract': {
+    title:'Two application versions, one schema. How do you deploy without downtime?', difficulty:'Advanced',
+    scenario:`**Fictional example.** A case-management application runs on six instances. The team wants to replace a \`status\` column with \`state\`, change its allowed values and immediately remove the old field. The rollout is gradual, so old and new application versions run together for several minutes.
+
+The new version reads only \`state\`; the old version reads only \`status\`. Backfilling several million rows will take longer than the code rollout. The team plans to roll back the application if needed, but has not explained what happens to the database change or to records written during the transition.`,
+    question:'How do you split this change into safe stages? When may writes to the old field stop, when may the field be removed, and how do you test rollback?',
+    hints:['Which code version must work with which schema state?','How will you handle writes that happen while historical rows are being backfilled?','Will rolling back code work after an irreversible column removal?','What evidence permits the move from expand to migrate and contract?'],
+    analysis:`### Name the coexistence window
+
+A rolling deployment means old and new code use the same database for a while. Dropping \`status\` first breaks the old version, and rolling code back cannot restore removed data.
+
+### Use parallel change: expand, migrate, contract
+
+1. **Expand:** add \`state\` compatibly. Keep old code on \`status\`; introduce transitional code that handles both fields. Make the owner of dual writes or value translation explicit.
+2. **Migrate:** backfill in resumable, idempotent batches. Account for records written during the backfill and measure discrepancies.
+3. **Switch reads:** read \`state\` only after completeness checks pass. Monitor missing or unknown values and retain old-code compatibility for the agreed rollback window.
+4. **Contract:** stop writing \`status\` when no supported version needs it. Remove it in a later deployment, after the rollback window and recovery plan are closed.
+
+Each transition needs evidence: every eligible row has a valid \`state\`, discrepancies remain at zero for an agreed window, all instances run compatible code, and rolling deployment plus rollback has been rehearsed. Dual writes can also fail, so limit the transition and monitor it.
+
+> Enable version coexistence first, move data and traffic next, and remove the old contract last.`,
+    decisionRecord:{
+      context:'Old and new application versions coexist during a rolling deployment, while backfilling several million records takes longer than the code rollout.',
+      decision:'Use expand, migrate and contract phases. Remove the old column in a separate deployment after the rollback window closes.',
+      consequences:'Two fields and extra consistency checks exist temporarily. The backfill needs telemetry, resumability and explicit completion criteria.',
+      verification:'Rehearse rolling deployment and rollback on representative data; check backfill completeness, field discrepancies, errors in both versions and database lock time.',
+      openQuestions:'How long must rollback remain possible? Where is value translation owned? Which thresholds permit the contract phase?',
+    },
+  },
   '2026-w40-izolacja-zasobow': {
     title:'Reports block checkout. What do you isolate?', difficulty:'Intermediate',
     scenario:`**Fictional example.** A shop application calls two external services: one calculates delivery prices and the other generates reports for sellers. Both use the same pool of 40 outbound connections and the same worker queue.
