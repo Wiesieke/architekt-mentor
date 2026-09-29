@@ -3,6 +3,8 @@ const nodemailer = require('nodemailer');
 const { storage, validPath, hash, randomUUID } = require('./_comments');
 
 const unavailable = (res) => res.status(503).json({ error: 'Comments are temporarily unavailable.' });
+const previewHost = 'project-ead46-git-feature-moderated-comments-my-c.vercel.app';
+const publicHost = () => process.env.VERCEL_ENV === 'preview' ? previewHost : 'ejsymont.com';
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -51,7 +53,7 @@ module.exports = async (req, res) => {
       signal: AbortSignal.timeout(5000)
     });
     const verdict = await challenge.json();
-    if (!verdict.success || verdict.hostname !== 'ejsymont.com') return res.status(400).json({ error: 'Verification failed. / Weryfikacja nie powiodła się.' });
+    if (!verdict.success || verdict.hostname !== publicHost()) return res.status(400).json({ error: 'Verification failed. / Weryfikacja nie powiodła się.' });
   } catch { return unavailable(res); }
   const id = randomUUID(), token = randomBytes(32).toString('hex');
   const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
@@ -66,7 +68,7 @@ module.exports = async (req, res) => {
       auth: { user: process.env.LH_SMTP_USER, pass: process.env.LH_SMTP_PASSWORD },
       connectionTimeout: 8000, greetingTimeout: 8000, socketTimeout: 10000
     });
-    const link = 'https://ejsymont.com/api/comments?action=verify&id=' + encodeURIComponent(id) + '&token=' + token;
+    const link = 'https://' + publicHost() + '/api/comments?action=verify&id=' + encodeURIComponent(id) + '&token=' + token;
     await transport.sendMail({
       from: process.env.LH_SMTP_USER, to: email,
       subject: language === 'en' ? 'Confirm your ArchitectMentor comment' : 'Potwierdź komentarz w ArchitectMentor',
