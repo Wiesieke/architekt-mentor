@@ -26,7 +26,7 @@ function validId(mixed $id): bool {
     return is_string($id) && (bool)preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iD', $id);
 }
 function validPath(mixed $path, mixed $locale): bool {
-    return is_string($path) && is_string($locale) &&
+    return is_string($path) && in_array($locale, ['pl', 'en'], true) &&
         (bool)preg_match('~^/(?:podstawy-architektury|architektura-w-ruchu|antywzorce|en/(?:foundations|architecture-in-motion|anti-patterns))/[a-z0-9-]+/$~D', $path) &&
         (($locale === 'en') === str_starts_with($path, '/en/'));
 }
