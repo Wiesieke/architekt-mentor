@@ -1,5 +1,6 @@
 ---
 import Studio from '../../../layouts/Studio.astro';
+import Comments from '../../../components/Comments.astro';
 import { englishArticles, englishArticleUrl, polishArticleUrl, type EnglishArticle } from '../../../data/articles-en';
 
 export function getStaticPaths() {
@@ -17,7 +18,7 @@ const schema = {
 };
 ---
 <Studio locale="en" translationUrl={polishArticleUrl(article)} title={article.title} description={article.description} published={article.published}>
-  <div class="article-page"><div class="container article-wrap"><a class="back" href={`/en/${article.section}/`}>← {sectionTitle}</a><header><div class="eyebrow">{sectionTitle} · {article.topic}</div><h1>{article.title}</h1><p>{article.description}</p><div class="meta">Wiesław Ejsymont {article.published && <> · Published <time datetime={article.published}>{format(article.published)}</time></>}{article.eventDate && <> · Event date <time datetime={article.eventDate}>{format(article.eventDate)}</time></>}</div></header><article class="article-body" set:html={article.body} /><nav class="more" aria-label="Further reading"><a href={`/en/${article.section}/`}>More articles →</a><a href="/en/foundations/">Explore foundations →</a></nav></div></div>
+  <div class="article-page"><div class="container article-wrap"><a class="back" href={`/en/${article.section}/`}>← {sectionTitle}</a><header><div class="eyebrow">{sectionTitle} · {article.topic}</div><h1>{article.title}</h1><p>{article.description}</p><div class="meta">Wiesław Ejsymont {article.published && <> · Published <time datetime={article.published}>{format(article.published)}</time></>}{article.eventDate && <> · Event date <time datetime={article.eventDate}>{format(article.eventDate)}</time></>}</div></header><article class="article-body" set:html={article.body} /><Comments articlePath={englishArticleUrl(article)} locale="en" /><nav class="more" aria-label="Further reading"><a href={`/en/${article.section}/`}>More articles →</a><a href="/en/foundations/">Explore foundations →</a></nav></div></div>
   <script type="application/ld+json" is:inline set:html={JSON.stringify(schema).replace(/</g,'\u003c')} />
 </Studio>
 <style>

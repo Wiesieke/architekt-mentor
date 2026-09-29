@@ -1,7 +1,7 @@
 ---
 import Studio from '../../layouts/Studio.astro';
 ---
-<Studio locale="en" translationUrl="/informacja-o-danych/" title="Data notice" description="How ArchitectMentor handles briefs, generated designs, exercise answers and contact enquiries.">
+<Studio locale="en" translationUrl="/informacja-o-danych/" title="Data notice" description="How ArchitectMentor handles briefs, exercise answers, comments and contact enquiries.">
  <article class="container data-page">
   <h1>Information about briefs and answers</h1>
   <p class="lead">This notice covers the HLD generator, exercises assessed by the AI mentor and the contact form on ejsymont.com.</p>
@@ -9,8 +9,11 @@ import Studio from '../../layouts/Studio.astro';
   <h2>What happens when you use the tools?</h2><p>A brief entered in the generator or an exercise answer passes through Vercel to an Anthropic model to produce an HLD or feedback. This also happens when you do not opt to save it. Do not enter confidential information or other people’s personal data.</p>
   <p>If you tick a separate save box, we store in a database at LH.pl the brief and generated HLD with the model and chosen options, or the exercise answer and mentor question or assessment. This helps improve the tool. The voluntary save relies on your consent, which you can withdraw by emailing us. Without opting in, the tool works but these contents are not stored in this database.</p>
   <p>The contact form forwards your name, company if provided, email address, selected service and message to architektura@sensinte.com. Sending an enquiry does not require consent to store HLD briefs or exercise answers.</p>
+  <p>If you submit a comment, we store your display name, email address, text, article path, moderation status and a technical hash of the submission source at LH.pl to limit spam. We send an email confirmation link. This does not subscribe you to the newsletter. Once confirmed, the comment awaits moderation. Only your display name, text and approval date appear publicly. Cloudflare Turnstile protects the form and may process technical data under its own terms.</p>
   <h2>For how long and where?</h2><p>Saved brief and answer records are due for deletion after 90 days. Vercel, LH.pl and Anthropic may keep separate technical logs under their own terms. The briefs and exercise database does not store your email address, IP address or account identifier. Contact correspondence remains in the mailbox; its retention depends on subsequent correspondence.</p>
+  <p>Unconfirmed comments are removed after the link expires and up to five more days; rejected comments after 30 days. Published comments remain until the author requests removal or the discussion closes. Email addresses and source hashes are never shown publicly.</p>
   <h2>How can you request deletion?</h2><p>After a successful save, the tool shows a record ID. Email it to <a href="mailto:architektura@sensinte.com">architektura@sensinte.com</a> to request earlier deletion or withdraw consent. You may also request access, correction or restriction of processing and lodge a complaint with Poland’s data protection authority (UODO).</p>
+  <p>To remove a comment, email us from the address used to submit it and include the article URL. We do not publish your email address.</p>
   <p><a href="/en/tools/hld/">HLD generator</a> · <a href="/en/practice/">Architecture exercise</a> · <a href="/en/for-business/#enquiry">Contact form</a></p>
  </article>
 </Studio>
