@@ -1,5 +1,44 @@
 [
   {
+    "id": "2026-09-29-expand-contract",
+    "week": "Publikacja codzienna / 2026",
+    "date": "2026-09-29",
+    "title": "Dwie wersje aplikacji, jeden schemat. Jak wdrożysz zmianę bez przestoju?",
+    "difficulty": "Zaawansowany",
+    "tags": ["ewolucja schematu", "kompatybilność", "wdrożenia", "rollback"],
+    "scenario": "**Przykład fikcyjny.** Aplikacja obsługująca zgłoszenia działa w sześciu instancjach. Zespół chce zastąpić kolumnę `status` nową kolumną `state`, zmienić zestaw wartości i od razu usunąć stare pole. Wdrożenie jest kroczące: przez kilkanaście minut równocześnie działają stara i nowa wersja aplikacji.\n\nNowa wersja potrafi czytać tylko `state`, stara tylko `status`. Migracja danych dla kilku milionów rekordów potrwa dłużej niż samo wdrożenie. Zespół zakłada, że w razie problemów cofnie aplikację, ale nie opisał, co stanie się ze zmianą bazy ani z rekordami zapisanymi w czasie przejścia.",
+    "question": "Jak rozłożysz tę zmianę na bezpieczne etapy? Kiedy wolno przestać zapisywać stare pole i kiedy można je usunąć? Jak sprawdzisz możliwość wycofania wdrożenia?",
+    "hints": [
+      "Która wersja aplikacji musi działać z którym wariantem schematu?",
+      "Jak zsynchronizujesz dane zapisane podczas migracji historycznych rekordów?",
+      "Czy rollback kodu zadziała po nieodwracalnym usunięciu kolumny?",
+      "Jakie obserwacje pozwolą przejść z etapu rozszerzenia do migracji i zwężenia?"
+    ],
+    "analysis": "### Najpierw nazwij okno współistnienia\n\nWdrożenie kroczące oznacza, że przez pewien czas stary i nowy kod korzystają z tej samej bazy. Zmiana schematu nie może więc zakładać natychmiastowego przełączenia wszystkich instancji. Usunięcie `status` w pierwszym kroku złamie starą wersję, a rollback nowej aplikacji nie odtworzy usuniętych danych.\n\n### Zastosuj zmianę równoległą: rozszerz — migruj — zwęź\n\n1. **Rozszerz:** dodaj `state` jako zmianę zgodną wstecz. Stary kod nadal używa `status`. Wprowadź nową wersję, która potrafi pracować w okresie przejściowym; jawnie określ, gdzie wykonywany jest podwójny zapis lub tłumaczenie wartości.\n2. **Migruj:** uzupełniaj historyczne rekordy partiami, bez długiej blokady. Proces musi być wznawialny i idempotentny. Kontroluj rekordy powstające podczas migracji oraz licz rozbieżności między polami.\n3. **Przełącz odczyt:** dopiero po potwierdzeniu kompletności zacznij czytać `state`. Obserwuj błędy, wartości nieznane i udział rekordów bez nowego pola. Zachowaj przez uzgodnione okno możliwość powrotu starego kodu.\n4. **Zwęź:** przestań zapisywać `status`, gdy żadna wspierana wersja już go nie potrzebuje. Usuń kolumnę w osobnym, późniejszym wdrożeniu po zakończeniu okna rollbacku i potwierdzeniu kopii lub planu odtworzenia.\n\n### Co powinno być warunkiem przejścia\n\nKażdy etap potrzebuje mierzalnego kryterium: 100% kwalifikujących się rekordów ma poprawne `state`, brak rozbieżności przez ustalone okno, wszystkie instancje używają zgodnej wersji, a próba rollbacku została wykonana w środowisku z takim samym układem migracji. Podwójny zapis także może zawieść; wybierz jednego właściciela transformacji, monitoruj rozjazdy i ogranicz czas okresu przejściowego.\n\n> Najpierw zapewnij współistnienie wersji, potem przenieś dane i ruch, a dopiero na końcu usuń stary kontrakt.",
+    "related": [
+      {"type":"ANTYWZORZEC","title":"Migracja schematu w jednym kroku","description":"Rozpoznaj zmianę, która odbiera możliwość bezpiecznego wdrożenia","href":"/antywzorce/2026-09-29-migracja-schematu-jeden-krok/"},
+      {"type":"PODSTAWY","title":"Scenariusz jakościowy: od przymiotnika do miary","description":"Zapisz wdrażalność i modyfikowalność jako sprawdzalne zachowanie","href":"/podstawy-architektury/scenariusze-atrybutow-jakosciowych/"}
+    ],
+    "decisionRecord": {
+      "status": "Przykład do dyskusji — nie jest zatwierdzoną decyzją projektu",
+      "context": "Stara i nowa wersja aplikacji współistnieją podczas wdrożenia kroczącego, a migracja kilku milionów rekordów trwa dłużej niż wdrożenie kodu.",
+      "decision": "Przeprowadzić zmianę w fazach rozszerzenia, migracji i zwężenia. Usunięcie starej kolumny wykonać w osobnym wdrożeniu po zamknięciu okna rollbacku.",
+      "rationale": "Kompatybilny etap pośredni pozwala staremu i nowemu kodowi korzystać ze wspólnej bazy oraz oddziela odwracalne przełączenie od nieodwracalnego sprzątania.",
+      "consequences": ["Przez ograniczony czas utrzymywane są dwa pola i dodatkowa kontrola spójności.", "Proces migracji wymaga telemetrii, wznawiania i jawnych kryteriów zakończenia."],
+      "verification": "Przeprowadzić wdrożenie kroczące i rollback na reprezentatywnych danych; sprawdzić kompletność migracji, rozbieżności pól, błędy obu wersji i czas blokad bazy.",
+      "openQuestions": ["Jak długo musi być możliwy rollback?", "Gdzie będzie wykonywane mapowanie wartości między polami?", "Które metryki i progi pozwalają rozpocząć fazę zwężenia?"]
+    },
+    "coach": {
+      "criteria": [
+        {"id":"coexistence","label":"Współistnienie wersji","expected":"Rozpoznaje, że stary i nowy kod działają równocześnie i wymagają kompatybilnego schematu przejściowego."},
+        {"id":"phases","label":"Etapy zmiany","expected":"Rozkłada zmianę na rozszerzenie, migrację i późniejsze zwężenie zamiast usuwać starą kolumnę w pierwszym wdrożeniu."},
+        {"id":"migration","label":"Migracja i spójność danych","expected":"Proponuje wznawialną migrację partiami oraz sposób obsługi zapisów powstających w trakcie i pomiar rozbieżności."},
+        {"id":"rollback","label":"Rollback i nieodwracalność","expected":"Oddziela rollback kodu od cofnięcia schematu i opóźnia destrukcyjne usunięcie do końca uzgodnionego okna."},
+        {"id":"evidence","label":"Kryteria przejścia","expected":"Definiuje mierzalne warunki kolejnych faz, telemetrię i test wdrożenia kroczącego oraz rollbacku."}
+      ]
+    }
+  },
+  {
     "id": "2026-w40-izolacja-zasobow",
     "week": "Tydzień 40 / 2026",
     "date": "2026-09-28",

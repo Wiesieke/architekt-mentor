@@ -1,4 +1,15 @@
 {
+  "2026-09-29-expand-contract": {
+    "scenario": "Fictional case-management application. Six instances are deployed gradually. The team wants to replace status with state, backfill millions of rows and drop the old column immediately. Old and new versions coexist, and rollback of code has not been reconciled with the database change.",
+    "question": "How do you stage the schema and code change safely? When can old writes stop, when can the column be removed, and how do you prove rollback works?",
+    "criteria": [
+      {"id":"coexistence","label":"Version coexistence","expected":"Recognise that old and new code run together and require a backward-compatible transitional schema."},
+      {"id":"phases","label":"Change phases","expected":"Split the change into expand, migrate and later contract rather than dropping the old column in the first rollout."},
+      {"id":"migration","label":"Data migration and consistency","expected":"Use a resumable batched backfill, handle concurrent writes and measure discrepancies."},
+      {"id":"rollback","label":"Rollback and irreversibility","expected":"Separate code rollback from schema reversal and delay destructive removal until the rollback window closes."},
+      {"id":"evidence","label":"Transition evidence","expected":"Define measurable phase gates, telemetry, and tests of mixed-version deployment and rollback."}
+    ]
+  },
   "2026-w40-izolacja-zasobow": {
     "scenario": "Fictional shop application. Delivery pricing and seller reporting calls share 40 outbound connections and one worker queue. A reporting slowdown holds workers for 20 seconds and blocks checkout even though delivery pricing is healthy. The team proposes doubling the pool and retrying each call three times. Traffic levels and service objectives are unknown.",
     "question": "How do you keep reporting delays from blocking orders? What limits, overload behaviour and measurements do you define before changing connection counts?",

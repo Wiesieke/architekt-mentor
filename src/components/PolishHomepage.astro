@@ -3,13 +3,12 @@ import Studio from '../layouts/Studio.astro';
 import { editions, latestEditionDate } from '../data/editions';
 import SponsorSlot from './SponsorSlot.astro';
 import { articles, articleUrl } from '../data/articles';
+import puzzles from '../../data/puzzles.json';
 
 const featuredArticle = articles.filter(article => article.published).sort((a, b) => b.published!.localeCompare(a.published!))[0];
+const latestPuzzle = [...puzzles].filter(puzzle => puzzle.coach).sort((a, b) => b.date.localeCompare(a.date))[0];
 const editionStart = new Date(`${latestEditionDate}T12:00:00Z`);
-const editionEnd = new Date(editionStart);
-editionEnd.setUTCDate(editionEnd.getUTCDate() + 6);
 const formatDate = (date: Date) => new Intl.DateTimeFormat('pl-PL', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(date);
-const weekLabel = `${formatDate(editionStart)}–${formatDate(editionEnd)}`;
 const currentEditionCount = editions.filter(item => item.published === latestEditionDate).length;
 ---
 <Studio title="Architektura IT w praktyce: ćwiczenia, wzorce i decyzje" description="Magazyn architektury IT i architektury korporacyjnej. Praktyczne łamigłówki, antywzorce, podstawy i analizy zmian technologicznych." modified={latestEditionDate} showEdition translationUrl="/en/">
@@ -27,7 +26,7 @@ const currentEditionCount = editions.filter(item => item.published === latestEdi
         <div class="workspace-head"><span class="tiny-mark">AM</span><span>STUDIO DECYZJI</span><span class="work-label">WARSZTAT 01</span></div>
         <div class="workspace-body">
           <div class="case-meta"><span class="signal"></span> Pytanie architektoniczne <span class="case-count">01 / 03</span></div>
-          <h2>Co się stanie, gdy jedna zależność spowolni cały system?</h2>
+          <h2>{latestPuzzle.title}</h2>
           <div class="work-step"><span>01</span><div><strong>Rozpoznaj ryzyko</strong><small>Znajdź wspólną granicę awarii.</small></div></div>
           <div class="work-step"><span>02</span><div><strong>Uzasadnij decyzję</strong><small>Wybierz kompromis, który potrafisz obronić.</small></div></div>
           <div class="work-step muted-step"><span>03</span><div><strong>Porównaj z analizą</strong><small>Zobacz, czego zabrakło w odpowiedzi.</small></div></div>
@@ -46,7 +45,7 @@ const currentEditionCount = editions.filter(item => item.published === latestEdi
     </div>
   </div></section>
 
-  <section class="this-week" id="nowe" aria-labelledby="week-title"><div class="container week-grid"><div class="week-intro"><div class="eyebrow">Nowe w magazynie · {weekLabel}</div><h2 id="week-title">Co się zmieniło<br /><em>w tym tygodniu?</em></h2><p>{currentEditionCount} materiałów opublikowanych <time datetime={latestEditionDate}>{new Intl.DateTimeFormat('pl-PL', {dateStyle:'long',timeZone:'UTC'}).format(editionStart)}</time>. Daty wydarzeń technologicznych znajdziesz osobno w artykułach.</p><a class="text-link" href="/lamiglowka/">Przejdź do ćwiczenia <span aria-hidden="true">→</span></a></div><div class="week-list">
+  <section class="this-week" id="nowe" aria-labelledby="week-title"><div class="container week-grid"><div class="week-intro"><div class="eyebrow">Najnowsza publikacja · {formatDate(editionStart)}</div><h2 id="week-title">Co dodaliśmy<br /><em>dzisiaj?</em></h2><p>{currentEditionCount} nowe materiały opublikowane <time datetime={latestEditionDate}>{new Intl.DateTimeFormat('pl-PL', {dateStyle:'long',timeZone:'UTC'}).format(editionStart)}</time>. Każdy prowadzi od konkretnej sytuacji do sprawdzalnej decyzji.</p><a class="text-link" href="/lamiglowka/">Przejdź do ćwiczenia <span aria-hidden="true">→</span></a></div><div class="week-list">
     {editions.filter(item => item.published === latestEditionDate).map(item => <a href={item.href}><span class="week-type">{item.kind} · <time datetime={item.published}>{formatDate(new Date(`${item.published}T12:00:00Z`))}</time></span><strong>{item.title}</strong><small>{item.summary}</small><span class="week-arrow" aria-hidden="true">↗</span></a>)}
   </div></div></section>
   <SponsorSlot />
