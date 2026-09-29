@@ -2,8 +2,8 @@ const { createHash, randomUUID, timingSafeEqual } = require('node:crypto');
 
 function storageUrl() {
   const source = process.env.LH_STORAGE_URL || '';
-  if (!/^https:\/\/[^/?#]+\/[a-z0-9/_-]+\/save\.php$/i.test(source)) return null;
-  return source.replace(/save\.php$/, 'comments.php');
+  if (!/^https:\/\/[^/?#]+\/(?:[a-z0-9_-]+\/)*save\.php$/i.test(source)) return null;
+  return source.replace(/save\.php$/i, 'comments.php');
 }
 
 function validPath(path, locale) {
