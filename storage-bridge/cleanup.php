@@ -10,3 +10,5 @@ $pdo = new PDO(
 );
 $pdo->exec('DELETE FROM mentor_hld_generations WHERE expires_at <= UTC_TIMESTAMP()');
 $pdo->exec('DELETE FROM mentor_puzzle_assessments WHERE expires_at <= UTC_TIMESTAMP()');
+$pdo->exec("DELETE FROM mentor_comments WHERE status='email_pending' AND verification_expires_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL 5 DAY)");
+$pdo->exec("DELETE FROM mentor_comments WHERE status='rejected' AND created_at < DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)");
