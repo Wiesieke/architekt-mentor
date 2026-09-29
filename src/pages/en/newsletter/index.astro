@@ -1,0 +1,12 @@
+---
+import Studio from '../../../layouts/Studio.astro';
+import NewsletterForm from '../../../components/NewsletterForm.astro';
+---
+<Studio locale="en" title="Newsletter: ArchitectMentor Weekly" description="A weekly selection of useful architecture decisions, exercises and articles. Subscribe to the English edition." translationUrl="/newsletter/">
+  <div class="container newsletter-page"><div class="eyebrow">Newsletter · English edition</div><h1>ArchitectMentor Weekly</h1><p class="lead">One email a week: a decision worth examining, an exercise and selected articles. Practical and concise.</p>
+    <NewsletterForm locale="en" />
+    <p class="note">Please confirm your email address to subscribe. Every issue includes an unsubscribe link. MailerLite stores your address; see our <a href="/en/data-notice/">data notice</a>.</p>
+    <p><a href="/newsletter/" lang="pl">Polska edycja →</a></p>
+  </div>
+</Studio>
+<style>.newsletter-page{max-width:850px;padding-top:65px;padding-bottom:100px}.newsletter-page h1{font-size:clamp(36px,5vw,56px);margin:16px 0}.lead{font-size:19px;color:var(--muted);max-width:58ch}.note{font-size:13px;color:var(--muted);margin-top:22px}.newsletter-page a{color:var(--teal)}</style>

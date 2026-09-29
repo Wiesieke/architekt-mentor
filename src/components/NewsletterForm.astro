@@ -1,0 +1,14 @@
+---
+interface Props { locale: 'pl' | 'en' }
+const { locale } = Astro.props;
+const account = import.meta.env.PUBLIC_MAILERLITE_ACCOUNT_ID || '';
+const form = locale === 'pl' ? import.meta.env.PUBLIC_MAILERLITE_PL_FORM_ID : import.meta.env.PUBLIC_MAILERLITE_EN_FORM_ID;
+const ready = /^\d{4,15}$/.test(account) && /^[a-zA-Z0-9]{4,20}$/.test(form || '');
+// Only validated public identifiers are inserted into the vendor's bootstrap snippet.
+const bootstrap = ready ? `(function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[]).push(arguments)},l=d.createElement(e),l.async=1,l.src=u,n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n)})(window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');ml('account','${account}');` : '';
+---
+{ready ? <>
+  <div class="newsletter-form"><div class="ml-embedded" data-form={form}></div></div>
+  <script is:inline set:html={bootstrap} />
+</> : <p class="muted">{locale === 'pl' ? 'Formularz zapisu uruchomimy po zakończeniu konfiguracji.' : 'The signup form will open after setup is complete.'}</p>}
+<style>.newsletter-form{background:#fff;border:1px solid var(--line);border-radius:12px;padding:clamp(16px,3vw,28px);min-height:125px}</style>
