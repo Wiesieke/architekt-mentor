@@ -1,5 +1,6 @@
 ---
 import Studio from '../../layouts/Studio.astro';
+import Comments from '../../components/Comments.astro';
 import { articles, articleUrl, type Article } from '../../data/articles';
 import { englishUrlForPolishArticle } from '../../data/articles-en';
 
@@ -25,6 +26,7 @@ const format = (value: string) => new Intl.DateTimeFormat('pl-PL', {dateStyle:'l
       <div class="meta">Wiesław Ejsymont {article.published && <> · Opublikowano <time datetime={article.published}>{format(article.published)}</time></>}{article.eventDate && <> · Data wydarzenia <time datetime={article.eventDate}>{format(article.eventDate)}</time></>}</div>
     </header>
     <article class="article-body" set:html={article.body} />
+    <Comments articlePath={articleUrl(article)} />
     <nav class="more" aria-label="Dalsza lektura"><a href={`/${article.section}/`}>Zobacz pozostałe materiały →</a><a href="/lamiglowka/">Przećwicz decyzję →</a></nav>
   </div></div>
   <script type="application/ld+json" is:inline set:html={JSON.stringify(schema).replace(/</g, '\u003c')} />
