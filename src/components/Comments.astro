@@ -6,7 +6,7 @@ const en = locale === 'en';
 ---
 {siteKey && <section class="comments" aria-labelledby="comments-title" data-article={articlePath} data-locale={locale}>
   <h2 id="comments-title">{en ? 'Discuss this article' : 'Porozmawiajmy o tym artykule'}</h2>
-  <p>{en ? 'Share a constructive observation or an anonymised example. Comments appear after email confirmation and moderation.' : 'Podziel się uwagą lub zanonimizowanym przykładem. Komentarze pojawiają się po potwierdzeniu e-maila i moderacji.'}</p>
+  <p>{en ? 'Share a constructive observation or an anonymised example. Comments are checked by AI before publication. Uncertain cases go to the moderator.' : 'Podziel się uwagą lub zanonimizowanym przykładem. Komentarze sprawdza AI przed publikacją. Niejednoznaczne przypadki trafiają do moderatora.'}</p>
   <div class="comment-list" aria-live="polite"></div>
   <form class="comment-form">
     <label>{en ? 'Display name' : 'Nazwa wyświetlana'}<input name="name" required minlength="2" maxlength="80" autocomplete="name" /></label>
@@ -25,7 +25,7 @@ const en = locale === 'en';
     const path = section.dataset.article, locale = section.dataset.locale;
     const list = section.querySelector<HTMLElement>('.comment-list');
     if (!list || !path || !locale) continue;
-    fetch('/api/comments?article=' + encodeURIComponent(path) + '&locale=' + locale)
+    const loadComments = () => fetch('/api/comments?article=' + encodeURIComponent(path) + '&locale=' + locale)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(({ comments }) => {
         list.replaceChildren();
@@ -38,6 +38,7 @@ const en = locale === 'en';
         }
       })
       .catch(() => { list.textContent = locale === 'en' ? 'Comments are temporarily unavailable.' : 'Komentarze są chwilowo niedostępne.'; });
+    loadComments();
     const form = section.querySelector<HTMLFormElement>('form');
     form?.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -46,15 +47,21 @@ const en = locale === 'en';
       if (!status || !button) return;
       const fields = new FormData(form);
       const token = fields.get('cf-turnstile-response');
-      status.textContent = ''; button.disabled = true;
+      status.textContent = locale === 'en' ? 'Checking your comment…' : 'Sprawdzamy komentarz…'; button.disabled = true;
       try {
         const response = await fetch('/api/comments', {
           method: 'POST', headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ articlePath: path, locale, name: fields.get('name'), email: fields.get('email'),
             message: fields.get('message'), website: fields.get('website'), turnstileToken: token })
         });
-        if (!response.ok) throw new Error((await response.json()).error || 'Error');
-        status.textContent = locale === 'en' ? 'Check your inbox to confirm the comment.' : 'Sprawdź pocztę i potwierdź komentarz.';
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Error');
+        status.textContent = result.status === 'approved'
+          ? (locale === 'en' ? 'Your comment has been published.' : 'Komentarz został opublikowany.')
+          : result.status === 'rejected'
+            ? (locale === 'en' ? 'Your comment was not published under our discussion rules.' : 'Komentarz nie został opublikowany ze względu na zasady dyskusji.')
+            : (locale === 'en' ? 'Your comment has been saved for moderator review. No email confirmation is needed.' : 'Komentarz zapisany i czeka na decyzję moderatora. Nie musisz potwierdzać e-maila.');
+        if (result.status === 'approved') await loadComments();
         form.reset();
       } catch (error) {
         status.textContent = error instanceof Error ? error.message : 'Error';

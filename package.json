@@ -2,8 +2,9 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
+    "build": "astro build && node scripts/build-comment-context.cjs",
+    "preview": "astro preview",
+    "test:comments": "node --test tests/comments.test.cjs"
   },
   "dependencies": {
     "astro": "^7.3.5",
