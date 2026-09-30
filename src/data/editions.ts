@@ -1,6 +1,7 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'W RUCHU', published:'2026-09-30', eventDate:'2026-09-29', title:'Google Cloud API Gateway: strumieniowanie zmienia projekt API', summary:'Data wydarzenia: 29.09 · fakty · konsekwencje projektu', href:'/architektura-w-ruchu/google-api-gateway-streaming/' },
   { kind:'ĆWICZENIE', published:'2026-09-30', title:'Baza wróciła, załączniki nie. Czy włączysz portal?', summary:'Scenariusz · pytanie mentora · kryteria oceny', href:'/lamiglowka/' },
   { kind:'ANTYWZORZEC', published:'2026-09-30', title:'Kopia bez próby odtworzenia', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-09-30-backup-bez-proby-odtworzenia/' },
   { kind:'PODSTAWY', published:'2026-09-30', title:'RPO, RTO i próba odtworzenia całej usługi', summary:'Cele · spójność · pomiar podczas ćwiczenia', href:'/podstawy-architektury/rpo-rto-proba-odtworzenia/' },
