@@ -1,6 +1,9 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'ĆWICZENIE', published:'2026-09-30', title:'Baza wróciła, załączniki nie. Czy włączysz portal?', summary:'Scenariusz · pytanie mentora · kryteria oceny', href:'/lamiglowka/' },
+  { kind:'ANTYWZORZEC', published:'2026-09-30', title:'Kopia bez próby odtworzenia', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-09-30-backup-bez-proby-odtworzenia/' },
+  { kind:'PODSTAWY', published:'2026-09-30', title:'RPO, RTO i próba odtworzenia całej usługi', summary:'Cele · spójność · pomiar podczas ćwiczenia', href:'/podstawy-architektury/rpo-rto-proba-odtworzenia/' },
   { kind: 'ĆWICZENIE', published: '2026-09-29', title: 'Dwie wersje aplikacji, jeden schemat. Jak wdrożysz zmianę bez przestoju?', summary: 'Scenariusz · pytanie mentora · kryteria oceny', href: '/lamiglowka/' },
   { kind: 'ANTYWZORZEC', published: '2026-09-29', title: 'Migracja schematu w jednym kroku', summary: 'Objawy · konsekwencje · lepsza decyzja', href: '/antywzorce/2026-09-29-migracja-schematu-jeden-krok/' },
   { kind: 'PODSTAWY', published: '2026-09-29', title: 'Scenariusz jakościowy: od przymiotnika do miary', summary: 'Bodziec · środowisko · reakcja · miara', href: '/podstawy-architektury/scenariusze-atrybutow-jakosciowych/' },

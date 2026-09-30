@@ -1,10 +1,28 @@
 [
   {
+    "id": "2026-09-30-backup-bez-proby-odtworzenia",
+    "date": "2026-09-30",
+    "title": "Kopia bez próby odtworzenia",
+    "summary": "Zielony raport z kopii nie dowodzi, że cała usługa wróci w zadanym czasie i bez nieuzgodnionych braków danych.",
+    "tags": [
+      "odtwarzanie",
+      "backup",
+      "RPO",
+      "RTO"
+    ],
+    "content": "**Przykład fikcyjny.** Nie opisuje żadnej konkretnej organizacji ani awarii.\n\n## Sytuacja\n\nOperator pokazuje zielony raport z nocnych kopii. Na pytanie o odtworzenie aplikacji, plików i kolejki zespół odpowiada: „Kopie przecież są”. Właściciel usługi zakłada 30 minut do ponownego uruchomienia. Nikt nie sprawdził czasu pobrania kopii, dostępu do kluczy ani tego, czy dane z różnych systemów pasują do siebie po odtworzeniu.\n\n## Objawy\n\n- Monitoring sprawdza, że zadanie kopii się zakończyło, ale nie odczytuje danych z kopii.\n- Procedura zawiera nazwę narzędzia, a nie kolejność odtworzenia zależności i osoby upoważnione do decyzji.\n- RPO i RTO zapisano dla „systemu”, chociaż baza, pliki i wiadomości mają inne harmonogramy.\n- Ostatnia próba odbyła się na małej próbce sprzed kilku lat; nie mierzono pełnej ścieżki użytkownika.\n\n## Konsekwencja\n\nPo awarii kopia może być nieczytelna, klucz niedostępny albo odtworzone załączniki mogą nie odpowiadać wpisom w bazie. Nawet sprawna kopia jednego elementu nie przywróci usługi jako całości. Zielony wskaźnik zadania jest wtedy miarą pracy harmonogramu, nie odporności architektury.\n\n## Lepsza decyzja\n\n1. Zapisz, co oznacza „usługa działa” z perspektywy użytkownika, i określ RPO oraz RTO dla tej ścieżki.\n2. Ustal retencję, integralność i dostępność kopii oraz kluczy także podczas awarii głównego regionu. Ogranicz dostęp i sprawdź możliwość odtworzenia w izolacji.\n3. Ćwicz całą procedurę na reprezentatywnej wielkości danych: baza, pliki, komunikaty, konfiguracja, routing. Odtwórz funkcję i wykonaj test transakcyjny.\n4. Zmierz osiągnięte cele, zapisz rozbieżności i właścicieli poprawek. Powtarzaj po istotnych zmianach i sprawdzaj, czy bieżące kopie dają się odczytać.\n\nĆwiczenie kosztuje czas i środowisko. Brak ćwiczenia również ma cenę, tylko rachunek przychodzi w najgorszym momencie.\n\n> Backup istnieje dopiero wtedy, gdy potrafisz z niego odtworzyć potrzebną usługę w wymaganym czasie."
+  },
+  {
     "id": "2026-09-29-migracja-schematu-jeden-krok",
     "date": "2026-09-29",
     "title": "Migracja schematu w jednym kroku",
     "summary": "Kod, dane i usunięcie starego kontraktu trafiają do jednego wdrożenia, więc wersje nie mogą współistnieć, a rollback kończy się na niezgodnym schemacie.",
-    "tags": ["bazy danych", "kompatybilność", "wdrożenia", "rollback"],
+    "tags": [
+      "bazy danych",
+      "kompatybilność",
+      "wdrożenia",
+      "rollback"
+    ],
     "content": "**Fikcyjny przykład edukacyjny.** Nie opisuje konkretnej organizacji ani incydentu.\n\n## Sytuacja\n\nZespół zmienia nazwę i znaczenie kolumny używanej przez kilka instancji aplikacji. Ten sam pakiet wdrożeniowy dodaje nowe pole, przepisuje wszystkie rekordy, przełącza kod i usuwa stare pole. Plan zakłada, że wszystkie kroki zakończą się przed uruchomieniem ruchu.\n\n## Gdzie powstaje antywzorzec\n\nWdrożenie traktuje kod, schemat i wielomilionową migrację danych jak jedną chwilę. W praktyce instancje aplikacji zmieniają się stopniowo, migracja może trwać długo, a jeden krok może wymagać wycofania niezależnie od pozostałych. Destrukcyjne usunięcie starego pola odbiera starej wersji możliwość działania i może zamknąć drogę do rollbacku.\n\n## Sygnały ostrzegawcze\n\n- migracja zawiera `DROP` lub zmianę znaczenia pola przed wycofaniem wszystkich jego konsumentów;\n- plan nie określa macierzy zgodności wersji kodu i schematu;\n- backfill musi zakończyć się w jednym oknie serwisowym i nie można go bezpiecznie wznowić;\n- rollback opisuje tylko obraz aplikacji, a pomija dane zapisane po zmianie;\n- zakończenie migracji oznacza „skrypt wykonał się bez błędu”, bez pomiaru kompletności i zgodności.\n\n## Lepsza decyzja\n\n1. Rozszerz schemat w sposób zgodny ze starą wersją.\n2. Wprowadź jawny mechanizm zgodności dla zapisów w okresie przejściowym. Nie ukrywaj kosztu podwójnego zapisu: wskaż właściciela transformacji i mierz rozbieżności.\n3. Migruj dane partiami za pomocą procesu idempotentnego i wznawialnego. Kontroluj blokady, obciążenie, postęp i rekordy pominięte.\n4. Przełącz odczyt dopiero po spełnieniu mierzalnych kryteriów. Przetestuj wdrożenie mieszane i rollback.\n5. Usuń stary kontrakt w osobnym wdrożeniu, gdy telemetria potwierdzi brak konsumentów, a okno wycofania zostało zamknięte.\n\n## Koszt kompromisu\n\nZmiana równoległa wydłuża migrację i przez pewien czas zwiększa złożoność. W zamian ogranicza promień błędu, pozwala obserwować kolejne kroki i oddziela zmianę odwracalną od destrukcyjnego sprzątania. Nie każda tabela wymaga skomplikowanej automatyzacji, ale każda destrukcyjna zmiana potrzebuje jawnej analizy zgodności.\n\n## Reguła do zapamiętania\n\n> Destrukcyjne sprzątanie nie powinno być pierwszym krokiem zmiany, której powodzenie dopiero trzeba potwierdzić."
   },
   {
