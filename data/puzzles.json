@@ -1,11 +1,96 @@
 [
   {
+    "id": "2026-09-30-odtwarzanie-po-awarii",
+    "week": "Publikacja codzienna / 2026",
+    "date": "2026-09-30",
+    "title": "Baza wróciła, załączniki nie. Czy włączysz portal?",
+    "difficulty": "Zaawansowany",
+    "tags": [
+      "odtwarzanie",
+      "RPO",
+      "RTO",
+      "spójność danych"
+    ],
+    "scenario": "**Przykład fikcyjny.** Portal przyjmuje wnioski. Metadane zapisuje w bazie, załączniki w magazynie plików, a po przyjęciu wniosku wysyła komunikat do kolejki. Zespół deklaruje RPO 5 minut i RTO 30 minut. Baza jest kopiowana co pięć minut, ale pliki mają osobny harmonogram. Nie przeprowadzono pełnego odtworzenia. Po awarii regionu operator odtwarza bazę; portal się uruchamia, lecz części załączników brakuje, a status przetwarzania niektórych wniosków jest niejasny.\n\nWłaściciel biznesowy pyta, czy można już włączyć ruch. Masz 30 minut od wykrycia awarii do spełnienia deklarowanego celu odtworzenia usługi, a nie tylko do uruchomienia bazy.",
+    "question": "Co musi być odtworzone i sprawdzone, zanim wznowisz przyjmowanie wniosków? Jak zweryfikujesz RPO 5 minut i RTO 30 minut dla całej usługi?",
+    "hints": [
+      "Czy RPO bazy oznacza to samo dla załączników i kolejki?",
+      "W którym momencie uznasz usługę za odtworzoną: po starcie bazy czy po teście ścieżki użytkownika?",
+      "Co z komunikatami opublikowanymi tuż przed awarią i po odtworzeniu?",
+      "Jak zmierzysz rzeczywistą utratę danych i czas od wykrycia awarii?"
+    ],
+    "analysis": "### Cel dotyczy usługi, nie pojedynczego serwera\n\nRPO to dopuszczalny odstęp między ostatnim odtworzonym, poprawnym stanem a awarią. RTO to czas potrzebny, by przywrócić uzgodnioną funkcję. Kopia bazy co pięć minut sama nie dowodzi żadnego z tych celów: może nie dać się jej odczytać, a załączniki i komunikaty mają własny cykl życia.\n\n### Przed ponownym wpuszczeniem ruchu\n\n1. Ustal granicę usługi: przyjęcie wniosku, powiązanie z załącznikiem i dalsze przetwarzanie. Wskaż, kto podejmuje decyzję o wznowieniu oraz jak poinformować użytkowników o ograniczeniach.\n2. Ustal ostatni **spójny** punkt odtworzenia metadanych i plików. Próbkuj identyfikatory wniosków i załączników, licz brakujące obiekty. Nie zakładaj, że identyczne znaczniki czasu gwarantują transakcję między dwoma magazynami.\n3. Zbadaj komunikaty opublikowane, niepotwierdzone i odtworzone. Powtórne odtworzenie kolejki może stworzyć duplikaty. Konsument musi bezpiecznie rozpoznawać już obsłużone wnioski; brakujące prace trzeba uzgodnić z bazą i ponowić kontrolowanie.\n4. Sprawdź klucze szyfrujące, uprawnienia, konfigurację zależności i DNS lub trasę ruchu. Przetestuj złożenie oraz późniejsze odczytanie wniosku z załącznikiem. Dopiero wtedy wydaj decyzję o uruchomieniu.\n\n### Jak udowodnić deklarację\n\nPrzećwicz awarię na odizolowanym środowisku z realistyczną wielkością danych. Zapisz czas wykrycia, decyzji, odtworzenia i zakończenia testu użytkownika. Policz najstarszy brakujący poprawny zapis w każdym magazynie i ustal rzeczywiście osiągnięte RPO oraz RTO. Powtórz próbę po istotnej zmianie architektury. Jeśli pomiary przekraczają cele, zmień projekt albo uzgodnij uczciwsze cele; same liczby w HLD nie skracają odtwarzania.\n\n> „Baza już działa” to pierwszy komunikat z procedury, nie dowód, że użytkownik może bezpiecznie wrócić.",
+    "related": [
+      {
+        "type": "ANTYWZORZEC",
+        "title": "Kopia bez próby odtworzenia",
+        "description": "Dlaczego istniejąca kopia nie dowodzi gotowości",
+        "href": "/antywzorce/2026-09-30-backup-bez-proby-odtworzenia/"
+      },
+      {
+        "type": "PODSTAWY",
+        "title": "RPO, RTO i próba odtworzenia",
+        "description": "Cele i pomiar całej ścieżki",
+        "href": "/podstawy-architektury/rpo-rto-proba-odtworzenia/"
+      }
+    ],
+    "decisionRecord": {
+      "status": "Przykład do dyskusji — nie jest zatwierdzoną decyzją projektu",
+      "context": "Portal zapisuje metadane, załączniki i komunikaty w odrębnych systemach; cele RPO 5 minut i RTO 30 minut nie zostały zweryfikowane próbą.",
+      "decision": "Wznowienie ruchu wymaga spójnego punktu odtworzenia, uzgodnienia komunikatów i pozytywnego testu pełnej ścieżki użytkownika.",
+      "rationale": "Dostępność samej bazy nie zapewnia poprawnego przyjęcia ani przetwarzania wniosków.",
+      "consequences": [
+        "Potrzebna jest procedura uzgadniania danych między magazynami i kolejką.",
+        "Konieczne są ćwiczenia odtworzeniowe oraz osoba upoważniona do wznowienia ruchu."
+      ],
+      "verification": "Zmierzony test od wykrycia awarii do poprawnego złożenia i odczytu wniosku; kontrola braków oraz duplikatów w każdym magazynie.",
+      "openQuestions": [
+        "Czy pięciominutowe RPO jest osiągalne dla załączników?",
+        "Kto akceptuje utratę danych lub wydłużenie niedostępności?"
+      ]
+    },
+    "coach": {
+      "criteria": [
+        {
+          "id": "scope",
+          "label": "Zakres usługi",
+          "expected": "Definiuje ścieżkę użytkownika i zależności: bazę, pliki oraz kolejkę, a nie wyłącznie uruchomienie bazy."
+        },
+        {
+          "id": "objectives",
+          "label": "RPO i RTO",
+          "expected": "Rozdziela akceptowaną utratę danych od czasu przywrócenia całej funkcji oraz weryfikuje, czy wymagane wartości są realne."
+        },
+        {
+          "id": "consistency",
+          "label": "Spójność odtwarzania",
+          "expected": "Planuje odtworzenie bazy i plików do spójnego punktu, identyfikuje nieznany stan komunikatów i obsługuje duplikaty."
+        },
+        {
+          "id": "runbook",
+          "label": "Kolejność i odpowiedzialność",
+          "expected": "Wskazuje właścicieli, kolejność odtworzenia, dostęp do kluczy i kopii oraz decyzję o ponownym uruchomieniu ruchu."
+        },
+        {
+          "id": "evidence",
+          "label": "Próba i pomiar",
+          "expected": "Proponuje ćwiczenie odtworzeniowe z pomiarem faktycznego RPO/RTO oraz testem ścieżki użytkownika i rozliczeniem braków."
+        }
+      ]
+    }
+  },
+  {
     "id": "2026-09-29-expand-contract",
     "week": "Publikacja codzienna / 2026",
     "date": "2026-09-29",
     "title": "Dwie wersje aplikacji, jeden schemat. Jak wdrożysz zmianę bez przestoju?",
     "difficulty": "Zaawansowany",
-    "tags": ["ewolucja schematu", "kompatybilność", "wdrożenia", "rollback"],
+    "tags": [
+      "ewolucja schematu",
+      "kompatybilność",
+      "wdrożenia",
+      "rollback"
+    ],
     "scenario": "**Przykład fikcyjny.** Aplikacja obsługująca zgłoszenia działa w sześciu instancjach. Zespół chce zastąpić kolumnę `status` nową kolumną `state`, zmienić zestaw wartości i od razu usunąć stare pole. Wdrożenie jest kroczące: przez kilkanaście minut równocześnie działają stara i nowa wersja aplikacji.\n\nNowa wersja potrafi czytać tylko `state`, stara tylko `status`. Migracja danych dla kilku milionów rekordów potrwa dłużej niż samo wdrożenie. Zespół zakłada, że w razie problemów cofnie aplikację, ale nie opisał, co stanie się ze zmianą bazy ani z rekordami zapisanymi w czasie przejścia.",
     "question": "Jak rozłożysz tę zmianę na bezpieczne etapy? Kiedy wolno przestać zapisywać stare pole i kiedy można je usunąć? Jak sprawdzisz możliwość wycofania wdrożenia?",
     "hints": [
@@ -16,25 +101,62 @@
     ],
     "analysis": "### Najpierw nazwij okno współistnienia\n\nWdrożenie kroczące oznacza, że przez pewien czas stary i nowy kod korzystają z tej samej bazy. Zmiana schematu nie może więc zakładać natychmiastowego przełączenia wszystkich instancji. Usunięcie `status` w pierwszym kroku złamie starą wersję, a rollback nowej aplikacji nie odtworzy usuniętych danych.\n\n### Zastosuj zmianę równoległą: rozszerz — migruj — zwęź\n\n1. **Rozszerz:** dodaj `state` jako zmianę zgodną wstecz. Stary kod nadal używa `status`. Wprowadź nową wersję, która potrafi pracować w okresie przejściowym; jawnie określ, gdzie wykonywany jest podwójny zapis lub tłumaczenie wartości.\n2. **Migruj:** uzupełniaj historyczne rekordy partiami, bez długiej blokady. Proces musi być wznawialny i idempotentny. Kontroluj rekordy powstające podczas migracji oraz licz rozbieżności między polami.\n3. **Przełącz odczyt:** dopiero po potwierdzeniu kompletności zacznij czytać `state`. Obserwuj błędy, wartości nieznane i udział rekordów bez nowego pola. Zachowaj przez uzgodnione okno możliwość powrotu starego kodu.\n4. **Zwęź:** przestań zapisywać `status`, gdy żadna wspierana wersja już go nie potrzebuje. Usuń kolumnę w osobnym, późniejszym wdrożeniu po zakończeniu okna rollbacku i potwierdzeniu kopii lub planu odtworzenia.\n\n### Co powinno być warunkiem przejścia\n\nKażdy etap potrzebuje mierzalnego kryterium: 100% kwalifikujących się rekordów ma poprawne `state`, brak rozbieżności przez ustalone okno, wszystkie instancje używają zgodnej wersji, a próba rollbacku została wykonana w środowisku z takim samym układem migracji. Podwójny zapis także może zawieść; wybierz jednego właściciela transformacji, monitoruj rozjazdy i ogranicz czas okresu przejściowego.\n\n> Najpierw zapewnij współistnienie wersji, potem przenieś dane i ruch, a dopiero na końcu usuń stary kontrakt.",
     "related": [
-      {"type":"ANTYWZORZEC","title":"Migracja schematu w jednym kroku","description":"Rozpoznaj zmianę, która odbiera możliwość bezpiecznego wdrożenia","href":"/antywzorce/2026-09-29-migracja-schematu-jeden-krok/"},
-      {"type":"PODSTAWY","title":"Scenariusz jakościowy: od przymiotnika do miary","description":"Zapisz wdrażalność i modyfikowalność jako sprawdzalne zachowanie","href":"/podstawy-architektury/scenariusze-atrybutow-jakosciowych/"}
+      {
+        "type": "ANTYWZORZEC",
+        "title": "Migracja schematu w jednym kroku",
+        "description": "Rozpoznaj zmianę, która odbiera możliwość bezpiecznego wdrożenia",
+        "href": "/antywzorce/2026-09-29-migracja-schematu-jeden-krok/"
+      },
+      {
+        "type": "PODSTAWY",
+        "title": "Scenariusz jakościowy: od przymiotnika do miary",
+        "description": "Zapisz wdrażalność i modyfikowalność jako sprawdzalne zachowanie",
+        "href": "/podstawy-architektury/scenariusze-atrybutow-jakosciowych/"
+      }
     ],
     "decisionRecord": {
       "status": "Przykład do dyskusji — nie jest zatwierdzoną decyzją projektu",
       "context": "Stara i nowa wersja aplikacji współistnieją podczas wdrożenia kroczącego, a migracja kilku milionów rekordów trwa dłużej niż wdrożenie kodu.",
       "decision": "Przeprowadzić zmianę w fazach rozszerzenia, migracji i zwężenia. Usunięcie starej kolumny wykonać w osobnym wdrożeniu po zamknięciu okna rollbacku.",
       "rationale": "Kompatybilny etap pośredni pozwala staremu i nowemu kodowi korzystać ze wspólnej bazy oraz oddziela odwracalne przełączenie od nieodwracalnego sprzątania.",
-      "consequences": ["Przez ograniczony czas utrzymywane są dwa pola i dodatkowa kontrola spójności.", "Proces migracji wymaga telemetrii, wznawiania i jawnych kryteriów zakończenia."],
+      "consequences": [
+        "Przez ograniczony czas utrzymywane są dwa pola i dodatkowa kontrola spójności.",
+        "Proces migracji wymaga telemetrii, wznawiania i jawnych kryteriów zakończenia."
+      ],
       "verification": "Przeprowadzić wdrożenie kroczące i rollback na reprezentatywnych danych; sprawdzić kompletność migracji, rozbieżności pól, błędy obu wersji i czas blokad bazy.",
-      "openQuestions": ["Jak długo musi być możliwy rollback?", "Gdzie będzie wykonywane mapowanie wartości między polami?", "Które metryki i progi pozwalają rozpocząć fazę zwężenia?"]
+      "openQuestions": [
+        "Jak długo musi być możliwy rollback?",
+        "Gdzie będzie wykonywane mapowanie wartości między polami?",
+        "Które metryki i progi pozwalają rozpocząć fazę zwężenia?"
+      ]
     },
     "coach": {
       "criteria": [
-        {"id":"coexistence","label":"Współistnienie wersji","expected":"Rozpoznaje, że stary i nowy kod działają równocześnie i wymagają kompatybilnego schematu przejściowego."},
-        {"id":"phases","label":"Etapy zmiany","expected":"Rozkłada zmianę na rozszerzenie, migrację i późniejsze zwężenie zamiast usuwać starą kolumnę w pierwszym wdrożeniu."},
-        {"id":"migration","label":"Migracja i spójność danych","expected":"Proponuje wznawialną migrację partiami oraz sposób obsługi zapisów powstających w trakcie i pomiar rozbieżności."},
-        {"id":"rollback","label":"Rollback i nieodwracalność","expected":"Oddziela rollback kodu od cofnięcia schematu i opóźnia destrukcyjne usunięcie do końca uzgodnionego okna."},
-        {"id":"evidence","label":"Kryteria przejścia","expected":"Definiuje mierzalne warunki kolejnych faz, telemetrię i test wdrożenia kroczącego oraz rollbacku."}
+        {
+          "id": "coexistence",
+          "label": "Współistnienie wersji",
+          "expected": "Rozpoznaje, że stary i nowy kod działają równocześnie i wymagają kompatybilnego schematu przejściowego."
+        },
+        {
+          "id": "phases",
+          "label": "Etapy zmiany",
+          "expected": "Rozkłada zmianę na rozszerzenie, migrację i późniejsze zwężenie zamiast usuwać starą kolumnę w pierwszym wdrożeniu."
+        },
+        {
+          "id": "migration",
+          "label": "Migracja i spójność danych",
+          "expected": "Proponuje wznawialną migrację partiami oraz sposób obsługi zapisów powstających w trakcie i pomiar rozbieżności."
+        },
+        {
+          "id": "rollback",
+          "label": "Rollback i nieodwracalność",
+          "expected": "Oddziela rollback kodu od cofnięcia schematu i opóźnia destrukcyjne usunięcie do końca uzgodnionego okna."
+        },
+        {
+          "id": "evidence",
+          "label": "Kryteria przejścia",
+          "expected": "Definiuje mierzalne warunki kolejnych faz, telemetrię i test wdrożenia kroczącego oraz rollbacku."
+        }
       ]
     }
   },

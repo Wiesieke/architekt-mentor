@@ -1,3 +1,4 @@
+import recovery from '../content/articles/en/rpo-rto-recovery-drill.html?raw';
 import postgresql from '../content/articles/en/postgresql-19-beta4.html?raw';
 import otel from '../content/articles/en/otel-k8s.html?raw';
 import platforma from '../content/articles/en/platforma.html?raw';
@@ -16,6 +17,7 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'rpo-rto-recovery-drill', plSlug:'rpo-rto-proba-odtworzenia', title:'RPO, RTO and a full-service recovery drill', description:'Separate acceptable data loss from recovery time and measure both across the complete user journey.', topic:'Resilience and recovery', published:'2026-09-30', body:recovery },
   { section:'foundations', slug:'quality-attribute-scenarios', plSlug:'scenariusze-atrybutow-jakosciowych', title:'Quality-attribute scenarios: from adjective to measure', description:'Turn “fast, secure and easy to change” into a testable requirement that guides an architecture decision.', topic:'Quality attributes', published:'2026-09-29', body:qualityScenarios },
   { section:'foundations', slug:'slo-error-budget', plSlug:'slo-budzet-bledow', title:'SLOs and error budgets: from measurement to decisions', description:'Define an SLI for a user journey, calculate an error budget and use it to guide an architecture decision.', topic:'Reliability', published:'2026-09-28', body:slo },
   { section:'architecture-in-motion', slug:'postgresql-19-beta4', plSlug:'postgresql-19-beta4', title:'PostgreSQL 19 Beta 4: features removed before release', description:'Which features were removed from PostgreSQL 19 Beta 4, and what does that mean for a migration decision?', topic:'Databases', published:'2026-09-28', eventDate:'2026-09-24', body:postgresql },

@@ -1,3 +1,4 @@
+import recovery from '../content/articles/rpo-rto-proba-odtworzenia.html?raw';
 import postgresql from '../content/articles/postgresql-19-beta4.html?raw';
 import otel from '../content/articles/otel-k8s.html?raw';
 import platforma from '../content/articles/platforma.html?raw';
@@ -23,6 +24,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'rpo-rto-proba-odtworzenia', title:'RPO, RTO i próba odtworzenia całej usługi', description:'Jak rozdzielić utratę danych od czasu odtworzenia i zmierzyć oba cele na pełnej ścieżce użytkownika.', topic:'Odporność i odtwarzanie', published:'2026-09-30', body:recovery },
   { section:'podstawy-architektury', slug:'scenariusze-atrybutow-jakosciowych', title:'Scenariusz jakościowy: od przymiotnika do miary', description:'Jak zamienić „szybki, bezpieczny i łatwy do zmiany” w sprawdzalne wymaganie, które prowadzi do decyzji architektonicznej.', topic:'Atrybuty jakościowe', published:'2026-09-29', body:qualityScenarios },
   { section:'podstawy-architektury', slug:'slo-budzet-bledow', title:'SLO i budżet błędów: od pomiaru do decyzji', description:'Jak zdefiniować SLI dla ścieżki użytkownika, policzyć budżet błędów i wykorzystać go w decyzji architektonicznej.', topic:'Niezawodność', published:'2026-09-28', body:slo },
   { section:'architektura-w-ruchu', slug:'postgresql-19-beta4', title:'PostgreSQL 19 Beta 4: funkcje wycofane przed wydaniem', description:'Które funkcje PostgreSQL 19 wycofano z bety i co to oznacza dla decyzji o migracji? Fakty, źródła i pytanie do projektu.', topic:'Bazy danych', published:'2026-09-28', eventDate:'2026-09-24', body:postgresql },
