@@ -22,6 +22,7 @@ const languageUrl = translationUrl ?? (locale === 'pl' ? '/en/' : '/pl/');
     <meta name="robots" content={indexable ? 'index,follow' : 'noindex,nofollow'} />
     <title>{title} | ArchitectMentor</title>
     {indexable && <link rel="canonical" href={canonical} />}
+    <link rel="alternate" type="application/rss+xml" title={locale === 'pl' ? 'ArchitectMentor PL' : 'ArchitectMentor EN'} href={locale === 'pl' ? '/rss.xml' : '/en/rss.xml'} />
     {indexable && translationUrl && <><link rel="alternate" hreflang="pl" href={locale === 'pl' ? canonical : new URL(translationUrl, 'https://ejsymont.com').href} /><link rel="alternate" hreflang="en" href={locale === 'en' ? canonical : new URL(translationUrl, 'https://ejsymont.com').href} />{(Astro.url.pathname === '/pl/' || Astro.url.pathname === '/en/') && <link rel="alternate" hreflang="x-default" href="https://ejsymont.com/" />}</>}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ArchitectMentor" />
