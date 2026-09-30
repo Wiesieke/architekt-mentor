@@ -65,7 +65,9 @@ A larger common pool might postpone failure but does not create a boundary. Sele
   },
   '2026-w39-anon-managed-platform': {
     title:'The offer works, but diverges from the architecture requirement', difficulty:'Advanced',
-    scenario:`An organisation is selecting a system for internal processes. Its architecture requirements say that the application layer should use managed cloud services and that the solution must integrate with an existing integration platform.
+    scenario:`**Anonymised case.** Inspired by a real offer-review dilemma; no implementation outcome is asserted.
+
+An organisation is selecting a system for internal processes. Its architecture requirements say that the application layer should use managed cloud services and that the solution must integrate with an existing integration platform.
 
 A supplier proposes a hybrid solution: the application runs on virtual machines while some data services are managed. Documentation describes a general integration capability, but only a portion has been confirmed. Business stakeholders want to continue because the offer covers important functional needs.
 
@@ -87,7 +89,9 @@ A conditional opinion could say that the proposal merits further review **if** t
   },
   '2026-w27-dual-write': {
     title:'The order was saved, but the warehouse never saw it', difficulty:'Intermediate',
-    scenario:`You are building an order service. After checkout it must **(1)** save the order in a database and **(2)** publish an \`OrderPlaced\` event to a queue consumed by the warehouse and notification services.
+    scenario:`**Fictional teaching scenario.** This is not an account of a particular deployment.
+
+You are building an order service. After checkout it must **(1)** save the order in a database and **(2)** publish an \`OrderPlaced\` event to a queue consumed by the warehouse and notification services.
 
 The team writes an \`INSERT\`, then calls \`publish()\` in the same service method. It works in a demo. In production, a customer sometimes gets confirmation but the warehouse never receives the order. In other cases the warehouse receives an event for an order that is absent from the database.`,
     question:'Why can this happen? How would you make the database change and event publication reliable? Why does swapping their order not solve it?',
@@ -108,7 +112,9 @@ Try/catch cannot roll back an already published event and cannot catch a process
   },
   '2026-w39-retry-idempotency': {
     title:'The client retried a payment. Will you charge twice?', difficulty:'Advanced',
-    scenario:`You design an API that accepts payments for orders. The application calls \`POST /payments\`. The server sends the request to a payment provider and records the result. Sometimes the provider charges the customer, but the response is lost to a timeout and the application retries.
+    scenario:`**Fictional teaching scenario.** This is not an account of a particular deployment.
+
+You design an API that accepts payments for orders. The application calls \`POST /payments\`. The server sends the request to a payment provider and records the result. Sometimes the provider charges the customer, but the response is lost to a timeout and the application retries.
 
 The team proposes retrying every error after checking whether the order is marked paid. Early tests pass, but production sees concurrent requests for the same order and delayed provider confirmations.`,
     question:'How will you make retries safe and avoid starting a second charge? What happens when the first call has an unknown outcome?',

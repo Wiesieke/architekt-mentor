@@ -253,7 +253,7 @@
       "integracje",
       "decyzja warunkowa"
     ],
-    "scenario": "Organizacja wybiera nowy system do obsługi procesów wewnętrznych. W wymaganiach architektonicznych wskazano, że warstwa aplikacyjna ma korzystać z zarządzanych usług chmurowych, a rozwiązanie ma współpracować z istniejącą platformą integracyjną.\n\nDostawca proponuje rozwiązanie hybrydowe: aplikacja działa na maszynach wirtualnych, natomiast część usług danych korzysta z komponentów zarządzanych. W dokumentacji opisano ogólną możliwość integracji, ale potwierdzono tylko wybrany jej fragment. Biznes chce kontynuować postępowanie, bo oferta pokrywa ważne potrzeby funkcjonalne.\n\nJesteś architektem opiniującym ofertę na tym etapie. Nie masz jeszcze pełnego projektu wdrożeniowego ani potwierdzenia wszystkich połączeń.",
+    "scenario": "**Przypadek zanonimizowany.** Inspirowany rzeczywistym dylematem oceny oferty; nie opisuje wyniku wdrożenia.\n\nOrganizacja wybiera nowy system do obsługi procesów wewnętrznych. W wymaganiach architektonicznych wskazano, że warstwa aplikacyjna ma korzystać z zarządzanych usług chmurowych, a rozwiązanie ma współpracować z istniejącą platformą integracyjną.\n\nDostawca proponuje rozwiązanie hybrydowe: aplikacja działa na maszynach wirtualnych, natomiast część usług danych korzysta z komponentów zarządzanych. W dokumentacji opisano ogólną możliwość integracji, ale potwierdzono tylko wybrany jej fragment. Biznes chce kontynuować postępowanie, bo oferta pokrywa ważne potrzeby funkcjonalne.\n\nJesteś architektem opiniującym ofertę na tym etapie. Nie masz jeszcze pełnego projektu wdrożeniowego ani potwierdzenia wszystkich połączeń.",
     "question": "Jak oddzielisz ocenę zgodności z wymaganiami od oceny, czy ofertę warto dalej analizować? Jaką rekomendację sformułujesz i jakie dowody musisz otrzymać przed zatwierdzeniem architektury wdrożenia?",
     "hints": [
       "Czy „usługi chmurowe” oznaczają to samo co zarządzane uruchamianie aplikacji?",
@@ -303,7 +303,7 @@
       "systemy rozproszone",
       "kolejki"
     ],
-    "scenario": "Budujesz serwis zamówień. Po złożeniu zamówienia trzeba zrobić dwie rzeczy: **(1)** zapisać zamówienie w bazie danych oraz **(2)** opublikować zdarzenie `ZamówienieZłożone` na kolejce, którą konsumują magazyn i serwis powiadomień.\n\nZespół napisał to najprościej: w jednej metodzie serwisu najpierw `INSERT` do bazy, a zaraz po nim `publish()` na kolejkę.\n\nNa demie działa idealnie. Ale na produkcji zdarza się dwojako źle: czasem klient dostaje potwierdzenie, a magazyn **nigdy** nie dostaje zamówienia. A czasem odwrotnie — magazyn dostaje zdarzenie o zamówieniu, którego **nie ma** w bazie.",
+    "scenario": "**Scenariusz dydaktyczny (fikcyjny).** Nie jest relacją z konkretnego wdrożenia.\n\nBudujesz serwis zamówień. Po złożeniu zamówienia trzeba zrobić dwie rzeczy: **(1)** zapisać zamówienie w bazie danych oraz **(2)** opublikować zdarzenie `ZamówienieZłożone` na kolejce, którą konsumują magazyn i serwis powiadomień.\n\nZespół napisał to najprościej: w jednej metodzie serwisu najpierw `INSERT` do bazy, a zaraz po nim `publish()` na kolejkę.\n\nNa demie działa idealnie. Ale na produkcji zdarza się dwojako źle: czasem klient dostaje potwierdzenie, a magazyn **nigdy** nie dostaje zamówienia. A czasem odwrotnie — magazyn dostaje zdarzenie o zamówieniu, którego **nie ma** w bazie.",
     "question": "Dlaczego to się dzieje? Jak zapewnić, żeby baza i kolejka były spójne? Jaki wzorzec byś zastosował — i dlaczego „najpierw jedno, potem drugie” nie wystarcza?",
     "hints": [
       "Co się stanie, jeśli `publish()` rzuci wyjątek już PO udanym `INSERT`?",
@@ -324,7 +324,7 @@
       "idempotencja",
       "integracja API"
     ],
-    "scenario": "Projektujesz API przyjmujące płatności za zamówienia. Aplikacja wysyła żądanie `POST /payments`. Serwer przekazuje je do operatora płatności i zapisuje wynik. Czasem operator pobiera środki, ale odpowiedź do aplikacji ginie wskutek timeoutu. Aplikacja ponawia żądanie.\n\nZespół proponuje po prostu ponawiać każde żądanie po błędzie, a przed ponowieniem sprawdzać, czy zamówienie ma status „opłacone”. W pierwszych testach wszystko działa. W produkcji zdarzają się jednak dwa równoczesne żądania dla tego samego zamówienia oraz opóźnione potwierdzenia od operatora.",
+    "scenario": "**Scenariusz dydaktyczny (fikcyjny).** Nie jest relacją z konkretnego wdrożenia.\n\nProjektujesz API przyjmujące płatności za zamówienia. Aplikacja wysyła żądanie `POST /payments`. Serwer przekazuje je do operatora płatności i zapisuje wynik. Czasem operator pobiera środki, ale odpowiedź do aplikacji ginie wskutek timeoutu. Aplikacja ponawia żądanie.\n\nZespół proponuje po prostu ponawiać każde żądanie po błędzie, a przed ponowieniem sprawdzać, czy zamówienie ma status „opłacone”. W pierwszych testach wszystko działa. W produkcji zdarzają się jednak dwa równoczesne żądania dla tego samego zamówienia oraz opóźnione potwierdzenia od operatora.",
     "question": "Jak zaprojektujesz ponowienia, żeby nie zainicjować drugiej płatności? Co zrobisz, gdy pierwsze wywołanie ma nieznany wynik?",
     "hints": [
       "Czy odczyt statusu i wywołanie operatora są jedną operacją atomową?",
