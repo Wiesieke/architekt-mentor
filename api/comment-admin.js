@@ -34,12 +34,14 @@ module.exports = async (req, res) => {
   const result = await storage({ action: 'queue' });
   if (result.status !== 200) return res.status(503).send('Storage unavailable');
   const rows = result.data.comments || [];
+  const configNotice = process.env.OPENAI_API_KEY ? '' : '<p><strong>Brak OPENAI_API_KEY: nowe komentarze czekają na ręczną moderację.</strong></p>';
+  const count = '<p>Do sprawdzenia: ' + rows.length + (rows.length === 100 ? ' (pierwsze 100)' : '') + '. AI publikuje poprawne komentarze; tutaj trafiają przypadki niejednoznaczne i błędy oceny.</p>';
   const html = rows.map(item => '<article><strong>' + escapeHtml(item.display_name) + '</strong> · ' +
-    escapeHtml(item.email) + ' · ' + escapeHtml(item.created_at) + '<br><small>' + escapeHtml(item.article_path) +
+    escapeHtml(item.email) + ' · ' + escapeHtml(item.created_at) + '<br><small>' + '<a href="https://ejsymont.com' + escapeHtml(item.article_path) + '">' + escapeHtml(item.article_path) + '</a>' +
     '</small><p>' + escapeHtml(item.body) + '</p><form method="post" action="/api/comment-admin">' +
     '<input type="hidden" name="id" value="' + escapeHtml(item.id) + '">' +
     '<button name="decision" value="approved">Opublikuj</button><button name="decision" value="rejected">Odrzuć</button>' +
     '</form></article>').join('');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  return res.status(200).send(page(html || '<p>Brak komentarzy do sprawdzenia.</p>'));
+  return res.status(200).send(page(configNotice + count + (html || '<p>Brak komentarzy do sprawdzenia.</p>')));
 };

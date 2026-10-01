@@ -1,10 +1,11 @@
 const { randomBytes, createHmac } = require('node:crypto');
-const nodemailer = require('nodemailer');
+const { moderateComment } = require('./_comment-moderation');
+const articleContexts = require('./_comment-context.json');
 const { storage, validPath, hash, randomUUID } = require('./_comments');
 
 const unavailable = (res) => res.status(503).json({ error: 'Comments are temporarily unavailable.' });
 const previewHost = 'project-ead46-git-feature-moderated-comments-my-c.vercel.app';
-const publicHost = () => process.env.VERCEL_ENV === 'preview' ? previewHost : 'ejsymont.com';
+const publicHost = () => process.env.VERCEL_ENV === 'preview' ? (process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL || previewHost) : 'ejsymont.com';
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -28,8 +29,7 @@ module.exports = async (req, res) => {
     return result.status === 200 ? res.status(200).json(result.data) : unavailable(res);
   }
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' });
-  if (!process.env.TURNSTILE_SECRET_KEY || !process.env.LH_SMTP_HOST || !process.env.LH_SMTP_USER ||
-      !process.env.LH_SMTP_PASSWORD || !process.env.LH_STORAGE_TOKEN) return unavailable(res);
+  if (!process.env.TURNSTILE_SECRET_KEY || !process.env.LH_STORAGE_TOKEN) return unavailable(res);
   if (Number(req.headers['content-length']) > 6500 ||
       !String(req.headers['content-type'] || '').startsWith('application/json')) return res.status(400).json({ error: 'Invalid request.' });
   let body = req.body;
@@ -40,7 +40,7 @@ module.exports = async (req, res) => {
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
-  if (!validPath(articlePath, language) || name.length < 2 || name.length > 80 || /[<>\r\n]/.test(name) ||
+  if (!validPath(articlePath, language) || !articleContexts[articlePath] || name.length < 2 || name.length > 80 || /[<>\r\n]/.test(name) ||
       email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
       message.length < 10 || message.length > 2500 || typeof body.turnstileToken !== 'string' ||
       body.turnstileToken.length > 2048 || !body.turnstileToken) {
@@ -62,22 +62,18 @@ module.exports = async (req, res) => {
     sourceHash, verificationHash: hash(token) });
   if (result.status === 429) return res.status(429).json({ error: language === 'en' ? 'Please try again tomorrow.' : 'Spróbuj ponownie jutro.' });
   if (result.status !== 201) return unavailable(res);
-  try {
-    const transport = nodemailer.createTransport({
-      host: process.env.LH_SMTP_HOST, port: 465, secure: true,
-      auth: { user: process.env.LH_SMTP_USER, pass: process.env.LH_SMTP_PASSWORD },
-      connectionTimeout: 8000, greetingTimeout: 8000, socketTimeout: 10000
-    });
-    const link = 'https://' + publicHost() + '/api/comments?action=verify&id=' + encodeURIComponent(id) + '&token=' + token;
-    await transport.sendMail({
-      from: process.env.LH_SMTP_USER, to: email,
-      subject: language === 'en' ? 'Confirm your ArchitectMentor comment' : 'Potwierdź komentarz w ArchitectMentor',
-      text: (language === 'en' ? 'Confirm your comment by opening this link within 48 hours:\n' : 'Potwierdź komentarz, otwierając ten link w ciągu 48 godzin:\n') + link + '\n\n' +
-        (language === 'en' ? 'If you did not submit a comment, ignore this message.' : 'Jeśli nie wysyłano komentarza, zignoruj tę wiadomość.')
-    });
-    return res.status(202).json({ ok: true });
-  } catch (error) {
-    console.error('Comment verification mail failed:', error?.code || 'SMTP_ERROR');
-    return unavailable(res);
+  // Compatibility with the deployed LH.pl bridge: unlock the manual queue using
+  // the server-only token. This records a technical transition, not verified email ownership.
+  const queued = await storage({ action: 'verify', id, verificationHash: hash(token) });
+  if (queued.status !== 200) return unavailable(res);
+  const decision = await moderateComment({ article: articleContexts[articlePath], name, message });
+  let status = 'pending';
+  if (decision !== 'pending') {
+    const applied = await storage({ action: 'moderate', id, decision });
+    if (applied.status === 200) status = decision;
+    // A failed/uncertain write never promises publication. The saved row remains
+    // visible in the manual queue unless the bridge already committed the update.
   }
+  return res.status(status === 'approved' ? 201 : 202).json({ ok: true, status,
+    ...(status === 'approved' ? { comment: { id, display_name: name, body: message } } : {}) });
 };

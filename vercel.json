@@ -1,9 +1,35 @@
 {
   "redirects": [
-    { "source": "/generator.html", "destination": "/narzedzia/hld/", "permanent": true },
-    { "source": "/dlafirm.html", "destination": "/dlafirm/", "permanent": true },
-    { "source": "/informacja-o-danych.html", "destination": "/informacja-o-danych/", "permanent": true },
-    { "source": "/lamiglowki.html", "destination": "/lamiglowki/", "permanent": true },
-    { "source": "/antywzorce.html", "destination": "/antywzorce/", "permanent": true }
-  ]
+    {
+      "source": "/generator.html",
+      "destination": "/narzedzia/hld/",
+      "permanent": true
+    },
+    {
+      "source": "/dlafirm.html",
+      "destination": "/dlafirm/",
+      "permanent": true
+    },
+    {
+      "source": "/informacja-o-danych.html",
+      "destination": "/informacja-o-danych/",
+      "permanent": true
+    },
+    {
+      "source": "/lamiglowki.html",
+      "destination": "/lamiglowki/",
+      "permanent": true
+    },
+    {
+      "source": "/antywzorce.html",
+      "destination": "/antywzorce/",
+      "permanent": true
+    }
+  ],
+  "functions": {
+    "api/comments.js": {
+      "maxDuration": 60
+    }
+  },
+  "buildCommand": "npm run build"
 }
