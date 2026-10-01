@@ -72,14 +72,10 @@ Calm, precise, mentoring; encouraging but candid; clarity over jargon.`;
 
 // ---- Guardrails (chronią Twój rachunek) ----
 const { storeWithConsent } = require("./_store");
-const ALLOWED_MODELS = new Set(["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8"]);
-const MAX_BRIEF_CHARS = 30000;    // limit długości briefu w ZNAKACH (było 6000 — za mało)
-const MODEL_MAX_OUT = {           // sufit tokenów WYJŚCIA per model (bezpieczny dla API)
-  "claude-haiku-4-5": 8000,
-  "claude-sonnet-4-6": 16000,
-  "claude-opus-4-8": 16000
-};
-const DEFAULT_MODEL = "claude-sonnet-4-6";
+const ALLOWED_MODELS = new Set(["gpt-4.1-mini", "gpt-4.1"]);
+const MAX_BRIEF_CHARS = 30000;
+const MODEL_MAX_OUT = { "gpt-4.1-mini": 8000, "gpt-4.1": 16000 };
+const DEFAULT_MODEL = "gpt-4.1";
 
 // ---- Prosty limit zapytań (best-effort, w pamięci instancji) ----
 const WINDOW_MS = 60_000, LIMIT = 8;
@@ -97,8 +93,8 @@ module.exports = async (req, res) => {
   const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
   if (rateLimited(ip)) { res.status(429).json({ error: "Za dużo żądań — odczekaj chwilę." }); return; }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    res.status(500).json({ error: "Serwer nie ma ustawionej zmiennej ANTHROPIC_API_KEY." }); return;
+  if (!process.env.OPENAI_API_KEY) {
+    res.status(500).json({ error: "Generator jest chwilowo niedostępny." }); return;
   }
 
   let body = req.body;
@@ -119,25 +115,35 @@ module.exports = async (req, res) => {
   const userMessage = `BRIEF:\n${brief}\n\nMODE: ${mode}\nDIAGRAM: ${diagram}`;
 
   try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
+    const r = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        authorization: "Bearer " + process.env.OPENAI_API_KEY,
         "content-type": "application/json"
       },
+      signal: AbortSignal.timeout(55000),
       body: JSON.stringify({
-        model, max_tokens: maxTokens, temperature: 0.3,
-        system: SYSTEM_PROMPT + (body.locale === "en" ? "\n# ENGLISH EDITION OVERRIDE\nRespond entirely in English, including headings and mentor notes, regardless of the brief's language. Standard architecture terms remain unchanged." : ""),
-        messages: [{ role: "user", content: userMessage }]
+        model, store: false, max_output_tokens: maxTokens, temperature: 0.3,
+        instructions: SYSTEM_PROMPT + (body.locale === "en" ? "\n# ENGLISH EDITION OVERRIDE\nRespond entirely in English, including headings and mentor notes, regardless of the brief's language. Standard architecture terms remain unchanged." : ""),
+        input: userMessage
       })
     });
     const data = await r.json();
-    if (!r.ok) { res.status(r.status).json({ error: (data.error && data.error.message) || "Błąd API." }); return; }
-    const text = (data.content || []).map(b => b.text || "").join("\n");
+    if (!r.ok) {
+      console.error("HLD API status:", r.status);
+      res.status(r.status === 429 ? 429 : 502).json({ error: "Nie udało się przygotować HLD. Spróbuj ponownie." }); return;
+    }
+    const parts = (data.output || []).filter(item => item.type === "message").flatMap(item => item.content || []);
+    if (data.status !== "completed" || parts.some(item => item.type === "refusal")) {
+      console.error("HLD incomplete output", { status: data.status || "unknown" });
+      res.status(502).json({ error: "HLD nie został ukończony. Spróbuj ponownie." }); return;
+    }
+    const text = parts.filter(item => item.type === "output_text").map(item => item.text).join("\n").trim();
+    if (!text) { res.status(502).json({ error: "Nie udało się odczytać HLD. Spróbuj ponownie." }); return; }
     const storage = await storeWithConsent({ consent: body.saveHld === true, type: "hld", brief, hld: text, model, mode, diagram });
     res.status(200).json({ text, usage: data.usage || null, ...storage });
   } catch (e) {
-    res.status(500).json({ error: String(e.message || e) });
+    console.error("HLD request failed:", e?.name || "Error");
+    res.status(502).json({ error: "Generator jest chwilowo niedostępny. Spróbuj ponownie." });
   }
 };
