@@ -3,11 +3,31 @@
     "scenario": "Fictional multi-tenant SaaS. Report numbers are local to each tenant. The shared cache uses only the report number and can return a cached response before the tenant-filtered database query runs.",
     "question": "Where did tenant isolation break? How will you change authorisation, cache keys and tests so the fix covers the full path?",
     "criteria": [
-      {"id": "authz", "label": "Resource authorisation", "expected": "Distinguish gateway authentication from permission for a particular report and require a decision on cache hits too."},
-      {"id": "key", "label": "Key namespace", "expected": "Include trusted tenant identity in the cache namespace or propose stronger separation without treating the key as a replacement for authorisation."},
-      {"id": "layers", "label": "Defence in depth", "expected": "Enforce tenant scope in the data layer and inspect adjacent shortcuts including lists, exports, search and asynchronous work."},
-      {"id": "migration", "label": "Old entries and permissions", "expected": "Purge or version old cache entries and handle invalidation after role change or access revocation."},
-      {"id": "evidence", "label": "Negative test", "expected": "Test two tenants with the same local identifier after cache warm-up and observe a measurable outcome without leaking content into logs."}
+      {
+        "id": "authz",
+        "label": "Resource authorisation",
+        "expected": "Distinguish gateway authentication from permission for a particular report and require a decision on cache hits too."
+      },
+      {
+        "id": "key",
+        "label": "Key namespace",
+        "expected": "Include trusted tenant identity in the cache namespace or propose stronger separation without treating the key as a replacement for authorisation."
+      },
+      {
+        "id": "layers",
+        "label": "Defence in depth",
+        "expected": "Enforce tenant scope in the data layer and inspect adjacent shortcuts including lists, exports, search and asynchronous work."
+      },
+      {
+        "id": "migration",
+        "label": "Old entries and permissions",
+        "expected": "Purge or version old cache entries and handle invalidation after role change or access revocation."
+      },
+      {
+        "id": "evidence",
+        "label": "Negative test",
+        "expected": "Test two tenants with the same local identifier after cache warm-up and observe a measurable outcome without leaking content into logs."
+      }
     ]
   },
   "2026-09-30-odtwarzanie-po-awarii": {
@@ -131,6 +151,69 @@
         "id": "next",
         "label": "Review point",
         "expected": "Differentiate evidence needed before selection from what HLD and tests can verify, and name a reassessment point."
+      }
+    ]
+  },
+  "2026-10-01-wymiana-urzadzen": {
+    "scenario": "Practice-inspired educational scenario\n\nA company replaces older tablets used to process work orders. The new devices have a newer operating system. Users will perform the same tasks and the app will still connect to the same server. The team says, “No features are changing, so we only need to buy the devices.” App compatibility, sign-in and communication have not yet been checked on the new devices.",
+    "question": "Which three areas would you check before concluding that the replacement needs no architecture change? Explain what evidence would support a safe rollout.",
+    "criteria": [
+      {
+        "id": "compatibility",
+        "label": "App compatibility",
+        "expected": "Recognises the need to check the app and its dependencies on the new operating system."
+      },
+      {
+        "id": "boundaries",
+        "label": "Sign-in and communication",
+        "expected": "Identifies identity/permissions or server communication impact without inventing new integrations."
+      },
+      {
+        "id": "evidence",
+        "label": "Trial and conclusion",
+        "expected": "Proposes a representative trial and a conditional conclusion rather than automatic redesign."
+      }
+    ]
+  },
+  "2026-10-01-nieznany-wynik-transakcji": {
+    "scenario": "Practice-inspired educational scenario\n\nA service has accepted payment and requested a ticket booking. The response never arrived. The API contract allows safe retries of the same operation using the same identifier and payload. After a limited number of these attempts, the outcome is still unknown. The provider offers a lookup operation to check status by operation identifier. In this scenario, reversal means undoing the collected payment and is allowed only after unequivocal confirmation that no booking was created.",
+    "question": "What would you do after exhausting safe retries? Explain the operation identifier, status lookup and the condition for reversing payment.",
+    "criteria": [
+      {
+        "id": "unknown",
+        "label": "Unknown outcome",
+        "expected": "Distinguishes timeout from confirmed failure and avoids blindly creating another operation."
+      },
+      {
+        "id": "lookup",
+        "label": "Identity and lookup",
+        "expected": "Preserves the identity of the same operation under the API contract and looks up the original outcome."
+      },
+      {
+        "id": "compensation",
+        "label": "Condition and uncertainty",
+        "expected": "Requires confirmed absence for reversal in this scenario and routes unresolved outcomes to reconciliation."
+      }
+    ]
+  },
+  "2026-10-01-opcjonalny-zapis": {
+    "scenario": "Practice-inspired educational scenario\n\nA portal has generated a document and already has it in the server response. The user selected an optional saved copy for later use. The storage service is unavailable and the copy was not saved. The document can still be safely displayed and downloaded. In this exercise, durable storage is not a condition for document validity or completion of a mandatory business operation.",
+    "question": "What would you show after the storage error? Explain why it is appropriate here and when a different approach would be needed.",
+    "criteria": [
+      {
+        "id": "core",
+        "label": "Core function",
+        "expected": "Provides the ready document despite failure of optional storage."
+      },
+      {
+        "id": "honesty",
+        "label": "Clear feedback",
+        "expected": "Reports the failed save and download option without falsely claiming success."
+      },
+      {
+        "id": "boundary",
+        "label": "Applicability",
+        "expected": "Distinguishes optional copy storage from mandatory durable recording."
       }
     ]
   }

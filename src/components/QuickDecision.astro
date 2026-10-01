@@ -1,0 +1,58 @@
+---
+export interface QuickDecisionData { question:string; hint:string; correctId:string; options:{id:string;text:string;explanation:string}[] }
+interface Props { quick:QuickDecisionData; locale?:'pl'|'en' }
+const { quick, locale='pl' } = Astro.props;
+const en=locale==='en';
+---
+<section class="decision-modes" data-decision-modes data-correct={quick.correctId} data-locale={locale} aria-label={en?'Choose an exercise mode':'Wybierz wariant ćwiczenia'}>
+ <div class="mode-buttons"><button type="button" data-mode="quick" aria-pressed="true" aria-controls="quick-decision">{en?'Quick decision · about 2 minutes':'Szybka decyzja · około 2 minuty'}</button><button type="button" data-mode="mentor" aria-pressed="false" aria-controls="mentor-workshop">{en?'Mentor workshop · about 10 minutes':'Warsztat z mentorem · około 10 minut'}</button></div>
+ <p class="mode-note">{en?'Start with a choice or explain your reasoning to the mentor. You can switch modes at any time.':'Zacznij od wyboru albo od razu uzasadnij decyzję mentorowi. Wariant możesz zmienić w każdej chwili.'}</p>
+ <div id="quick-decision">
+  <form class="quick-form"><fieldset><legend>{quick.question}</legend>{quick.options.map(option=><label class="quick-option"><input type="radio" name="quick-choice" value={option.id}/><span>{option.text}</span></label>)}</fieldset><button class="button" type="submit">{en?'Check my decision':'Sprawdź moją decyzję'}</button><p class="quick-status" role="status"></p></form>
+  <details class="quick-hint"><summary>{en?'Not sure? Show a hint':'Nie wiem — pokaż wskazówkę'}</summary><p>{quick.hint}</p></details>
+  <div class="quick-feedback" role="region" aria-label={en?'Decision feedback':'Wyjaśnienie decyzji'} tabindex="-1" hidden>
+   <h3 class="feedback-title"></h3>
+   {quick.options.map(option=><p data-explanation={option.id} hidden>{option.explanation}</p>)}
+   <div class="correct-explanation" hidden><strong>{en?'The best choice under these assumptions:':'Najlepszy wybór przy tych założeniach:'}</strong><p>{quick.options.find(option=>option.id===quick.correctId)?.text}</p></div>
+   <p>{en?'Next, explore the linked learning material below or practise explaining your decision to the mentor.':'Teraz zajrzyj do powiązanego materiału poniżej albo przećwicz uzasadnienie decyzji z mentorem.'}</p>
+   <button type="button" class="button" data-open-mentor>{en?'Explain my decision to the mentor →':'Uzasadnię decyzję mentorowi →'}</button>
+  </div>
+ </div>
+</section>
+<script>
+ for(const root of document.querySelectorAll<HTMLElement>('[data-decision-modes]')){
+  const quick=root.querySelector<HTMLElement>('#quick-decision');
+  const mentor=document.querySelector<HTMLElement>('#mentor-workshop');
+  const en=root.dataset.locale==='en';
+  const setMode=(mode:string)=>{
+   if(!quick||!mentor)return;
+   quick.hidden=mode!=='quick';mentor.hidden=mode!=='mentor';
+   for(const button of root.querySelectorAll('[data-mode]'))button.setAttribute('aria-pressed',String((button as HTMLElement).dataset.mode===mode));
+   if(mode==='mentor'){
+    mentor.scrollIntoView({block:'start',behavior:'instant'});
+    mentor.querySelector<HTMLElement>('h2')?.focus({preventScroll:true});
+   }
+  };
+  for(const button of root.querySelectorAll<HTMLElement>('[data-mode]'))button.addEventListener('click',()=>setMode(button.dataset.mode||'quick'));
+  root.querySelector('[data-open-mentor]')?.addEventListener('click',()=>setMode('mentor'));
+  root.querySelector('form')?.addEventListener('submit',event=>{
+   event.preventDefault();
+   const selected=root.querySelector<HTMLInputElement>('input[name="quick-choice"]:checked');
+   const status=root.querySelector<HTMLElement>('.quick-status');
+   const feedback=root.querySelector<HTMLElement>('.quick-feedback');
+   if(!selected){if(status)status.textContent=en?'Choose an option or open the hint.':'Wybierz odpowiedź albo otwórz wskazówkę.';root.querySelector<HTMLInputElement>('input[name="quick-choice"]')?.focus();return;}
+   if(!feedback)return;
+   if(status)status.textContent=en?'Explanation ready.':'Wyjaśnienie gotowe.';
+   const correct=selected.value===root.dataset.correct;
+   const title=feedback.querySelector<HTMLElement>('.feedback-title');
+   if(title)title.textContent=correct?(en?'A sound decision under these assumptions':'Trafna decyzja przy tych założeniach'):(en?'This choice has a risk':'Ten wybór niesie ryzyko');
+   for(const explanation of feedback.querySelectorAll<HTMLElement>('[data-explanation]'))explanation.hidden=explanation.dataset.explanation!==selected.value&&!(explanation.dataset.explanation===root.dataset.correct&&!correct);
+   const alternative=feedback.querySelector<HTMLElement>('.correct-explanation');if(alternative)alternative.hidden=correct;
+   feedback.hidden=false;
+   feedback.scrollIntoView({block:'start',behavior:'instant'});feedback.focus({preventScroll:true});
+  });
+ }
+</script>
+<style>
+ .decision-modes{scroll-margin-top:140px;background:#fff;border:1px solid #dce4df;border-radius:14px;padding:25px 30px;margin-bottom:22px}.mode-buttons{display:flex;flex-wrap:wrap;gap:10px}.mode-buttons button{border:1px solid #136d73;border-radius:8px;padding:11px 15px;background:#fff;color:#136d73;font-weight:700;cursor:pointer}.mode-buttons button[aria-pressed=true]{background:#136d73;color:white}.mode-note{font-size:13px;color:#536577}.quick-form fieldset{border:0;padding:0;margin:22px 0}.quick-form legend{font:700 21px/1.4 var(--display);margin-bottom:14px}.quick-option{display:flex;align-items:start;gap:12px;background:#f5f8f5;border:1px solid #dce4df;border-radius:8px;padding:15px;margin:10px 0;cursor:pointer}.quick-option input{flex:none;margin-top:5px}.quick-option:has(input:checked){border-color:#136d73;background:#e8f4ef}.quick-form .button,.quick-feedback .button{border:0;cursor:pointer}.quick-hint{margin:20px 0;font-size:14px}.quick-hint summary{cursor:pointer;color:#136d73;font-weight:700}.quick-status{font-size:13px}.quick-feedback{background:#e8f4ef;border-radius:10px;padding:22px;scroll-margin-top:110px}.quick-feedback h3{margin-top:0}.quick-feedback p{line-height:1.65}.quick-feedback:focus-visible{outline:2px solid #136d73;outline-offset:3px}[hidden]{display:none!important}@media(max-width:540px){.decision-modes{padding:20px}.quick-feedback{scroll-margin-top:140px}.mode-buttons button{flex:1}}
+</style>

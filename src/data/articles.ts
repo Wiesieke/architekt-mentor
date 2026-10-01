@@ -1,3 +1,6 @@
+import starterLearning0 from '../content/articles/analiza-wplywu-zmiany.html?raw';
+import starterLearning1 from '../content/articles/idempotencja-lookup-kompensacja.html?raw';
+import starterLearning2 from '../content/articles/graceful-degradation.html?raw';
 import checksums from '../content/articles/cloud-storage-domyslne-sumy-kontrolne.html?raw';
 import tenantIsolation from '../content/articles/izolacja-tenantow-niezmiennik.html?raw';
 import streaming from '../content/articles/google-api-gateway-streaming.html?raw';
@@ -27,6 +30,9 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:"analiza-wplywu-zmiany", title:"Analiza wpływu zmiany: sprzęt, aplikacja i granice systemu", description:"Jak sprawdzić zgodność i dobrać zakres przeglądu do rzeczywistej zmiany.", topic:"Technika analizy", published:'2026-10-01', body:starterLearning0 },
+  { section:'podstawy-architektury', slug:"idempotencja-lookup-kompensacja", title:"Idempotencja, lookup i kompensacja: trzy różne zadania", description:"Bezpieczne ponowienia i decyzje przy nieznanym wyniku operacji.", topic:"Wzorce integracji", published:'2026-10-01', body:starterLearning1 },
+  { section:'podstawy-architektury', slug:"graceful-degradation", title:"Graceful degradation: zachowaj główną funkcję", description:"Kiedy awaria dodatku nie powinna blokować wyniku i gdzie leży granica.", topic:"Odporność", published:'2026-10-01', body:starterLearning2 },
   { section:'architektura-w-ruchu', slug:'cloud-storage-domyslne-sumy-kontrolne', title:'Cloud Storage: sumy kontrolne domyślnie w bibliotekach', description:'Zmiana z 30 września chroni integralność transferu, ale ma ograniczenia dla odczytów zakresowych i złożonych uploadów.', topic:'Dane i niezawodność', published:'2026-10-01', eventDate:'2026-09-30', body:checksums },
   { section:'podstawy-architektury', slug:'izolacja-tenantow-niezmiennik', title:'Izolacja tenantów jako niezmiennik całej ścieżki', description:'Jak przenieść zaufany kontekst klienta przez autoryzację, dane, cache, wyszukiwanie i zadania asynchroniczne.', topic:'Bezpieczeństwo i wielodostępność', published:'2026-10-01', body:tenantIsolation },
   { section:'architektura-w-ruchu', slug:'google-api-gateway-streaming', title:'Google Cloud API Gateway: strumieniowanie zmienia projekt API', description:'Public Preview z 29 września: SSE, WebSocket i gRPC przez bramę, ale też ograniczenia domen, terminów i migracji.', topic:'API i AI', published:'2026-09-30', eventDate:'2026-09-29', body:streaming },

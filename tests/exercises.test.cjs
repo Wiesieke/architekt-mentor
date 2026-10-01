@@ -1,0 +1,59 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const starters=require('../data/starter-exercises.json');
+const puzzles=require('../data/puzzles.json');
+const english=require('../data/puzzle-coach-en.json');
+
+test('the starter set has equivalent, anonymised choices, criteria and learning links',()=>{
+  assert.equal(starters.length,3);
+  for(const starter of starters){
+    const published=puzzles.find(p=>p.id===starter.id);
+    assert.ok(published?.coach);
+    assert.deepEqual(published.quick,starter.pl.quick);
+    assert.deepEqual(published.coach.criteria,starter.pl.criteria);
+    assert.equal(english[starter.id].scenario,starter.en.scenario);
+    for(const locale of ['pl','en']){
+      const p=starter[locale];
+      assert.equal(p.criteria.length,3);
+      assert.deepEqual(p.criteria.map(c=>c.id),starter.pl.criteria.map(c=>c.id));
+      assert.equal(p.quick.options.length,3);
+      assert.equal(new Set(p.quick.options.map(o=>o.id)).size,3);
+      assert.ok(p.quick.options.some(o=>o.id===p.quick.correctId));
+      assert.ok(p.quick.options.every(o=>o.explanation.length>30));
+      assert.ok(fs.existsSync(`src/content/articles/${locale==='en'?'en/':''}${p.learnSlug}.html`));
+      assert.match(p.scenario,locale==='pl'?/^Scenariusz edukacyjny inspirowany praktyką/:/^Practice-inspired educational scenario/);
+      assert.doesNotMatch(JSON.stringify(p),/brightstar|euronet|szczegóły zmieniono|TransactionLookup/i);
+    }
+  }
+});
+
+async function assess(starter,locale,stage,invalid=false){
+  let stored,request;
+  const module={exports:{}};
+  const criteria=starter[locale].criteria;
+  const feedback=stage==='hint'?{positive:'A reasoned choice',focusId:criteria[0].id,question:'What evidence would you check?'}:{criteria:criteria.map(c=>({id:c.id,points:2,reason:'Supported by the stated assumptions'})),overall:'A sound decision.',nextStep:'Check it with one representative test.'};
+  if(invalid)feedback.criteria.push({id:'invented',points:2,reason:'Extra requirement'});
+  vm.runInNewContext(fs.readFileSync('api/evaluate-puzzle.js','utf8'),{
+    module,require:path=>path.includes('_store')?{randomUUID:()=> 'ce818959-6952-4c75-93f4-41f3ddf2a222',storeWithConsent:async record=>{stored=record;return {saved:null};}}:path.includes('puzzle-coach-en')?english:puzzles,
+    process:{env:{ANTHROPIC_API_KEY:'test-only'}},console,AbortSignal,
+    fetch:async(url,options)=>{request=JSON.parse(options.body);return {ok:true,json:async()=>({content:[{type:'text',text:JSON.stringify(feedback)}]})};},
+  });
+  const res={setHeader(){},status(code){this.code=code;return this;},json(data){this.data=data;return this;}};
+  await module.exports({method:'POST',headers:{},body:{puzzleId:starter.id,locale,stage,answer:'I would check the existing outcome before taking another action.',saveAnswer:false}},res);
+  return {res,stored,request};
+}
+for(const starter of starters)for(const locale of ['pl','en']){
+  test(`${starter.id} ${locale}: hint and six-point score respect the three-criterion contract`,async()=>{
+    const hint=await assess(starter,locale,'hint');
+    assert.equal(hint.res.code,200);assert.ok(hint.res.data.question);assert.equal(hint.res.data.score,undefined);
+    const score=await assess(starter,locale,'score');
+    assert.equal(score.res.code,200);assert.equal(score.res.data.maxScore,6);assert.equal(score.res.data.score,6);
+    assert.equal(score.stored.consent,false);assert.equal(score.res.data.saved,null);
+    assert.ok(starter[locale].criteria.every(c=>score.request.system.includes(c.id)));
+    assert.match(score.request.system,locale==='pl'?/krótkie, sensowne uzasadnienie/:/short sound justification/);
+    const invalid=await assess(starter,locale,'score',true);
+    assert.equal(invalid.res.code,502);assert.equal(invalid.stored,undefined);
+  });
+}

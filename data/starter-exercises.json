@@ -1,0 +1,329 @@
+[
+  {
+    "id": "2026-10-01-wymiana-urzadzen",
+    "pl": {
+      "title": "Nowe tablety, ta sama aplikacja. Co trzeba sprawdzić?",
+      "difficulty": "Łatwy",
+      "goal": "Rozpoznaj wpływ zmiany, zanim uznasz ją za samą wymianę sprzętu.",
+      "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nFirma wymienia starsze tablety używane do obsługi zleceń. Nowe urządzenia mają nowszy system operacyjny. Użytkownicy mają wykonywać te same zadania, a aplikacja nadal łączy się z tym samym serwerem. Zespół mówi: „Funkcje się nie zmieniają, więc wystarczy kupić sprzęt”. Nie sprawdzono jeszcze działania aplikacji, logowania ani komunikacji na nowych urządzeniach.",
+      "question": "Jakie trzy obszary sprawdzisz przed uznaniem, że wymiana nie wymaga zmiany architektury? Uzasadnij, co pozwoli bezpiecznie rozpocząć wdrożenie.",
+      "hints": [
+        "Czy te same funkcje oznaczają zgodność z nowym systemem operacyjnym?",
+        "Co może zmienić się w logowaniu, uprawnieniach lub komunikacji?",
+        "Jak krótka próba na jednym urządzeniu dostarczy dowodów?"
+      ],
+      "analysis": "### Zacznij od wpływu, nie od etykiety\n\nNowe urządzenie nie oznacza automatycznie nowej architektury. Brak nowych funkcji również nie dowodzi braku wpływu. Sprawdź trzy obszary: zgodność aplikacji i bibliotek z systemem, logowanie oraz uprawnienia urządzenia, komunikację z serwerem i pełną ścieżkę pracy użytkownika.\n\n### Mała próba przed większą zmianą\n\nUruchom aplikację na reprezentatywnym nowym urządzeniu. Wykonaj logowanie, przyjęcie zlecenia i wysłanie wyniku. Sprawdź istotne urządzenia peryferyjne, jeśli są używane. Zapisz wynik, wykryte różnice i sposób powrotu do dotychczasowego rozwiązania.\n\nJeżeli kontrakty, granice systemu i sposób działania pozostają takie same, wystarczy udokumentować wpływ i potwierdzoną zgodność. Jeśli zmieniają się te elementy, zakres przeglądu architektury powinien odpowiadać zmianie. Nie wymagamy pełnej przebudowy dokumentacji dla samej wymiany urządzenia.\n\n> Analiza wpływu zmiany jest techniką. C4 może pomóc pokazać granice i zależności, ale nie zastępuje testu zgodności.",
+      "quick": {
+        "question": "Jaki jest najlepszy pierwszy krok?",
+        "hint": "Oddziel cel użytkownika od technicznej zgodności nowego środowiska.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "b",
+            "text": "Sprawdź zgodność aplikacji, logowanie i komunikację w małym pilotażu, a potem oceń wpływ.",
+            "explanation": "To daje dowody przed decyzją. Architektura może pozostać taka sama, ale trzeba potwierdzić zgodność i opisać rzeczywiste zmiany."
+          },
+          {
+            "id": "a",
+            "text": "Kup nowe urządzenia — skoro funkcje są takie same, testy zgodności nie są potrzebne.",
+            "explanation": "Niezmienione zadania użytkownika nie gwarantują zgodności aplikacji, logowania i komunikacji z nowym systemem."
+          },
+          {
+            "id": "c",
+            "text": "Od razu zaprojektuj cały system od nowa, bo zmienił się sprzęt.",
+            "explanation": "To zbyt szeroki krok bez dowodów. Najpierw ustal wpływ; nowy sprzęt nie wymusza sam w sobie przebudowy architektury."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "compatibility",
+          "label": "Zgodność aplikacji",
+          "expected": "Rozpoznaje potrzebę sprawdzenia aplikacji i zależności na nowym systemie."
+        },
+        {
+          "id": "boundaries",
+          "label": "Logowanie i komunikacja",
+          "expected": "Wskazuje wpływ na tożsamość/uprawnienia lub komunikację z serwerem; nie wymyśla nowych integracji."
+        },
+        {
+          "id": "evidence",
+          "label": "Próba i wniosek",
+          "expected": "Proponuje reprezentatywną próbę oraz warunkowy wniosek o zakresie zmiany zamiast automatycznej przebudowy."
+        }
+      ],
+      "learnSlug": "analiza-wplywu-zmiany"
+    },
+    "en": {
+      "title": "New tablets, the same app. What should you check?",
+      "difficulty": "Easy",
+      "goal": "Understand the impact before treating a change as a hardware swap.",
+      "scenario": "Practice-inspired educational scenario\n\nA company replaces older tablets used to process work orders. The new devices have a newer operating system. Users will perform the same tasks and the app will still connect to the same server. The team says, “No features are changing, so we only need to buy the devices.” App compatibility, sign-in and communication have not yet been checked on the new devices.",
+      "question": "Which three areas would you check before concluding that the replacement needs no architecture change? Explain what evidence would support a safe rollout.",
+      "hints": [
+        "Do unchanged features prove compatibility with a new operating system?",
+        "What could change in sign-in, permissions or communication?",
+        "How could a small trial provide evidence?"
+      ],
+      "analysis": "### Assess impact before choosing a label\n\nNew hardware does not automatically mean a new architecture. Unchanged features do not prove unchanged impact either. Check app and library compatibility, sign-in and device permissions, and server communication across the user journey.\n\n### Try a small representative rollout\n\nRun the app on a representative new device. Sign in, accept a work order and submit its result. Check important peripherals if they are used. Record findings, differences and a way back to the previous setup.\n\nIf contracts, system boundaries and behaviour remain unchanged, document the impact and verified compatibility. If those elements change, scale the architecture review to that change. A device replacement does not always require rewriting the whole architecture.\n\n> Change impact analysis is a technique. C4 can clarify boundaries and dependencies, but does not replace compatibility testing.",
+      "quick": {
+        "question": "What is the best first step?",
+        "hint": "Separate the user’s goal from compatibility with the new environment.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "b",
+            "text": "Check app compatibility, sign-in and communication in a small trial, then assess impact.",
+            "explanation": "This produces evidence before the decision. The architecture may remain unchanged, but compatibility and actual differences need verification."
+          },
+          {
+            "id": "a",
+            "text": "Buy the devices — unchanged features mean compatibility testing is unnecessary.",
+            "explanation": "The same user tasks do not guarantee that the app, sign-in and communication work on the new operating system."
+          },
+          {
+            "id": "c",
+            "text": "Redesign the whole system immediately because the hardware changed.",
+            "explanation": "That is too broad without evidence. Assess impact first; hardware alone does not require a complete redesign."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "compatibility",
+          "label": "App compatibility",
+          "expected": "Recognises the need to check the app and its dependencies on the new operating system."
+        },
+        {
+          "id": "boundaries",
+          "label": "Sign-in and communication",
+          "expected": "Identifies identity/permissions or server communication impact without inventing new integrations."
+        },
+        {
+          "id": "evidence",
+          "label": "Trial and conclusion",
+          "expected": "Proposes a representative trial and a conditional conclusion rather than automatic redesign."
+        }
+      ],
+      "learnSlug": "change-impact-analysis"
+    }
+  },
+  {
+    "id": "2026-10-01-nieznany-wynik-transakcji",
+    "pl": {
+      "title": "Brak odpowiedzi. Czy rezerwacja powstała?",
+      "difficulty": "Średni",
+      "goal": "Odróżnij brak odpowiedzi od niepowodzenia operacji.",
+      "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nSerwis przyjął płatność i wysłał żądanie utworzenia rezerwacji biletu. Odpowiedź nie dotarła. Umowa API pozwala bezpiecznie ponawiać tę samą operację z tym samym identyfikatorem i danymi. Po ograniczonej liczbie takich prób wynik nadal jest nieznany. Dostawca udostępnia lookup — sprawdzenie statusu po identyfikatorze operacji. W tym scenariuszu reversal, czyli cofnięcie pobranej płatności, jest dopuszczony dopiero po jednoznacznym potwierdzeniu, że rezerwacja nie powstała.",
+      "question": "Co zrobisz po wyczerpaniu bezpiecznych ponowień? Opisz rolę identyfikatora operacji, sprawdzenia statusu i warunku cofnięcia płatności.",
+      "hints": [
+        "Czy timeout dowodzi, że dostawca nic nie wykonał?",
+        "Czy nowy identyfikator oznacza tę samą operację?",
+        "Co zrobisz, jeśli lookup też nie da jednoznacznego wyniku?"
+      ],
+      "analysis": "### Timeout oznacza niepewność\n\nŻądanie mogło zostać wykonane mimo utraty odpowiedzi. Nowa operacja z nowym identyfikatorem może utworzyć drugą rezerwację. Automatyczne cofnięcie płatności może natomiast pozostawić istniejącą rezerwację bez należności.\n\n### Ponowienie, sprawdzenie, rozstrzygnięcie\n\nBezpieczne retry dotyczy tej samej operacji: zachowuje identyfikator i dane zgodnie z umową API oraz ma limit prób. Po ich wyczerpaniu wykonaj lookup. Potwierdzony sukces kończy operację bez nowej rezerwacji. Potwierdzony brak rezerwacji pozwala w tym scenariuszu uruchomić reversal według uzgodnionej procedury. Nieznany wynik nadal pozostaje nieznany: zapisz go do uzgodnienia i jasno poinformuj użytkownika. Sam brak znalezionego wpisu nie jest dowodem niewykonania operacji, jeśli umowa API nie gwarantuje takiego znaczenia.\n\n### Granice wzorców\n\nIdempotencja oznacza, że powtórzenie tej samej operacji nie wywoła dodatkowego skutku w uzgodnionym zakresie. Lookup pomaga ustalić wynik. Reversal jest operacją kompensującą z własnymi warunkami i możliwymi błędami; nie cofa magicznie całej historii. Reguły i czasy konkretnego API trzeba uzgodnić.\n\n> Kolejność i warunek reversal są założeniami tego scenariusza, a nie uniwersalną regułą wszystkich systemów płatności.",
+      "quick": {
+        "question": "Co robisz po wyczerpaniu bezpiecznych ponowień?",
+        "hint": "Dostawca mógł wykonać operację, ale nie dostarczyć odpowiedzi.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "a",
+            "text": "Wyślij nową rezerwację z nowym identyfikatorem.",
+            "explanation": "To może utworzyć duplikat. Brak odpowiedzi nie dowodzi, że pierwotna rezerwacja nie istnieje."
+          },
+          {
+            "id": "c",
+            "text": "Od razu cofnij płatność, bo timeout oznacza niepowodzenie.",
+            "explanation": "Timeout oznacza brak odpowiedzi. W tej umowie nie daje prawa do reversal; rezerwacja mogła powstać."
+          },
+          {
+            "id": "b",
+            "text": "Sprawdź pierwotną operację przez lookup; dalszy krok dobierz do potwierdzonego wyniku.",
+            "explanation": "To rozstrzyga niepewność bez uruchamiania nowej operacji. Reversal wymaga tu potwierdzenia braku rezerwacji. Nadal nieznany wynik trzeba uzgodnić."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "unknown",
+          "label": "Znaczenie nieznanego wyniku",
+          "expected": "Rozróżnia timeout od potwierdzonej porażki i nie uruchamia nowej operacji w ciemno."
+        },
+        {
+          "id": "lookup",
+          "label": "Tożsamość i sprawdzenie",
+          "expected": "Zachowuje tożsamość tej samej operacji zgodnie z umową API i sprawdza pierwotny wynik przez lookup."
+        },
+        {
+          "id": "compensation",
+          "label": "Warunek i dalsza niepewność",
+          "expected": "Uzależnia reversal od potwierdzenia braku rezerwacji w tym scenariuszu; nierozstrzygnięty wynik kieruje do uzgodnienia."
+        }
+      ],
+      "learnSlug": "idempotencja-lookup-kompensacja"
+    },
+    "en": {
+      "title": "No response. Was the booking created?",
+      "difficulty": "Intermediate",
+      "goal": "Distinguish a missing response from a failed operation.",
+      "scenario": "Practice-inspired educational scenario\n\nA service has accepted payment and requested a ticket booking. The response never arrived. The API contract allows safe retries of the same operation using the same identifier and payload. After a limited number of these attempts, the outcome is still unknown. The provider offers a lookup operation to check status by operation identifier. In this scenario, reversal means undoing the collected payment and is allowed only after unequivocal confirmation that no booking was created.",
+      "question": "What would you do after exhausting safe retries? Explain the operation identifier, status lookup and the condition for reversing payment.",
+      "hints": [
+        "Does a timeout prove the provider did nothing?",
+        "Does a new identifier represent the same operation?",
+        "What if lookup also leaves the outcome unknown?"
+      ],
+      "analysis": "### A timeout means uncertainty\n\nThe request may have succeeded even if the response was lost. Starting a new operation with a new identifier can create a second booking. Automatically reversing payment could leave a successful booking unpaid.\n\n### Retry, look up, resolve\n\nSafe retries preserve the same logical operation, identifier and payload within the API contract and a bounded retry policy. When that policy is exhausted, use lookup. Confirmed success completes the operation without another booking. Confirmed absence of a booking permits reversal under this scenario’s agreed procedure. An unknown outcome stays unknown: retain it for reconciliation and tell the user clearly. A missing lookup entry does not prove non-execution unless the API contract guarantees that meaning.\n\n### Boundaries of the patterns\n\nIdempotency prevents repeated execution from creating an additional effect within an agreed scope. Lookup establishes the outcome. Reversal is a compensating operation with its own conditions and possible failures; it does not magically roll back all history. Confirm the semantics and timing of the actual API.\n\n> The sequence and reversal condition are assumptions of this scenario, not universal rules for every payment system.",
+      "quick": {
+        "question": "What do you do after exhausting safe retries?",
+        "hint": "The provider may have performed the operation without delivering its response.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "a",
+            "text": "Start a new booking with a new identifier.",
+            "explanation": "This can create a duplicate. A missing response does not prove the original booking is absent."
+          },
+          {
+            "id": "c",
+            "text": "Reverse payment immediately because a timeout means failure.",
+            "explanation": "A timeout means no response. Under this contract it does not authorise reversal; the booking may exist."
+          },
+          {
+            "id": "b",
+            "text": "Look up the original operation; choose the next step from its confirmed outcome.",
+            "explanation": "This resolves uncertainty without starting a new operation. Here, reversal needs confirmed absence of a booking. An unresolved result requires reconciliation."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "unknown",
+          "label": "Unknown outcome",
+          "expected": "Distinguishes timeout from confirmed failure and avoids blindly creating another operation."
+        },
+        {
+          "id": "lookup",
+          "label": "Identity and lookup",
+          "expected": "Preserves the identity of the same operation under the API contract and looks up the original outcome."
+        },
+        {
+          "id": "compensation",
+          "label": "Condition and uncertainty",
+          "expected": "Requires confirmed absence for reversal in this scenario and routes unresolved outcomes to reconciliation."
+        }
+      ],
+      "learnSlug": "idempotency-lookup-compensation"
+    }
+  },
+  {
+    "id": "2026-10-01-opcjonalny-zapis",
+    "pl": {
+      "title": "Wynik gotowy, ale zapis nie działa. Co pokażesz?",
+      "difficulty": "Łatwy",
+      "goal": "Zachowaj główną funkcję przy awarii funkcji dodatkowej.",
+      "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nPortal wygenerował dokument i ma go już w odpowiedzi serwera. Użytkownik zaznaczył opcjonalne zapisanie kopii na później. Usługa przechowywania jest niedostępna i kopia nie została zapisana. Dokument można jednak bezpiecznie wyświetlić i pobrać. W tym zadaniu trwały zapis nie jest warunkiem poprawności dokumentu ani wykonania obowiązkowej operacji biznesowej.",
+      "question": "Co pokażesz użytkownikowi po błędzie zapisu? Wyjaśnij, dlaczego to zachowanie jest właściwe tutaj i kiedy należałoby postąpić inaczej.",
+      "hints": [
+        "Która funkcja jest główna, a która dodatkowa?",
+        "Czy wolno napisać „Zapisano” bez potwierdzenia?",
+        "Co gdy trwały zapis jest obowiązkowym warunkiem wykonania operacji?"
+      ],
+      "analysis": "### Zachowaj użyteczny wynik\n\nDokument już istnieje, a zapis kopii jest opcjonalny. Pokaż wynik i możliwość pobrania oraz jednoznaczny komunikat: „Dokument jest gotowy. Kopii nie zapisano”. Nie ukrywaj dokumentu i nie deklaruj sukcesu zapisu.\n\n### Graceful degradation\n\nTo zasada zachowania podstawowej funkcji przy ograniczeniu funkcji dodatkowej. W tym zadaniu podstawą jest uzyskanie dokumentu, a przechowywanie kopii jest dodatkiem. Zależność powinna mieć ograniczony czas oczekiwania; błąd należy odnotować operacyjnie bez logowania poufnej treści.\n\n### Kiedy nie stosować tego skrótu?\n\nJeżeli trwały zapis stanowi warunek wykonania operacji, np. przyjęcia zamówienia albo zarejestrowania decyzji, samo wyświetlenie wyniku nie dowodzi sukcesu. Trzeba wtedy potwierdzić zapis lub jawnie pokazać, że operacja nie została ukończona. Granicę określa wymaganie biznesowe, nie wygoda interfejsu.\n\n> Ogranicz funkcję dodatkową, ale nie ukrywaj braku wykonania funkcji obowiązkowej.",
+      "quick": {
+        "question": "Jak powinien zachować się portal?",
+        "hint": "Gotowy dokument i zapis jego kopii są tu dwiema różnymi funkcjami.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "a",
+            "text": "Ukryj dokument i pokaż niepowodzenie całego zadania.",
+            "explanation": "Tracisz użyteczny wynik, mimo że w tym scenariuszu zapis kopii jest jedynie dodatkiem."
+          },
+          {
+            "id": "b",
+            "text": "Pokaż dokument do pobrania i jasno poinformuj, że kopii nie zapisano.",
+            "explanation": "Zachowujesz główną funkcję i uczciwie opisujesz ograniczenie. Użytkownik może zachować dokument samodzielnie."
+          },
+          {
+            "id": "c",
+            "text": "Pokaż dokument i komunikat „Zapisano”, żeby nie niepokoić użytkownika.",
+            "explanation": "To fałszywa informacja. Użytkownik może polegać na kopii, której nie ma."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "core",
+          "label": "Główna funkcja",
+          "expected": "Udostępnia gotowy dokument mimo awarii opcjonalnego zapisu."
+        },
+        {
+          "id": "honesty",
+          "label": "Jasny komunikat",
+          "expected": "Informuje o nieudanym zapisie i możliwości pobrania bez deklarowania fałszywego sukcesu."
+        },
+        {
+          "id": "boundary",
+          "label": "Granica zastosowania",
+          "expected": "Rozróżnia opcjonalny zapis kopii od obowiązkowego trwałego zapisu operacji."
+        }
+      ],
+      "learnSlug": "graceful-degradation"
+    },
+    "en": {
+      "title": "The result is ready, but saving failed. What do you show?",
+      "difficulty": "Easy",
+      "goal": "Preserve the core function when an optional feature fails.",
+      "scenario": "Practice-inspired educational scenario\n\nA portal has generated a document and already has it in the server response. The user selected an optional saved copy for later use. The storage service is unavailable and the copy was not saved. The document can still be safely displayed and downloaded. In this exercise, durable storage is not a condition for document validity or completion of a mandatory business operation.",
+      "question": "What would you show after the storage error? Explain why it is appropriate here and when a different approach would be needed.",
+      "hints": [
+        "Which function is essential and which is optional?",
+        "Can you say “Saved” without confirmation?",
+        "What if durable storage is a mandatory condition for the operation?"
+      ],
+      "analysis": "### Preserve the useful result\n\nThe document exists and saving a copy is optional. Show the result and a download option with a clear message: “Your document is ready. The copy was not saved.” Do not hide the document or claim that storage succeeded.\n\n### Graceful degradation\n\nThis preserves the core function while limiting an optional feature. Here the core function is obtaining the document; keeping a copy is an extra. Bound the dependency wait and record operational failures without logging confidential content.\n\n### When is this inappropriate?\n\nIf durable storage is required to complete an operation, such as accepting an order or registering a decision, displaying a result does not prove success. Confirm storage or clearly state that the operation is incomplete. Business requirements define this boundary, not interface convenience.\n\n> Degrade an optional feature; do not hide failure of a mandatory one.",
+      "quick": {
+        "question": "How should the portal respond?",
+        "hint": "Producing the document and saving a copy are separate functions here.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "a",
+            "text": "Hide the document and report failure of the whole task.",
+            "explanation": "You discard a useful result even though saving a copy is optional in this scenario."
+          },
+          {
+            "id": "b",
+            "text": "Show the downloadable document and clearly say the copy was not saved.",
+            "explanation": "You preserve the core function and honestly describe the limitation. The user can keep the document themselves."
+          },
+          {
+            "id": "c",
+            "text": "Show the document and say “Saved” to avoid worrying the user.",
+            "explanation": "This is false. The user may rely on a copy that does not exist."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "core",
+          "label": "Core function",
+          "expected": "Provides the ready document despite failure of optional storage."
+        },
+        {
+          "id": "honesty",
+          "label": "Clear feedback",
+          "expected": "Reports the failed save and download option without falsely claiming success."
+        },
+        {
+          "id": "boundary",
+          "label": "Applicability",
+          "expected": "Distinguishes optional copy storage from mandatory durable recording."
+        }
+      ],
+      "learnSlug": "graceful-degradation"
+    }
+  }
+]
