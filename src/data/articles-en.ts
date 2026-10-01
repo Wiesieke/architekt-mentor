@@ -1,3 +1,5 @@
+import checksums from '../content/articles/en/cloud-storage-default-checksums.html?raw';
+import tenantIsolation from '../content/articles/en/tenant-isolation-invariant.html?raw';
 import streaming from '../content/articles/en/google-api-gateway-streaming.html?raw';
 import recovery from '../content/articles/en/rpo-rto-recovery-drill.html?raw';
 import postgresql from '../content/articles/en/postgresql-19-beta4.html?raw';
@@ -18,6 +20,8 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'architecture-in-motion', slug:'cloud-storage-default-checksums', plSlug:'cloud-storage-domyslne-sumy-kontrolne', title:'Cloud Storage client libraries enable checksums by default', description:'The 30 September change improves transfer integrity, with limits for range reads and composite uploads.', topic:'Data and reliability', published:'2026-10-01', eventDate:'2026-09-30', body:checksums },
+  { section:'foundations', slug:'tenant-isolation-invariant', plSlug:'izolacja-tenantow-niezmiennik', title:'Tenant isolation is an end-to-end invariant', description:'Carry trusted tenant context through authorisation, data, caches, search and asynchronous work.', topic:'Security and multitenancy', published:'2026-10-01', body:tenantIsolation },
   { section:'architecture-in-motion', slug:'google-api-gateway-streaming', plSlug:'google-api-gateway-streaming', title:'Google Cloud API Gateway: streaming changes API design', description:'The 29 September Public Preview adds SSE, WebSockets and gRPC streaming, with migration and domain constraints to weigh.', topic:'APIs and AI', published:'2026-09-30', eventDate:'2026-09-29', body:streaming },
   { section:'foundations', slug:'rpo-rto-recovery-drill', plSlug:'rpo-rto-proba-odtworzenia', title:'RPO, RTO and a full-service recovery drill', description:'Separate acceptable data loss from recovery time and measure both across the complete user journey.', topic:'Resilience and recovery', published:'2026-09-30', body:recovery },
   { section:'foundations', slug:'quality-attribute-scenarios', plSlug:'scenariusze-atrybutow-jakosciowych', title:'Quality-attribute scenarios: from adjective to measure', description:'Turn “fast, secure and easy to change” into a testable requirement that guides an architecture decision.', topic:'Quality attributes', published:'2026-09-29', body:qualityScenarios },
