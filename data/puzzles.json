@@ -1,5 +1,44 @@
 [
   {
+    "id": "2026-10-01-cache-bez-tenanta",
+    "week": "Publikacja codzienna / 2026",
+    "date": "2026-10-01",
+    "title": "Cache zna raport, ale nie klienta. Co zobaczy najemca B?",
+    "difficulty": "Zaawansowany",
+    "tags": ["wielodostępność", "autoryzacja", "cache", "izolacja danych"],
+    "scenario": "**Przykład fikcyjny.** Aplikacja SaaS obsługuje wiele firm. Token zawiera identyfikator użytkownika i klienta, a brama sprawdza podpis oraz ważność tokenu. Raporty mają numery nadawane osobno w każdej firmie, więc zarówno klient A, jak i B mogą mieć raport `42`.\n\nEndpoint `GET /reports/42` najpierw szuka wyniku we wspólnym cache pod kluczem `report:42`. Dopiero przy braku wpisu wykonuje zapytanie do bazy z filtrem po kliencie. Użytkownik A otwiera swój raport i wypełnia cache. Chwilę później uprawniony użytkownik klienta B żąda własnego raportu `42` i otrzymuje odpowiedź z cache. Zespół odpowiada: „Przecież autoryzację sprawdza gateway”.",
+    "question": "Gdzie została przerwana izolacja klientów? Jak zmienisz autoryzację, klucz cache i testy, aby poprawka obejmowała całą ścieżkę, a nie tylko ten jeden endpoint?",
+    "hints": [
+      "Czy poprawny token dowodzi prawa do konkretnego raportu?",
+      "Które elementy identyfikują raport jednoznacznie w całym systemie?",
+      "Czy kontrola dostępu jest wykonywana także przy trafieniu w cache?",
+      "Jak test z dwoma klientami i tym samym lokalnym numerem wykryje regresję?"
+    ],
+    "analysis": "### Uwierzytelnienie nie jest autoryzacją zasobu\n\nGateway potwierdził, kim jest użytkownik i że token jest ważny. Nie potwierdził, że użytkownik może odczytać konkretny raport. Aplikacja ominęła zakres klienta w najbardziej wydajnej ścieżce, czyli przy trafieniu w cache. To wystarczy do naruszenia izolacji.\n\n### Popraw granicę, nie pojedynczy objaw\n\n1. Ustal z zaufanego tokenu aktywny kontekst klienta i zweryfikuj członkostwo oraz operację na zasobie. Nie przyjmuj identyfikatora klienta z parametru jako rozstrzygającego.\n2. Włącz klienta do przestrzeni kluczy, na przykład `tenant:{tenantId}:report:{reportId}`, albo użyj fizycznie oddzielonych cache, jeśli wymaga tego poziom ryzyka. Sam dłuższy klucz nie zastępuje autoryzacji.\n3. Sprawdzaj decyzję o dostępie przed zwróceniem trafienia z cache. Warstwa danych powinna dodatkowo wymuszać filtr klienta; traktuj to jako obronę warstwową, nie alternatywę dla kontroli aplikacyjnej.\n4. Usuń lub wersjonuj stare wpisy. Sprawdź podobne ścieżki: listy, eksporty, wyszukiwanie, miniatury i zadania asynchroniczne. Błąd rzadko szanuje granicę jednego kontrolera.\n5. Dodaj test negatywny z dwoma klientami mającymi raport `42`: rozgrzej cache danymi A, wywołaj B i potwierdź odmowę albo dane B. Powtórz po zmianie roli i unieważnieniu dostępu. Monitoruj odmowy i nietypowe kolizje bez zapisywania treści raportów.\n\nJeżeli wyciek mógł wystąpić, poprawka kodu nie zamyka sprawy: trzeba zachować dowody, ustalić zakres, uruchomić właściwą procedurę bezpieczeństwa i nie zgadywać skutków.\n\n> Cache przyspiesza również błędną decyzję. Dlatego granica bezpieczeństwa musi działać przed skrótem.",
+    "related": [
+      {"type": "ANTYWZORZEC", "title": "Autoryzacja sprawdzona przy wejściu", "description": "Dlaczego poprawny token nie wystarcza", "href": "/antywzorce/2026-10-01-autoryzacja-tylko-na-wejsciu/"},
+      {"type": "PODSTAWY", "title": "Izolacja tenantów jako niezmiennik", "description": "Granica prowadzona przez całą ścieżkę", "href": "/podstawy-architektury/izolacja-tenantow-niezmiennik/"}
+    ],
+    "decisionRecord": {
+      "status": "Przykład do dyskusji — nie jest zatwierdzoną decyzją projektu",
+      "context": "Raporty mają identyfikatory lokalne dla klienta, a wspólny cache pomija kontekst klienta i może zwrócić wpis przed kontrolą zasobu.",
+      "decision": "Kontekst klienta będzie ustalany z zaufanej tożsamości, sprawdzany dla zasobu i włączony do każdej przestrzeni kluczy oraz zapytania.",
+      "rationale": "Izolacja musi obowiązywać jednakowo przy trafieniu w cache i przy odczycie z bazy.",
+      "consequences": ["Konieczne jest usunięcie lub wersjonowanie istniejących wpisów.", "Testy przekrojowe muszą objąć pozostałe cache, eksporty, wyszukiwanie i zadania asynchroniczne."],
+      "verification": "Automatyczny test z dwoma klientami i kolidującymi identyfikatorami po rozgrzaniu cache, zmianie roli i unieważnieniu dostępu.",
+      "openQuestions": ["Czy inne komponenty tworzą klucze bez kontekstu klienta?", "Czy logi pozwalają ustalić zakres ewentualnego ujawnienia bez utrwalania danych raportu?"]
+    },
+    "coach": {
+      "criteria": [
+        {"id": "authz", "label": "Autoryzacja zasobu", "expected": "Rozróżnia uwierzytelnienie na bramie od prawa do konkretnej operacji na raporcie i wymaga kontroli również przy trafieniu w cache."},
+        {"id": "key", "label": "Przestrzeń kluczy", "expected": "Włącza zaufany identyfikator klienta do klucza lub proponuje mocniejszą separację, pamiętając, że sam klucz nie zastępuje autoryzacji."},
+        {"id": "layers", "label": "Obrona warstwowa", "expected": "Wymusza zakres klienta w warstwie danych i sprawdza inne skróty: listy, eksporty, wyszukiwanie oraz zadania asynchroniczne."},
+        {"id": "migration", "label": "Stare wpisy i uprawnienia", "expected": "Planuje usunięcie lub wersjonowanie starego cache oraz unieważnianie po zmianie roli lub odebraniu dostępu."},
+        {"id": "evidence", "label": "Test negatywny", "expected": "Proponuje test z dwoma klientami mającymi ten sam lokalny identyfikator, rozgrzanym cache i mierzalnym wynikiem bez ujawniania danych w logach."}
+      ]
+    }
+  },
+  {
     "id": "2026-09-30-odtwarzanie-po-awarii",
     "week": "Publikacja codzienna / 2026",
     "date": "2026-09-30",
