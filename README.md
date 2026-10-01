@@ -1,129 +1,87 @@
-# Architekt-Mentor — wersja produkcyjna (front + proxy)
+# ArchitectMentor
 
-Generator HLD, w którym **klucz API siedzi po stronie serwera**, a przeglądarka woła Twoją funkcję,
-nie API Anthropic. Dzięki temu można to bezpiecznie wystawić ludziom — klucz nie jest widoczny,
-Twój prompt też nie.
+**A bilingual educational magazine for people learning to make better IT architecture decisions.**
 
-## Struktura plików (zachowaj dokładnie)
+ArchitectMentor brings together practical exercises, architecture foundations, anti-patterns and selected technology developments. It connects technical choices with business goals, risks and ways to verify that a solution works.
 
-```
-architekt-mentor/
-├── index.html          ← front (woła /api/generate)
-└── api/
-    └── generate.js      ← funkcja serverless (trzyma klucz, prompt, limity)
-```
+Visit the magazine: [English](https://ejsymont.com/en/) · [Polski](https://ejsymont.com/pl/)
 
-`api/generate.js` MUSI leżeć w katalogu `api/` — to na tej podstawie Vercel robi z niego endpoint `/api/generate`.
+## Our mission
 
----
+Help readers develop architectural judgement: ask better questions, recognise trade-offs and explain decisions clearly. We want to make the experience of practising architects accessible to people entering the field, while giving experienced professionals a place to challenge assumptions and exchange ideas.
 
-## Wdrożenie na Vercel (najprostsza droga, darmowy plan)
+The learning approach starts with a concrete situation. Readers propose a decision, examine its consequences and compare their reasoning with a senior architect’s analysis. AI provides guiding questions and feedback; readers remain responsible for their own decisions.
 
-### Wariant A — przez stronę Vercel (bez terminala, polecany na start)
+## What readers can explore
 
-1. Załóż darmowe konto na **vercel.com** (możesz przez GitHub).
-2. Wrzuć ten folder do repozytorium GitHub (lub użyj „deploy" z dysku — Vercel obsługuje import folderu).
-3. W Vercel: **Add New → Project →** wskaż repozytorium. Framework: **Other** (to statyczny front + funkcja).
-4. Zanim klikniesz Deploy, w **Environment Variables** dodaj:
-   - Name: `ANTHROPIC_API_KEY`
-   - Value: Twój klucz `sk-ant-…`
-5. **Deploy.** Po chwili dostaniesz adres typu `https://architekt-mentor.vercel.app`. Wejdź i testuj.
+- **Architecture exercises:** a scenario, a first answer, a mentor’s question, a revised answer and a senior analysis.
+- **Anti-patterns:** recurring mistakes, warning signs, consequences and possible alternatives.
+- **Architecture foundations:** concepts explained through practical decisions and examples.
+- **Architecture in motion:** selected technology developments and their architectural implications.
+- **Learning tools:** an HLD generator and an ADR worksheet for structuring a proposal and recording a decision.
+- **Discussion and newsletter:** constructive comments and a way to keep up with new material.
 
-### Wariant B — przez terminal (CLI)
+Content is available in English and Polish. Scenarios and generated documents are learning aids and starting points for discussion. Applying them to a real project requires its own context, evidence and review. Examples should distinguish fictional scenarios from documented events; confidential project details do not belong in public submissions.
 
-```bash
-npm i -g vercel              # jednorazowo
-cd architekt-mentor
-vercel                       # pierwszy deploy (preview), zaloguje i poprowadzi
-vercel env add ANTHROPIC_API_KEY   # wklej klucz; wybierz Production (i Preview)
-vercel --prod                # wdrożenie produkcyjne
-```
+## About the author
 
-Projekt zawiera `package.json`, ponieważ formularz kontaktowy korzysta z biblioteki Nodemailer do wysyłki przez SMTP.
+The project is created by **Wiesław Ejsymont**, with more than 40 years in IT and over 20 years in solution and enterprise architecture. His career began with earlier computer generations, including the IBM PC 286, and developed through successive changes in hardware, operating systems, networks, software development and architecture, up to contemporary applications of AI. His experience spans industry, telecommunications and aviation.
 
----
+## How the project works
 
-## Zmienna środowiskowa — to jest sedno bezpieczeństwa
+The magazine uses **Astro** to build static pages and **Vercel serverless functions** for interactive features. A PHP bridge on **LH.pl** connects the backend to MySQL over authenticated HTTPS; the browser never receives database credentials or provider API keys.
 
-Klucza **nigdy nie wpisujesz w kod ani w pliki, które trafiają do repo.** Trzymasz go wyłącznie jako
-`ANTHROPIC_API_KEY` w ustawieniach projektu (Environment Variables). Funkcja czyta go z
-`process.env.ANTHROPIC_API_KEY`. Po zmianie zmiennej zrób ponowny deploy.
+| Location | Purpose |
+| --- | --- |
+| `src/` | Pages, layouts, components and article content |
+| `data/` | Exercise scenarios and supporting datasets |
+| `api/` | HLD generation, mentor feedback, comments and contact endpoints |
+| `storage-bridge/` | PHP storage endpoints, schema and retention cleanup |
+| `scripts/` | Build-time generation of article context for comment moderation |
+| `tests/` | Comment moderation and interface regression tests |
 
----
+Comment submissions pass Turnstile, are saved in the database and are evaluated using the **OpenAI Responses API**. Confirmed approvals are published and immediately displayed; clear violations are rejected, and uncertain cases or AI failures go to the manual moderation queue. Email confirmation is not required for new submissions. See [comment moderation](COMMENTS.md) for configuration and limitations.
 
-## Wbudowane zabezpieczenia kosztów (w `api/generate.js`)
+The HLD generator and exercise mentor currently use **Anthropic**. They are separate from OpenAI comment moderation; changing one provider does not migrate the other features.
 
-- **Whitelist modeli** — można użyć tylko Haiku/Sonnet/Opus, nic spoza listy.
-- **Sufit `max_tokens`** — twardy limit 6000 po stronie serwera, niezależnie od tego, co przyśle front.
-- **Limit długości briefu** — odrzuca briefy > 6000 znaków (blokuje próby wymuszenia drogich wywołań).
-- **Prosty rate limit** — maks. 8 zapytań / minutę z jednego IP.
-
-> **Uwaga o rate limicie:** to wersja „best-effort" w pamięci instancji. Na serverless funkcje bywają
-> mnożone/wygaszane, więc to deterrent, nie twarda gwarancja. Gdy ruch urośnie, dołóż wspólny licznik
-> (np. Vercel KV albo Upstash Redis) — wtedy limit działa globalnie.
-
-**Najpewniejszy bezpiecznik na końcu:** w Anthropic Console ustaw **miesięczny limit wydatków**
-(spend limit). Cokolwiek się stanie, rachunek nie przekroczy progu, który sam ustawisz. Zrób to od razu.
-
----
-
-## Alternatywa: Cloudflare Pages / Workers
-
-Działa analogicznie, ale funkcja ma inny kształt: zamiast `module.exports = (req,res)`,
-piszesz `export default { async fetch(request, env) { ... } }`, a klucz czytasz z `env.ANTHROPIC_API_KEY`
-(ustawiany w panelu Cloudflare jako secret). Reszta logiki (budowa wiadomości, wywołanie API, limity)
-jest identyczna. Jeśli wolisz Cloudflare, daj znać — przerobię `generate.js` na ten format.
-
----
-
-## Jak to testować lokalnie przed wdrożeniem
+## Local development
 
 ```bash
-npm i -g vercel
-cd architekt-mentor
-vercel dev        # uruchamia front + funkcję lokalnie pod http://localhost:3000
+npm ci
+npm run dev
 ```
-`vercel dev` poprosi o zmienną `ANTHROPIC_API_KEY` (albo dodaj plik `.env.local` z `ANTHROPIC_API_KEY=sk-ant-...`
-— i dopisz `.env.local` do `.gitignore`, żeby nie trafił do repo).
 
----
+The Astro development server serves the magazine. To exercise the Vercel API functions locally, use a Vercel development environment with the required server-side variables configured.
 
-## Co dalej (gdy podstawa działa)
+```bash
+npm run build
+npm run test:comments
+```
 
-- Wspólny rate limit (Vercel KV / Upstash) zamiast pamięci instancji.
-- Twardy dzienny cap liczby generacji (ochrona kosztu darmowego narzędzia).
-- Prosty licznik użycia / log (ile generacji, jakie modele) — przyda się do decyzji o monetyzacji.
-- Dopiero potem: konta, zapisywanie projektów, płatności.
+The build also generates the server-owned article context used by comment moderation. Automated tests use simulated provider and storage responses; they do not establish live model availability or moderation quality.
 
-## Formularz kontaktowy dla firm
+## Configuration and storage
 
-Formularz na `/dlafirm.html` wysyła dane do `/api/enquiry` na Vercel. Funkcja wysyła wiadomość przez SMTP w LH.pl, z adresem odwiedzającego w `Reply-To`. Dane logowania nie są przesyłane do przeglądarki ani do repozytorium.
+Configure secrets in the appropriate Vercel environment; never commit real keys, passwords or `config.local.php`.
 
-Do uruchomienia ustaw w projekcie Vercel `project-ead46` zmienne **Production**:
+| Variables | Used for |
+| --- | --- |
+| `OPENAI_API_KEY`, optional `COMMENT_MODERATION_MODEL` | AI comment moderation |
+| `ANTHROPIC_API_KEY` | HLD generation and exercise mentor |
+| `PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Browser challenge and server verification |
+| `LH_STORAGE_URL`, `LH_STORAGE_TOKEN` | Authenticated PHP storage bridge |
+| `COMMENT_ADMIN_PASSWORD` | Manual moderation panel |
+| `LH_SMTP_HOST`, `LH_SMTP_USER`, `LH_SMTP_PASSWORD` | Contact email through SMTP |
 
-- `LH_SMTP_HOST` — nazwa serwera SMTP z LH.pl, np. `mail-serwerXXXXX.lh.pl` dla hostingu współdzielonego albo `cXXXXX.lh.pl` dla Cloud Server.
-- `LH_SMTP_USER` — adres nadawcy w domenie sensinte.com. Zalecana osobna skrzynka `formularz@sensinte.com`; można też użyć `architektura@sensinte.com`.
-- `LH_SMTP_PASSWORD` — hasło skrzynki nadawczej. Dodaj jako sekret tylko w panelu Vercel; **nigdy nie podawaj hasła w rozmowie ani w repozytorium**.
+For a new storage installation, use a dedicated MySQL database, apply the relevant SQL schema from `storage-bridge/`, and configure the PHP endpoints using `config.example.php`. Keep the real configuration inaccessible over HTTP. Vercel uses the HTTPS bridge and shared token; MySQL credentials stay on LH.pl. Existing installations should be checked before any schema changes.
 
-Następnie wdróż ponownie projekt, aby funkcja odczytała nowe zmienne, i wyślij próbne zapytanie z formularza. Bez kompletu zmiennych funkcja zwraca 503 oraz adres do bezpośredniego kontaktu. Do czasu zakończenia konfiguracji nie scalaj PR włączającego nowy formularz.
+HLD and exercise storage is optional and requires the visitor’s explicit choice. A storage failure must not withhold an otherwise generated result. Configure the PHP cleanup job and verify it is running before relying on the stated retention periods. The public [data notice](https://ejsymont.com/en/data-notice/) describes the visitor-facing rules.
 
-Ograniczenia ochrony: ukryte pole przechwytuje proste boty, a pomocniczy limit 3 zgłoszeń/15 minut/IP działa w pamięci pojedynczej instancji Vercel. Nie jest globalną gwarancją; przy większym ruchu dołóż wspólny limit i weryfikację antybotową po stronie serwera. Nie loguj treści zapytań.
+## Further project notes
 
+- [Comment moderation and configuration](COMMENTS.md)
+- [Newsletter](NEWSLETTER.md)
+- [English edition](ENGLISH.md)
+- [Prototype notes](PROTOTYPE.md)
 
-## Opcjonalny zapis briefów/HLD i odpowiedzi na łamigłówki (przygotowane, nieaktywne do konfiguracji)
-
-Zapis jest dobrowolny: pola wyboru są domyślnie odznaczone. Bez ich zaznaczenia treści nadal są przetwarzane przez dotychczasowy model AI, ale aplikacja nie próbuje ich zapisać w bazie. Przy zapisie HLD przechowujemy brief, wynik, model i opcje; przy łamigłówce pierwszą odpowiedź z pytaniem naprowadzającym oraz poprawioną odpowiedź z oceną. Etapy mają wspólny losowy identyfikator próby. Nie zapisujemy w tych tabelach adresu IP, adresu e-mail ani identyfikatora konta. Serwery dostawców mogą prowadzić własne dzienniki techniczne.
-
-Baza `serwer428682_architektmentor` jest oddzielna od WordPressa. Vercel **nie łączy się bezpośrednio z MySQL**. Wysyła żądanie HTTPS do `storage-bridge/save.php` na LH.pl z tajnym tokenem; PHP zapisuje dane do lokalnej bazy przez PDO z zapytaniami parametryzowanymi. Endpoint ma tylko zapis, bez publicznego odczytu. Błąd zapisu nie odbiera użytkownikowi wygenerowanego wyniku.
-
-### Uruchomienie na LH.pl
-
-1. W phpMyAdmin wybierz bazę `serwer428682_architektmentor` i uruchom `storage-bridge/schema.sql`. **Sprawdź wybraną bazę przed importem.** Nie uruchamiaj go w bazie WordPressa.
-2. Utwórz pod HTTPS odrębny katalog lub subdomenę na LH.pl z PHP 8.2 lub nowszym. Wgraj `save.php` oraz `.htaccess` do tego katalogu. W tym samym katalogu stwórz `config.local.php` na podstawie `config.example.php`; wpisz host MySQL z panelu LH.pl (`sql189.lh.pl`), nazwę bazy i jej indywidualnego użytkownika, hasło bazy oraz osobny losowy token o długości przynajmniej 32 znaków. Prawdziwy `config.local.php` **nie trafia do repozytorium**. Zabezpiecz dostęp do niego przed HTTP (403).
-3. Ustaw w Vercel Preview i Production dwa sekrety: `LH_STORAGE_URL` (pełny adres HTTPS zakończony `/save.php`) i `LH_STORAGE_TOKEN` (ten sam losowy token). Hasła MySQL nie wpisuj do Vercel. Po zmianie sekretów wdrożenie musi zostać odświeżone.
-4. Wgraj `cleanup.php` do katalogu i skonfiguruj w LH.pl **codzienne zadanie cron z interpreterem PHP**, uruchamiające ten plik. Zapisy mają termin ważności 90 dni, a cron fizycznie usuwa przeterminowane rekordy. Bez działającego crona nie należy deklarować automatycznego usuwania ani włączać funkcji.
-5. Przed scaleniem zmian sprawdź, że żądanie bez tokenu zwraca 401, pliki konfiguracyjne nie są dostępne przez WWW, zapis za zgodą pojawia się w obu tabelach, zapis bez zgody nie tworzy rekordu, a po błędzie przechowywania wynik wciąż dociera do użytkownika. Dodaj do informacji o prywatności strony opis celu, zakresu, odbiorców, terminu i sposobu żądania usunięcia. Identyfikator zapisu pokazywany na stronie ułatwia jego odnalezienie do ręcznego usunięcia w phpMyAdmin.
-
-Stan testów 28.09.2026: uwierzytelniony test połączenia z MySQL przeszedł (`SELECT 1`), a zapis fikcyjnego HLD przez pośrednik PHP zwrócił 201. Nadal wymagane są test z podglądu Vercel, test zapisu odpowiedzi na łamigłówkę, harmonogram usuwania oraz informacja o prywatności. Po zmianie sekretu Vercel potrzebne jest nowe wdrożenie.
-
-Wskazówka: w LH.pl zdalne połączenie z MySQL może pozostać wyłączone; pośrednik PHP uruchamia się na serwerze bazy. Nie publikuj prawdziwego pliku konfiguracyjnego ani tokenu w GitHubie czy w rozmowie.
+Production updates are made through reviewed changes in the main branch. Preview deployments are used to inspect proposed changes before publication.
