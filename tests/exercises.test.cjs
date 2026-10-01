@@ -39,8 +39,8 @@ async function assess(starter,locale,stage,invalid=false){
   if(invalid==='points')feedback.criteria[criteria[0].id].points='2';
   vm.runInNewContext(fs.readFileSync('api/evaluate-puzzle.js','utf8'),{
     module,require:path=>path.includes('_store')?{randomUUID:()=> 'ce818959-6952-4c75-93f4-41f3ddf2a222',storeWithConsent:async record=>{stored=record;return {saved:null};}}:path.includes('puzzle-coach-en')?english:puzzles,
-    process:{env:{ANTHROPIC_API_KEY:'test-only'}},console:{error:(...items)=>logs.push(items)},AbortSignal,
-    fetch:async(url,options)=>{request=JSON.parse(options.body);return {ok:true,json:async()=>({content:[{type:'text',text:invalid==='json'?'not valid JSON':invalid==='null'?'null':JSON.stringify(feedback)}]})};},
+    process:{env:{OPENAI_API_KEY:'test-only'}},console:{error:(...items)=>logs.push(items)},AbortSignal,
+    fetch:async(url,options)=>{request=JSON.parse(options.body);return {ok:true,json:async()=>({status:invalid==='incomplete'?'incomplete':'completed',output:[{type:'message',content:[{type:invalid==='refusal'?'refusal':'output_text',text:invalid==='json'?'not valid JSON':invalid==='null'?'null':JSON.stringify(feedback)}]}]})};},
   });
   const res={setHeader(){},status(code){this.code=code;return this;},json(data){this.data=data;return this;}};
   await module.exports({method:'POST',headers:{},body:{puzzleId:starter.id,locale,stage,answer:'I would check the existing outcome before taking another action.',saveAnswer:false}},res);
@@ -51,18 +51,19 @@ for(const starter of starters)for(const locale of ['pl','en']){
     const hint=await assess(starter,locale,'hint');
     assert.equal(hint.res.code,200);assert.ok(hint.res.data.question);assert.equal(hint.res.data.score,undefined);
     const score=await assess(starter,locale,'score');
-    assert.deepEqual(score.request.output_config.format.schema.properties.criteria.required,starter[locale].criteria.map(c=>c.id));
-    assert.equal(score.request.output_config.format.type,'json_schema');
+    assert.deepEqual(score.request.text.format.schema.properties.criteria.required,starter[locale].criteria.map(c=>c.id));
+    assert.equal(score.request.text.format.type,'json_schema');assert.equal(score.request.text.format.strict,true);
+    assert.equal(score.request.model,'gpt-4.1-mini');assert.equal(score.request.store,false);
     assert.equal(score.res.code,200);assert.equal(score.res.data.maxScore,6);assert.equal(score.res.data.score,6);
     assert.equal(score.stored.consent,false);assert.equal(score.res.data.saved,null);
-    assert.ok(starter[locale].criteria.every(c=>score.request.system.includes(c.id)));
-    assert.match(score.request.system,locale==='pl'?/krótkie, sensowne uzasadnienie/:/short sound justification/);
+    assert.ok(starter[locale].criteria.every(c=>score.request.instructions.includes(c.id)));
+    assert.match(score.request.instructions,locale==='pl'?/krótkie, sensowne uzasadnienie/:/short sound justification/);
     const invalid=await assess(starter,locale,'score',true);
     assert.equal(invalid.res.code,502);assert.equal(invalid.stored,undefined);
   });
 }
 
-for(const invalid of ['missing','points','json','null'])test(`invalid ${invalid} fails closed with metadata-only diagnostics`,async()=>{
+for(const invalid of ['missing','points','json','null','incomplete','refusal'])test(`invalid ${invalid} fails closed with metadata-only diagnostics`,async()=>{
   const result=await assess(starters[0],'pl','score',invalid);
   assert.equal(result.res.code,502);assert.equal(result.stored,undefined);
   assert.equal(result.logs.length,1);assert.doesNotMatch(JSON.stringify(result.logs),/existing outcome|Supported by/);
