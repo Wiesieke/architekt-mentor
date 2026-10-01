@@ -2,8 +2,7 @@
 import puzzles from '../../../data/puzzles.json';
 import PuzzleExercise from '../../components/PuzzleExercise.astro';
 export function getStaticPaths(){
-  const latest = [...puzzles].filter(p => p.coach).sort((a,b) => b.date.localeCompare(a.date))[0];
-  return puzzles.filter(p => p.id !== latest.id).map(p => ({params:{id:p.id},props:{puzzle:p}}));
+  return puzzles.map(p => ({params:{id:p.id},props:{puzzle:p}}));
 }
 const { puzzle } = Astro.props as { puzzle: (typeof puzzles)[number] };
 ---

@@ -1,8 +1,14 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'ĆWICZENIE', published:'2026-10-01', title:'Nowe tablety, ta sama aplikacja. Co trzeba sprawdzić?', summary:'Łatwy · szybka decyzja lub mentor', href:'/lamiglowka/' },
+  { kind:'ĆWICZENIE', published:'2026-10-01', title:'Brak odpowiedzi. Czy rezerwacja powstała?', summary:'Średni · szybka decyzja lub mentor', href:'/lamiglowki/2026-10-01-nieznany-wynik-transakcji/' },
+  { kind:'ĆWICZENIE', published:'2026-10-01', title:'Wynik gotowy, ale zapis nie działa. Co pokażesz?', summary:'Łatwy · szybka decyzja lub mentor', href:'/lamiglowki/2026-10-01-opcjonalny-zapis/' },
+  { kind:'PODSTAWY', published:'2026-10-01', title:'Analiza wpływu zmiany', summary:'Zgodność · granice · próba', href:'/podstawy-architektury/analiza-wplywu-zmiany/' },
+  { kind:'PODSTAWY', published:'2026-10-01', title:'Idempotencja, lookup i kompensacja', summary:'Retry · nieznany wynik · warunki', href:'/podstawy-architektury/idempotencja-lookup-kompensacja/' },
+  { kind:'PODSTAWY', published:'2026-10-01', title:'Graceful degradation', summary:'Główna funkcja · ograniczenie · granice', href:'/podstawy-architektury/graceful-degradation/' },
   { kind:'W RUCHU', published:'2026-10-01', eventDate:'2026-09-30', title:'Cloud Storage: sumy kontrolne domyślnie w bibliotekach', summary:'Data wydarzenia: 30.09 · fakty · ograniczenia · decyzja', href:'/architektura-w-ruchu/cloud-storage-domyslne-sumy-kontrolne/' },
-  { kind:'ĆWICZENIE', published:'2026-10-01', title:'Cache zna raport, ale nie klienta. Co zobaczy najemca B?', summary:'Scenariusz · pytanie mentora · kryteria oceny', href:'/lamiglowka/' },
+  { kind:'ĆWICZENIE', published:'2026-10-01', title:'Cache zna raport, ale nie klienta. Co zobaczy najemca B?', summary:'Scenariusz · pytanie mentora · kryteria oceny', href:'/lamiglowki/2026-10-01-cache-bez-tenanta/' },
   { kind:'ANTYWZORZEC', published:'2026-10-01', title:'Autoryzacja sprawdzona przy wejściu', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-10-01-autoryzacja-tylko-na-wejsciu/' },
   { kind:'PODSTAWY', published:'2026-10-01', title:'Izolacja tenantów jako niezmiennik całej ścieżki', summary:'Tożsamość · dane · cache · test negatywny', href:'/podstawy-architektury/izolacja-tenantow-niezmiennik/' },
   { kind:'W RUCHU', published:'2026-09-30', eventDate:'2026-09-29', title:'Google Cloud API Gateway: strumieniowanie zmienia projekt API', summary:'Data wydarzenia: 29.09 · fakty · konsekwencje projektu', href:'/architektura-w-ruchu/google-api-gateway-streaming/' },

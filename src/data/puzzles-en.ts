@@ -1,7 +1,9 @@
 import puzzles from '../../data/puzzles.json';
+import starters from '../../data/starter-exercises.json';
+import type { QuickDecisionData } from '../components/QuickDecision.astro';
 
 type EnglishDecisionRecord = { context:string; decision:string; consequences:string; verification:string; openQuestions:string };
-const translations: Record<string, { title:string; scenario:string; question:string; hints:string[]; analysis:string; difficulty:string; decisionRecord?:EnglishDecisionRecord }> = {
+const translations: Record<string, { title:string; scenario:string; question:string; hints:string[]; analysis:string; difficulty:string; quick?:QuickDecisionData; learnSlug?:string; decisionRecord?:EnglishDecisionRecord }> = {
   '2026-10-01-cache-bez-tenanta': {
     title:"The cache knows the report, but not the tenant. What will tenant B see?",
     difficulty:"Advanced",
@@ -143,6 +145,6 @@ Do not promise a global exactly-once guarantee. If the provider supports neither
   },
 };
 
-export const englishPuzzles = puzzles.map(puzzle => ({ id:puzzle.id, week:puzzle.week.replace(/TYDZIEŃ/i, 'WEEK'), date:puzzle.date, coach:Boolean(puzzle.coach), ...translations[puzzle.id] }));
+export const englishPuzzles = puzzles.map(puzzle => ({ id:puzzle.id, week:puzzle.week.replace(/TYDZIEŃ/i, 'WEEK'), date:puzzle.date, coach:Boolean(puzzle.coach), ...(starters.find(item=>item.id===puzzle.id)?.en || translations[puzzle.id]) }));
 export const latestEnglishPuzzle = [...englishPuzzles].filter(p => p.coach).sort((a,b) => b.date.localeCompare(a.date))[0];
 export const englishPuzzleUrl = (id:string) => id === latestEnglishPuzzle.id ? '/en/practice/' : `/en/practice/${id}/`;

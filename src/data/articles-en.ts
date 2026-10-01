@@ -1,3 +1,6 @@
+import starterLearning0 from '../content/articles/en/change-impact-analysis.html?raw';
+import starterLearning1 from '../content/articles/en/idempotency-lookup-compensation.html?raw';
+import starterLearning2 from '../content/articles/en/graceful-degradation.html?raw';
 import checksums from '../content/articles/en/cloud-storage-default-checksums.html?raw';
 import tenantIsolation from '../content/articles/en/tenant-isolation-invariant.html?raw';
 import streaming from '../content/articles/en/google-api-gateway-streaming.html?raw';
@@ -20,6 +23,9 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:"change-impact-analysis", plSlug:"analiza-wplywu-zmiany", title:"Change impact analysis: hardware, apps and system boundaries", description:"Check compatibility and scale the review to the actual change.", topic:'Practical decisions', published:'2026-10-01', body:starterLearning0 },
+  { section:'foundations', slug:"idempotency-lookup-compensation", plSlug:"idempotencja-lookup-kompensacja", title:"Idempotency, lookup and compensation: three different jobs", description:"Safe retries and decisions when an operation has an unknown outcome.", topic:'Practical decisions', published:'2026-10-01', body:starterLearning1 },
+  { section:'foundations', slug:"graceful-degradation", plSlug:"graceful-degradation", title:"Graceful degradation: preserve the core function", description:"When optional-feature failure should not block a result, and where the boundary lies.", topic:'Practical decisions', published:'2026-10-01', body:starterLearning2 },
   { section:'architecture-in-motion', slug:'cloud-storage-default-checksums', plSlug:'cloud-storage-domyslne-sumy-kontrolne', title:'Cloud Storage client libraries enable checksums by default', description:'The 30 September change improves transfer integrity, with limits for range reads and composite uploads.', topic:'Data and reliability', published:'2026-10-01', eventDate:'2026-09-30', body:checksums },
   { section:'foundations', slug:'tenant-isolation-invariant', plSlug:'izolacja-tenantow-niezmiennik', title:'Tenant isolation is an end-to-end invariant', description:'Carry trusted tenant context through authorisation, data, caches, search and asynchronous work.', topic:'Security and multitenancy', published:'2026-10-01', body:tenantIsolation },
   { section:'architecture-in-motion', slug:'google-api-gateway-streaming', plSlug:'google-api-gateway-streaming', title:'Google Cloud API Gateway: streaming changes API design', description:'The 29 September Public Preview adds SSE, WebSockets and gRPC streaming, with migration and domain constraints to weigh.', topic:'APIs and AI', published:'2026-09-30', eventDate:'2026-09-29', body:streaming },
