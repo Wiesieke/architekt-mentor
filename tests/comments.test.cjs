@@ -49,16 +49,22 @@ test('safe comment publishes only after persisted queue and AI evaluation', asyn
   const { res, calls } = await scenario(t);
   assert.equal(res.code, 201); assert.equal(res.data.status, 'approved');
   assert.deepEqual(calls, ['turnstile', 'create', 'verify', 'ai', 'moderate']);
-  assert.deepEqual(Object.keys(res.data).sort(), ['ok', 'status']);
+  assert.deepEqual(Object.keys(res.data).sort(), ['comment', 'ok', 'status']);
+  assert.match(res.data.comment.id, /^[0-9a-f-]{36}$/i);
+  assert.equal(res.data.comment.display_name, 'Reader');
+  assert.equal(res.data.comment.body, 'Jak zmierzyć czas odtworzenia usługi?');
+  assert.ok(!JSON.stringify(res.data).includes('reader@example.org'));
 });
 test('clear spam is rejected', async t => {
   const { res } = await scenario(t, { verdict: { ...good, decision: 'reject', spam: true, confidence: 0.99 }, expectedDecision: 'rejected' });
   assert.equal(res.code, 202); assert.equal(res.data.status, 'rejected');
+  assert.equal(res.data.comment, undefined);
 });
 for (const [name, options] of Object.entries({ uncertain: { verdict: { ...good, confidence: 0.7 } }, timeout: { aiError: true }, missingKey: { noKey: true }, refusal: { aiResponse: { status: 'completed', output: [{ type: 'message', content: [{ type: 'refusal' }] }] } }, incomplete: { aiResponse: { status: 'incomplete', output: [] } }, malformed: { aiResponse: apiResult({}) }, updateFailure: { writeError: true } })) {
   test(name + ' retains comment for manual review without claiming publication', async t => {
     const { res, calls } = await scenario(t, options);
     assert.equal(res.code, 202); assert.equal(res.data.status, 'pending');
+    assert.equal(res.data.comment, undefined);
     if (!options.writeError) assert.ok(!calls.includes('moderate'));
   });
 }

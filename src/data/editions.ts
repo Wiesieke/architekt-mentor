@@ -1,6 +1,10 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'W RUCHU', published:'2026-10-01', eventDate:'2026-09-30', title:'Cloud Storage: sumy kontrolne domyślnie w bibliotekach', summary:'Data wydarzenia: 30.09 · fakty · ograniczenia · decyzja', href:'/architektura-w-ruchu/cloud-storage-domyslne-sumy-kontrolne/' },
+  { kind:'ĆWICZENIE', published:'2026-10-01', title:'Cache zna raport, ale nie klienta. Co zobaczy najemca B?', summary:'Scenariusz · pytanie mentora · kryteria oceny', href:'/lamiglowka/' },
+  { kind:'ANTYWZORZEC', published:'2026-10-01', title:'Autoryzacja sprawdzona przy wejściu', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-10-01-autoryzacja-tylko-na-wejsciu/' },
+  { kind:'PODSTAWY', published:'2026-10-01', title:'Izolacja tenantów jako niezmiennik całej ścieżki', summary:'Tożsamość · dane · cache · test negatywny', href:'/podstawy-architektury/izolacja-tenantow-niezmiennik/' },
   { kind:'W RUCHU', published:'2026-09-30', eventDate:'2026-09-29', title:'Google Cloud API Gateway: strumieniowanie zmienia projekt API', summary:'Data wydarzenia: 29.09 · fakty · konsekwencje projektu', href:'/architektura-w-ruchu/google-api-gateway-streaming/' },
   { kind:'ĆWICZENIE', published:'2026-09-30', title:'Baza wróciła, załączniki nie. Czy włączysz portal?', summary:'Scenariusz · pytanie mentora · kryteria oceny', href:'/lamiglowka/' },
   { kind:'ANTYWZORZEC', published:'2026-09-30', title:'Kopia bez próby odtworzenia', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-09-30-backup-bez-proby-odtworzenia/' },

@@ -4,7 +4,7 @@
     "dev": "astro dev",
     "build": "astro build && node scripts/build-comment-context.cjs",
     "preview": "astro preview",
-    "test:comments": "node --test tests/comments.test.cjs"
+    "test:comments": "node --test tests/comments*.test.cjs"
   },
   "dependencies": {
     "astro": "^7.3.5",

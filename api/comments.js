@@ -74,5 +74,6 @@ module.exports = async (req, res) => {
     // A failed/uncertain write never promises publication. The saved row remains
     // visible in the manual queue unless the bridge already committed the update.
   }
-  return res.status(status === 'approved' ? 201 : 202).json({ ok: true, status });
+  return res.status(status === 'approved' ? 201 : 202).json({ ok: true, status,
+    ...(status === 'approved' ? { comment: { id, display_name: name, body: message } } : {}) });
 };

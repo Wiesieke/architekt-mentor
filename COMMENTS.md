@@ -2,7 +2,7 @@
 
 Flow: Turnstile → persistent manual queue → OpenAI Responses API → approved / rejected / manual review.
 
-The comment is never public before the AI decision is applied successfully. The browser refreshes the discussion after approval. Uncertain results, API failures, missing keys, refusals, truncated/malformed output and failed decision writes use manual moderation. Respectful disagreement, technical criticism and brief thanks are allowed; this is moderation, not answer scoring.
+The comment is never public before the AI decision is applied successfully. After a confirmed database publication, the API returns the public comment fields and the browser inserts the comment immediately, scrolls to it and focuses it. A late initial list response cannot erase it. Rejected text stays in the form for editing; pending comments receive a manual-review notice. Uncertain results, API failures, missing keys, refusals, truncated/malformed output and failed decision writes use manual moderation. Respectful disagreement, technical criticism and brief thanks are allowed; this is moderation, not answer scoring.
 
 ## Configuration
 

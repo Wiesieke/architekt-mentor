@@ -1,4 +1,15 @@
 {
+  "2026-10-01-cache-bez-tenanta": {
+    "scenario": "Fictional multi-tenant SaaS. Report numbers are local to each tenant. The shared cache uses only the report number and can return a cached response before the tenant-filtered database query runs.",
+    "question": "Where did tenant isolation break? How will you change authorisation, cache keys and tests so the fix covers the full path?",
+    "criteria": [
+      {"id": "authz", "label": "Resource authorisation", "expected": "Distinguish gateway authentication from permission for a particular report and require a decision on cache hits too."},
+      {"id": "key", "label": "Key namespace", "expected": "Include trusted tenant identity in the cache namespace or propose stronger separation without treating the key as a replacement for authorisation."},
+      {"id": "layers", "label": "Defence in depth", "expected": "Enforce tenant scope in the data layer and inspect adjacent shortcuts including lists, exports, search and asynchronous work."},
+      {"id": "migration", "label": "Old entries and permissions", "expected": "Purge or version old cache entries and handle invalidation after role change or access revocation."},
+      {"id": "evidence", "label": "Negative test", "expected": "Test two tenants with the same local identifier after cache warm-up and observe a measurable outcome without leaking content into logs."}
+    ]
+  },
   "2026-09-30-odtwarzanie-po-awarii": {
     "scenario": "**Fictional example.** A portal accepts applications. It stores metadata in a database, attachments in object storage and sends a queue message after submission. The team declares an RPO of five minutes and an RTO of 30 minutes. Database backups run every five minutes, but files have a separate schedule. Nobody has rehearsed full recovery. After a regional outage the operator restores the database; the portal starts, but some attachments are missing and the processing state of some applications is uncertain.\n\nThe business owner asks whether traffic can resume. The 30-minute target runs from outage detection to restoration of the user journey, not merely database startup.",
     "question": "What must be restored and checked before you resume submissions? How will you verify a five-minute RPO and 30-minute RTO for the whole service?",
