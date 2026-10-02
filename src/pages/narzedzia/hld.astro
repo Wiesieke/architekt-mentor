@@ -9,11 +9,12 @@ import Studio from '../../layouts/Studio.astro';
     <p class="intro">Opisz potrzebę biznesową. Otrzymasz szkic HLD z założeniami i pytaniami, które trzeba rozstrzygnąć przed zatwierdzeniem projektu.</p>
     <p class="note">Brief jest wysyłany do usługi AI. Nie wpisuj danych poufnych ani danych innych osób. Wynik wymaga weryfikacji architekta.</p>
     <div class="settings">
-      <label>Model <select id="model"><option value="gpt-4.1">GPT-4.1</option><option value="gpt-4.1-mini">GPT-4.1 mini</option></select></label>
+      <label>Model <select id="model"><option value="gpt-4.1">GPT-4.1</option><option value="gpt-4.1-mini">GPT-4.1 mini</option><option value="gpt-6.1-sol">GPT-6.1 Sol</option></select></label>
       <label>Zakres <select id="mode"><option value="skeletal">Szkielet</option><option value="full">Pełny</option></select></label>
       <label>Diagram <select id="diagram"><option value="yes">Tak</option><option value="no">Nie</option></select></label>
       <label>Limit tokenów odpowiedzi <input id="maxTokens" type="number" value="6000" min="500" max="16000" step="1000" /></label>
     </div>
+    <p class="note">GPT-4.1 jest modelem domyślnym. GPT-6.1 Sol jest dodatkową opcją do porównania wyników; może potrzebować więcej czasu. Limit odpowiedzi obejmuje także tokeny rozumowania. Każdy wynik wymaga przeglądu.</p>
     <div class="workspace">
       <section class="pane" aria-label="Brief biznesowy">
         <h2>Brief biznesowy</h2>

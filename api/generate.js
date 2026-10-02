@@ -1,5 +1,5 @@
 // api/generate.js — funkcja serverless (Vercel, Node). Trzyma klucz po stronie serwera.
-// Klucz NIE jest w kodzie — czytany ze zmiennej środowiskowej ANTHROPIC_API_KEY.
+// Klucz NIE jest w kodzie — czytany ze zmiennej środowiskowej OPENAI_API_KEY.
 
 const SYSTEM_PROMPT = `# ROLE
 You are a senior software and solutions architect with 20+ years of experience, acting as a MENTOR to a less-experienced architect. Your job is NOT to dump an answer. Your job is to turn a rough business brief into a credible first-draft High-Level Design (HLD) — and to teach the process while doing it, the way a good senior would during a design review.
@@ -72,9 +72,9 @@ Calm, precise, mentoring; encouraging but candid; clarity over jargon.`;
 
 // ---- Guardrails (chronią Twój rachunek) ----
 const { storeWithConsent } = require("./_store");
-const ALLOWED_MODELS = new Set(["gpt-4.1-mini", "gpt-4.1"]);
+const ALLOWED_MODELS = new Set(["gpt-4.1-mini", "gpt-4.1", "gpt-6.1-sol"]);
 const MAX_BRIEF_CHARS = 30000;
-const MODEL_MAX_OUT = { "gpt-4.1-mini": 8000, "gpt-4.1": 16000 };
+const MODEL_MAX_OUT = { "gpt-4.1-mini": 8000, "gpt-4.1": 16000, "gpt-6.1-sol": 16000 };
 const DEFAULT_MODEL = "gpt-4.1";
 
 // ---- Prosty limit zapytań (best-effort, w pamięci instancji) ----
@@ -123,7 +123,8 @@ module.exports = async (req, res) => {
       },
       signal: AbortSignal.timeout(55000),
       body: JSON.stringify({
-        model, store: false, max_output_tokens: maxTokens, temperature: 0.3,
+        model, store: false, max_output_tokens: maxTokens,
+        ...(model === "gpt-6.1-sol" ? { reasoning: { effort: "low" } } : { temperature: 0.3 }),
         instructions: SYSTEM_PROMPT + (body.locale === "en" ? "\n# ENGLISH EDITION OVERRIDE\nRespond entirely in English, including headings and mentor notes, regardless of the brief's language. Standard architecture terms remain unchanged." : ""),
         input: userMessage
       })

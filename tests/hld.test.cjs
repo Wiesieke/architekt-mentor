@@ -13,10 +13,11 @@ async function generate(options={}){
  await module.exports({method:'POST',headers:{},body:{brief:'A public educational booking application.',locale:options.locale||'pl',model:options.model||'gpt-4.1',maxTokens:999999,saveHld:false}},res);
  return {res,request,stored,url};
 }
-for(const model of ['gpt-4.1','gpt-4.1-mini'])for(const locale of ['pl','en'])test(`${model} ${locale}: OpenAI HLD response keeps the public output contract`,async()=>{
+for(const model of ['gpt-4.1','gpt-4.1-mini','gpt-6.1-sol'])for(const locale of ['pl','en'])test(`${model} ${locale}: OpenAI HLD response keeps the public output contract`,async()=>{
  const r=await generate({model,locale});assert.equal(r.res.code,200);assert.match(r.res.data.text,/HLD/);
  assert.equal(r.url,'https://api.openai.com/v1/responses');assert.equal(r.request.model,model);assert.equal(r.request.store,false);
- assert.equal(r.request.max_output_tokens,model==='gpt-4.1'?16000:8000);assert.equal(r.stored.consent,false);
+ assert.equal(r.request.max_output_tokens,model==='gpt-4.1-mini'?8000:16000);assert.equal(r.stored.consent,false);
+ if(model==='gpt-6.1-sol'){assert.equal(r.request.reasoning.effort,'low');assert.equal(r.request.temperature,undefined);}else assert.equal(r.request.temperature,0.3);
  if(locale==='en')assert.match(r.request.instructions,/Respond entirely in English/);
 });
 for(const options of [{status:'incomplete'},{refusal:true}])test(`HLD ${JSON.stringify(options)} is never presented or saved as a completed document`,async()=>{
