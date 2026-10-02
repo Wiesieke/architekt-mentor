@@ -7,7 +7,7 @@ async function generate(options={}){
  vm.runInNewContext(fs.readFileSync('api/generate.js','utf8'),{
   module,process:{env:{OPENAI_API_KEY:'test-only'}},AbortSignal:{timeout(ms){timeoutMs=ms;return AbortSignal.timeout(ms);}},console:{error(){},info(){}},
   require:()=>({storeWithConsent:async record=>{stored=record;return {saved:null};}}),
-  fetch:async(endpoint,init)=>{if(options.timeout){const e=new Error("Timeout");e.name="TimeoutError";throw e;}url=endpoint;request=JSON.parse(init.body);return {ok:true,json:async()=>({status:options.status||'completed',output:[{type:'message',content:options.refusal?[{type:'refusal',refusal:'No'}]:[{type:'output_text',text:'# HLD\nA useful draft architecture.'}]}]})};},
+  fetch:async(endpoint,init)=>{if(options.timeout){const e=new Error("Timeout");e.name="TimeoutError";throw e;}url=endpoint;request=JSON.parse(init.body);return {ok:true,json:async()=>({status:options.status||'completed',incomplete_details:options.reason?{reason:options.reason}:undefined,output:[{type:'message',content:options.refusal?[{type:'refusal',refusal:'No'}]:[{type:'output_text',text:'# HLD\nA useful draft architecture.'}]}]})};},
  });
  const res={status(code){this.code=code;return this;},json(data){this.data=data;return this;}};
  await module.exports({method:'POST',headers:{},body:{brief:'A public educational booking application.',locale:options.locale||'pl',model:options.model||'gpt-4.1',mode:options.mode||'skeletal',maxTokens:999999,saveHld:false}},res);
@@ -38,4 +38,9 @@ test('provider timeout is explicit and never stores an unfinished HLD',async()=>
  for(const locale of ['pl','en']){const r=await generate({timeout:true,locale,mode:'full',model:'gpt-6.1-sol'});
  assert.equal(r.res.code,504);assert.equal(r.res.data.code,'generation_timeout');assert.equal(r.stored,undefined);
  assert.match(r.res.data.error,locale==='en'?/time limit/:/limit czasu/);}
+});
+
+test('a full HLD truncated by its output budget requests a larger limit and is never stored',async()=>{
+ const r=await generate({status:'incomplete',reason:'max_output_tokens',mode:'full'});
+ assert.equal(r.res.code,502);assert.equal(r.res.data.code,'output_token_limit');assert.match(r.res.data.error,/Zwiększ limit/);assert.equal(r.stored,undefined);
 });

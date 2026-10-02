@@ -140,6 +140,9 @@ module.exports = async (req, res) => {
     const parts = (data.output || []).filter(item => item.type === "message").flatMap(item => item.content || []);
     if (data.status !== "completed" || parts.some(item => item.type === "refusal")) {
       console.error("HLD incomplete output", { model, mode, status: data.status || "unknown", reason: data.incomplete_details?.reason, elapsedMs: Date.now() - startedAt });
+      if (data.incomplete_details?.reason === "max_output_tokens") {
+        res.status(502).json({ error: body.locale === "en" ? "The HLD exceeded the selected output token limit. Increase the limit or choose the skeletal mode." : "HLD przekroczył wybrany limit tokenów odpowiedzi. Zwiększ limit lub wybierz tryb szkieletu.", code: "output_token_limit" }); return;
+      }
       res.status(502).json({ error: "HLD nie został ukończony. Spróbuj ponownie." }); return;
     }
     const text = parts.filter(item => item.type === "output_text").map(item => item.text).join("\n").trim();

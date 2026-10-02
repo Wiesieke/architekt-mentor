@@ -3,6 +3,15 @@ const $ = id => document.getElementById(id);
 const briefEl=$("brief"), preview=$("preview"), statusEl=$("status"), genBtn=$("genBtn");
 const pdfBtn=$("pdfBtn"), docxBtn=$("docxBtn"), mdBtn=$("mdBtn");
 let lastMarkdown="";
+// Adjust the initial budget for full documents, preserving a manually chosen limit.
+let tokenBudgetEdited=false;
+$("maxTokens").addEventListener("input",()=>{tokenBudgetEdited=true;});
+function updateTokenBudget(){
+  if(!tokenBudgetEdited) $("maxTokens").value=$("mode").value==="full" ? ($("model").value==="gpt-4.1-mini" ? "8000" : "12000") : "6000";
+}
+$("mode").addEventListener("change",updateTokenBudget);
+$("model").addEventListener("change",updateTokenBudget);
+
 function setExportsEnabled(on){ [pdfBtn,docxBtn,mdBtn].forEach(b=>b.disabled=!on); }
 function setStatus(m,c){ statusEl.textContent=m; statusEl.className="status"+(c?(" "+c):""); }
 function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
