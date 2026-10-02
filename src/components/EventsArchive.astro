@@ -1,0 +1,78 @@
+---
+import Studio from '../layouts/Studio.astro';
+import events from '../../data/events.json';
+import { eventStatus } from '../lib/event-status.mjs';
+const {locale = 'pl'} = Astro.props;
+const en = locale === 'en';
+const title = en ? 'Worth attending' : 'Warto wziąć udział';
+const statuses = en ? {upcoming:'Upcoming',in_progress:'In progress',ended:'Past event',review:'Date passed — awaiting review',cancelled:'Cancelled',postponed:'Postponed'} : {upcoming:'Nadchodzące',in_progress:'W trakcie',ended:'Zakończone',review:'Termin minął — wymaga sprawdzenia',cancelled:'Odwołane',postponed:'Przełożone'};
+---
+<Studio locale={locale} title={title} description={en ? 'Selected educational events for IT architects, with independent recommendations and checked participation details.' : 'Wybrane wydarzenia edukacyjne dla architektów IT, z niezależnym komentarzem i sprawdzonymi warunkami udziału.'} translationUrl={en ? '/wydarzenia/' : '/en/events/'} modified="2026-10-02">
+<section class="container events-page" data-events-locale={locale}>
+  <div class="eyebrow">{en ? 'ArchitectMentor · Events pilot' : 'ArchitectMentor · Pilotaż wydarzeń'}</div>
+  <h1>{title}</h1>
+  <p class="intro">{en ? 'Selected events for better architectural decisions. We check the programme and participation details, and explain why each topic matters in practice.' : 'Wybrane wydarzenia pomagające podejmować lepsze decyzje architektoniczne. Sprawdzamy program i warunki udziału oraz wyjaśniamy, dlaczego dany temat jest przydatny w praktyce.'}</p>
+  <p class="notice">{en ? 'First selection checked on 2 October 2026. Unknown details are marked explicitly. Confirm current conditions with the organizer before registering.' : 'Pierwsza selekcja sprawdzona 2 października 2026. Brakujące dane oznaczamy wprost. Przed zapisem potwierdź aktualne warunki u organizatora.'}</p>
+  <form class="filters" aria-label={en ? 'Event filters' : 'Filtry wydarzeń'}>
+    <label>{en ? 'Format and place' : 'Format i miejsce'}<select name="format"><option value="all">{en ? 'All' : 'Wszystkie'}</option><option value="online">Online</option><option value="poland">{en ? 'Poland' : 'Polska'}</option><option value="europe">{en ? 'Europe, in person' : 'Europa stacjonarnie'}</option></select></label>
+    <label>{en ? 'Cost' : 'Koszt'}<select name="cost"><option value="all">{en ? 'All' : 'Wszystkie'}</option><option value="paid">{en ? 'Ticket price confirmed' : 'Cena biletu potwierdzona'}</option><option value="subscription">{en ? 'Subscription access' : 'Dostęp w abonamencie'}</option><option value="unknown">{en ? 'Unconfirmed' : 'Niepotwierdzony'}</option></select></label>
+    <label>{en ? 'Show' : 'Pokaż'}<select name="view"><option value="upcoming">{en ? 'Upcoming and ongoing' : 'Nadchodzące i w trakcie'}</option><option value="archive">{en ? 'Archive and notices' : 'Archiwum i komunikaty'}</option><option value="all">{en ? 'All' : 'Wszystkie'}</option></select></label>
+  </form>
+  <p class="result-count" aria-live="polite"></p>
+  <noscript><p>{en ? 'All events are displayed. Check dates with the organizers; live filters require JavaScript.' : 'Wyświetlamy wszystkie wydarzenia. Sprawdź terminy u organizatorów; filtry na żywo wymagają JavaScript.'}</p></noscript>
+  <div class="event-list">
+  {[...events].sort((a,b)=>a.startDate.localeCompare(b.startDate)).map(event => {const copy=event[locale as 'pl'|'en']; return <article id={event.id} data-event-id={event.id} class="event-card">
+    <div class="card-top"><span class="badge">{event.format==='online' ? 'Online' : en ? 'Kraków · in person' : 'Kraków · stacjonarnie'}</span><span class="event-status">{statuses[eventStatus(event) as keyof typeof statuses]}</span></div>
+    <h2><a href={'#'+event.id}>{event.title}</a></h2>
+    <p class="organizer">{en ? 'Organizer' : 'Organizator'}: {event.organizer}</p>
+    {event.sponsor && <p class="sponsor-note">{en ? 'Event sponsor' : 'Sponsor wydarzenia'}: {event.sponsor}. {en ? 'This does not indicate sponsorship of ArchitectMentor.' : 'Nie oznacza to sponsorowania ArchitectMentor.'}</p>}
+    <ul class="facts">{copy.facts.map(fact=><li>{fact}</li>)}</ul>
+    <div class="editorial"><span>{en ? 'Independent editorial selection' : 'Niezależny wybór redakcji'}</span><h3>{en ? 'Why this matters for an architect' : 'Dlaczego to ma wartość dla architekta'}</h3><p>{copy.recommendation}</p></div>
+    <details><summary>{en ? 'Programme and sources' : 'Program i źródła'}</summary><h3>{en ? 'According to the organizer' : 'Według organizatora'}</h3><p>{copy.programme}</p><ul>{event.sources.map(url=><li><a href={url} target="_blank" rel="noopener noreferrer">{new URL(url).hostname + new URL(url).pathname}</a></li>)}</ul></details>
+    <div class="event-actions"><a class="button organizer-link" href={event.registrationUrl} target="_blank" rel="noopener noreferrer">{en ? 'Programme and registration ↗' : 'Program i rejestracja ↗'}</a><button class="interest-button" type="button" aria-pressed="false">{en ? 'Interested' : 'To mnie interesuje'}</button><a class="learning-link" href={event.learningUrl[locale as 'pl'|'en']}>{en ? 'Related learning →' : 'Powiązany materiał →'}</a></div>
+    <p class="verification">{en ? 'Checked' : 'Sprawdzono'}: <time datetime={event.checked}>{event.checked}</time> · <span class="freshness"></span> · <a href={'mailto:architektura@sensinte.com?subject='+encodeURIComponent('ArchitectMentor: '+event.title)}>{en ? 'Report a change' : 'Zgłoś zmianę'}</a></p>
+    <p class="interest-result" role="status"></p>
+  </article>})}
+  </div>
+  <aside class="pilot"><h2>{en ? 'A small, useful selection' : 'Mała, przydatna selekcja'}</h2><p>{en ? 'A four-week pilot, 2–29 October: 3–5 new entries per week, selected for educational value. This section complements the daily magazine. We keep past events in an archive and check for changes.' : 'Czterotygodniowy pilotaż, 2–29 października: 3–5 nowych wpisów tygodniowo, dobieranych według wartości edukacyjnej. Sekcja uzupełnia codzienne wydanie magazynu. Zachowujemy archiwum i sprawdzamy zmiany.'}</p><p>{en ? 'Interest buttons and link actions help assess usefulness. We record event ID, language and action in technical logs, without adding personal identifiers. A click is not proof of attendance. Future commercial relationships will be explicitly disclosed.' : 'Przyciski zainteresowania i kliknięcia pomagają ocenić przydatność. Zapisujemy identyfikator wydarzenia, język i rodzaj działania w dziennikach technicznych, bez dodawania identyfikatorów osoby. Kliknięcie nie dowodzi udziału. Przyszłe relacje komercyjne będziemy jawnie oznaczać.'}</p><a href={en ? '/en/data-notice/' : '/informacja-o-danych/'}>{en ? 'Data notice' : 'Informacja o danych'}</a></aside>
+</section>
+</Studio>
+<script>
+import events from '../../data/events.json';
+import {eventStatus,verificationStale} from '../lib/event-status.mjs';
+const root=document.querySelector<HTMLElement>('[data-events-locale]');
+if(root){
+ const en=root.dataset.eventsLocale==='en';
+ const cards=Array.from(root.querySelectorAll<HTMLElement>('[data-event-id]'));
+ const form=root.querySelector<HTMLFormElement>('.filters')!;
+ const labels=en?{upcoming:'Upcoming',in_progress:'In progress',ended:'Past event',review:'Date passed — awaiting review',cancelled:'Cancelled',postponed:'Postponed'}:{upcoming:'Nadchodzące',in_progress:'W trakcie',ended:'Zakończone',review:'Termin minął — wymaga sprawdzenia',cancelled:'Odwołane',postponed:'Przełożone'};
+ const seen=new Set<string>();
+ const track=async(id:string,action:string)=>{try{const r=await fetch('/api/event-interest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({eventId:id,locale:en?'en':'pl',action}),keepalive:true});return r.ok;}catch{return false;}};
+ function update(){
+  const filters=new FormData(form);let count=0;
+  for(const card of cards){const event=events.find(e=>e.id===card.dataset.eventId)!;const status=eventStatus(event);const active=['upcoming','in_progress'].includes(status);
+   card.querySelector('.event-status')!.textContent=labels[status as keyof typeof labels];
+   card.querySelector('.freshness')!.textContent=verificationStale(event)?(en?'Verification overdue':'Wymaga ponownej weryfikacji'):(en?'Check current organizer terms':'Sprawdź bieżące warunki organizatora');
+   const format=filters.get('format'),cost=filters.get('cost'),view=filters.get('view');
+   card.hidden=!((format==='all'||format===event.format||format===event.region||format==='europe'&&event.format==='in-person'&&event.region==='poland')&&(cost==='all'||cost===event.cost)&&(view==='all'||view==='upcoming'&&active||view==='archive'&&!active));
+   card.querySelector<HTMLAnchorElement>('.organizer-link')!.hidden=!active;
+   if(!card.hidden)count++;
+  }
+  root!.querySelector('.result-count')!.textContent=en?`${count} events shown`:`Liczba wydarzeń: ${count}`;
+ }
+ form.addEventListener('change',update);form.addEventListener('submit',e=>e.preventDefault());update();setInterval(update,60000);
+ if(location.hash){const card=cards.find(c=>'#'+c.id===location.hash);if(card?.hidden){(form.elements.namedItem('view') as HTMLSelectElement).value='all';update();card.scrollIntoView();}}
+ const observer=new IntersectionObserver(entries=>{for(const entry of entries){const id=(entry.target as HTMLElement).dataset.eventId!;if(entry.isIntersecting&&!seen.has(id)){seen.add(id);void track(id,'card_view');}}},{threshold:0.25});
+ cards.forEach(card=>{
+  observer.observe(card);const id=card.dataset.eventId!;
+  card.querySelector('.organizer-link')!.addEventListener('click',()=>{void track(id,'organizer_click');});
+  card.querySelector('.learning-link')!.addEventListener('click',()=>{void track(id,'learning_click');});
+  card.querySelector('details')!.addEventListener('toggle',e=>{if((e.target as HTMLDetailsElement).open)void track(id,'detail_view');});
+  const button=card.querySelector<HTMLButtonElement>('.interest-button')!;
+  button.addEventListener('click',async()=>{button.disabled=true;const ok=await track(id,'interest_click');card.querySelector('.interest-result')!.textContent=ok?(en?'Thank you — interest recorded.':'Dziękujemy — zainteresowanie zapisane.'):(en?'Could not record interest. Please try again.':'Nie udało się zapisać zainteresowania. Spróbuj ponownie.');button.setAttribute('aria-pressed',String(ok));button.disabled=ok;});
+ });
+}
+</script>
+<style>
+.events-page{padding-block:50px 80px;max-width:1000px}.events-page h1{font-size:clamp(36px,5vw,58px);margin:20px 0}.intro{font-size:19px;color:var(--muted);max-width:70ch}.notice{background:var(--mint);padding:18px 22px;border-radius:10px}.filters{display:flex;gap:18px;flex-wrap:wrap;margin:30px 0 10px}.filters label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;flex:1;min-width:180px}select{font:inherit;padding:10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);max-width:100%}.result-count{font-size:13px;color:var(--muted)}.event-list{display:grid;gap:24px}.event-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px;scroll-margin-top:140px}.event-card[hidden]{display:none}.card-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--teal);font-weight:700}.badge{background:var(--mint);border-radius:20px;padding:5px 12px}.event-card h2{font-size:clamp(23px,3vw,31px);margin-bottom:12px}.event-card h2 a{text-decoration:none}.organizer{color:var(--muted);font-size:14px}.facts{padding-left:20px}.facts li{margin-bottom:7px}.sponsor-note{font-size:13px;border-left:3px solid var(--orange);padding-left:12px}.editorial{background:#f6f8f5;border-radius:9px;padding:20px;margin:22px 0}.editorial>span{font-size:11px;text-transform:uppercase;color:var(--teal);font-weight:800;letter-spacing:.08em}.editorial h3{font-size:20px;margin:12px 0}.editorial p{margin:0}summary{cursor:pointer;font-weight:700;color:var(--teal)}details a{overflow-wrap:anywhere}details h3{font-size:19px}.event-actions{display:flex;gap:15px;align-items:center;flex-wrap:wrap;margin-top:24px}.organizer-link[hidden]{display:none}.interest-button{background:#fff;border:1px solid var(--teal);border-radius:8px;padding:11px 16px;color:var(--teal);font-weight:700}.interest-button:disabled{cursor:default;opacity:.7}.learning-link{color:var(--teal);font-weight:700}.verification{font-size:12px;color:var(--muted);margin:18px 0 0}.interest-result{font-size:14px;margin:8px 0 0;color:var(--teal)}.pilot{margin-top:35px;max-width:75ch}.pilot h2{font-size:25px}.pilot a{color:var(--teal)}@media(max-width:560px){.events-page{padding-top:30px}.event-card{padding:20px}.filters{gap:12px}.event-actions{align-items:stretch;flex-direction:column}.event-actions .button{font-size:14px}.learning-link{padding:4px}.editorial{padding:15px}}
+</style>
