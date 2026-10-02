@@ -1,0 +1,15 @@
+<p><strong>Data ogłoszenia: 1 października 2026 r.</strong> GitHub zapowiedział wycofanie obrazów runnerów GitHub Actions opartych na macOS 14. To nie jest ciekawostka o numerze systemu. Dla pipeline’u budującego i podpisującego aplikacje jest to termin ważności części środowiska wykonawczego.</p>
+<h3>Co dokładnie ogłosił GitHub</h3>
+<ul>
+  <li>obrazy wskazywane etykietami <code>macos-14</code>, <code>macos-14-large</code> i <code>macos-14-xlarge</code> mają zostać wycofane 2 listopada 2026 r.;</li>
+  <li>GitHub planuje okresy próbnej niedostępności 5, 12, 16, 19, 23, 26, 29 i 30 października;</li>
+  <li>zalecana migracja prowadzi do <code>macos-latest</code> lub runnerów arm64 opartych na macOS 15, zależnie od wymagań zadania;</li>
+  <li>w okresie wycofywania pojemność runnerów macOS 14 może być ograniczana, co może wydłużać czas oczekiwania.</li>
+</ul>
+<p>To są fakty z <a href="https://github.blog/changelog/2026-10-01-github-actions-macos-14-runner-image-retirement/">GitHub Changelog z 1 października 2026 r.</a>. Dokładny zestaw narzędzi dla nowych obrazów należy sprawdzić w repozytorium <a href="https://github.com/actions/runner-images">actions/runner-images</a>.</p>
+<h3>Interpretacja architektoniczna</h3>
+<p>Najpierw zrób inwentaryzację workflow, reusable workflows i akcji, które wybierają te etykiety pośrednio. Potem uruchom reprezentatywne buildy na docelowym obrazie: kompilację, testy, tworzenie artefaktu, podpisywanie i publikację. Zielony prosty test nie dowodzi, że działa ostatni krok wydania.</p>
+<p>Przejście na <code>macos-latest</code> zmniejsza częstotliwość ręcznych migracji, lecz pozwala GitHubowi przesuwać wersję obrazu. To świadomy kompromis, nie darmowy spokój. Jeżeli kompilator, Xcode lub narzędzie podpisujące jest częścią kontrolowanego łańcucha dostaw, przypnij jego wersję jawnie i obserwuj aktualizacje obrazu.</p>
+<p>Właściciel pipeline’u powinien mieć datę, test migracyjny i plan odwrotu. Runner to zależność produkcyjna nawet wtedy, gdy nie obsługuje ruchu użytkowników. Bez niego nie ma poprawki, a to zwykle staje się interesujące dopiero w dniu awarii.</p>
+<p class="note"><strong>Pytanie do projektu:</strong> czy potraficie dziś wskazać wszystkie pipeline’y zależne od obrazu macOS 14 i udowodnić, że artefakt z nowego obrazu przechodzi także podpisanie oraz publikację?</p>
+<div class="source"><strong>Źródła pierwotne:</strong> <a href="https://github.blog/changelog/2026-10-01-github-actions-macos-14-runner-image-retirement/">GitHub Changelog, 1 października 2026</a>; <a href="https://github.com/actions/runner-images">GitHub Actions runner images</a>. Sekcja „Interpretacja architektoniczna” jest autorskim wnioskiem.</div>

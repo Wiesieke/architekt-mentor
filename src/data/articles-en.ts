@@ -1,3 +1,5 @@
+import asyncNotifications from '../content/articles/en/asynchronous-notifications.html?raw';
+import macos14 from '../content/articles/en/github-actions-macos-14-retirement.html?raw';
 import starterLearning0 from '../content/articles/en/change-impact-analysis.html?raw';
 import starterLearning1 from '../content/articles/en/idempotency-lookup-compensation.html?raw';
 import starterLearning2 from '../content/articles/en/graceful-degradation.html?raw';
@@ -23,6 +25,8 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'asynchronous-notifications', plSlug:'komunikacja-asynchroniczna-powiadomienia', title:'Asynchronous communication: separate the order from its notification', description:'Durably record auxiliary work, retry the right step and avoid duplicating the business operation.', topic:'Integration and resilience', published:'2026-10-02', body:asyncNotifications },
+  { section:'architecture-in-motion', slug:'github-actions-macos-14-retirement', plSlug:'github-actions-macos-14-wycofanie', title:'GitHub Actions retires macOS 14: CI has a lifecycle too', description:'The 2 November retirement and October brownouts call for testing the full build, signing and publication chain.', topic:'CI/CD and lifecycle', published:'2026-10-02', eventDate:'2026-10-01', body:macos14 },
   { section:'foundations', slug:"change-impact-analysis", plSlug:"analiza-wplywu-zmiany", title:"Change impact analysis: hardware, apps and system boundaries", description:"Check compatibility and scale the review to the actual change.", topic:'Practical decisions', published:'2026-10-01', body:starterLearning0 },
   { section:'foundations', slug:"idempotency-lookup-compensation", plSlug:"idempotencja-lookup-kompensacja", title:"Idempotency, lookup and compensation: three different jobs", description:"Safe retries and decisions when an operation has an unknown outcome.", topic:'Practical decisions', published:'2026-10-01', body:starterLearning1 },
   { section:'foundations', slug:"graceful-degradation", plSlug:"graceful-degradation", title:"Graceful degradation: preserve the core function", description:"When optional-feature failure should not block a result, and where the boundary lies.", topic:'Practical decisions', published:'2026-10-01', body:starterLearning2 },

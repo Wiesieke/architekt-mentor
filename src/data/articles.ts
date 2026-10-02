@@ -1,3 +1,5 @@
+import asyncNotifications from '../content/articles/komunikacja-asynchroniczna-powiadomienia.html?raw';
+import macos14 from '../content/articles/github-actions-macos-14-wycofanie.html?raw';
 import starterLearning0 from '../content/articles/analiza-wplywu-zmiany.html?raw';
 import starterLearning1 from '../content/articles/idempotencja-lookup-kompensacja.html?raw';
 import starterLearning2 from '../content/articles/graceful-degradation.html?raw';
@@ -30,6 +32,8 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'komunikacja-asynchroniczna-powiadomienia', title:'Komunikacja asynchroniczna: oddziel zamówienie od powiadomienia', description:'Jak trwale zapisać pomocniczą pracę, ponawiać właściwy krok i nie utworzyć duplikatu operacji biznesowej.', topic:'Integracja i odporność', published:'2026-10-02', body:asyncNotifications },
+  { section:'architektura-w-ruchu', slug:'github-actions-macos-14-wycofanie', title:'GitHub Actions wycofuje macOS 14: CI też ma cykl życia', description:'Wycofanie 2 listopada i październikowe brownouty wymagają testu całego łańcucha budowania, podpisywania i publikacji.', topic:'CI/CD i cykl życia', published:'2026-10-02', eventDate:'2026-10-01', body:macos14 },
   { section:'podstawy-architektury', slug:"analiza-wplywu-zmiany", title:"Analiza wpływu zmiany: sprzęt, aplikacja i granice systemu", description:"Jak sprawdzić zgodność i dobrać zakres przeglądu do rzeczywistej zmiany.", topic:"Technika analizy", published:'2026-10-01', body:starterLearning0 },
   { section:'podstawy-architektury', slug:"idempotencja-lookup-kompensacja", title:"Idempotencja, lookup i kompensacja: trzy różne zadania", description:"Bezpieczne ponowienia i decyzje przy nieznanym wyniku operacji.", topic:"Wzorce integracji", published:'2026-10-01', body:starterLearning1 },
   { section:'podstawy-architektury', slug:"graceful-degradation", title:"Graceful degradation: zachowaj główną funkcję", description:"Kiedy awaria dodatku nie powinna blokować wyniku i gdzie leży granica.", topic:"Odporność", published:'2026-10-01', body:starterLearning2 },

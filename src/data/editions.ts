@@ -1,6 +1,10 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'ĆWICZENIE', published:'2026-10-02', title:'Czy awaria powiadomienia powinna blokować zamówienie?', summary:'Łatwy · szybka decyzja lub mentor', href:'/lamiglowka/' },
+  { kind:'ANTYWZORZEC', published:'2026-10-02', title:'Powiadomienie steruje wynikiem zamówienia', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-10-02-powiadomienie-steruje-transakcja/' },
+  { kind:'PODSTAWY', published:'2026-10-02', title:'Komunikacja asynchroniczna: oddziel zamówienie od powiadomienia', summary:'Trwałe zadanie · outbox · właściwy retry', href:'/podstawy-architektury/komunikacja-asynchroniczna-powiadomienia/' },
+  { kind:'W RUCHU', published:'2026-10-02', eventDate:'2026-10-01', title:'GitHub Actions wycofuje macOS 14: CI też ma cykl życia', summary:'Data wydarzenia: 1.10 · termin · brownouty · test migracji', href:'/architektura-w-ruchu/github-actions-macos-14-wycofanie/' },
   { kind:'ĆWICZENIE', published:'2026-10-01', title:'Nowe tablety, ta sama aplikacja. Co trzeba sprawdzić?', summary:'Łatwy · szybka decyzja lub mentor', href:'/lamiglowka/' },
   { kind:'ĆWICZENIE', published:'2026-10-01', title:'Brak odpowiedzi. Czy rezerwacja powstała?', summary:'Średni · szybka decyzja lub mentor', href:'/lamiglowki/2026-10-01-nieznany-wynik-transakcji/' },
   { kind:'ĆWICZENIE', published:'2026-10-01', title:'Wynik gotowy, ale zapis nie działa. Co pokażesz?', summary:'Łatwy · szybka decyzja lub mentor', href:'/lamiglowki/2026-10-01-opcjonalny-zapis/' },

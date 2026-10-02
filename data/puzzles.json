@@ -1,5 +1,28 @@
 [
   {
+    "id": "2026-10-02-email-po-zamowieniu",
+    "week": "Publikacja codzienna / 2026",
+    "date": "2026-10-02",
+    "title": "Czy awaria powiadomienia powinna blokować zamówienie?",
+    "difficulty": "Łatwy",
+    "goal": "Oddziel wynik operacji biznesowej od awarii pomocniczego powiadomienia.",
+    "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nSerwis zapisał zamówienie i nadał mu numer. Transakcja w bazie została zatwierdzona. Następnie serwis próbował synchronicznie wysłać informacyjny e-mail, lecz usługa pocztowa zwróciła błąd. E-mail nie jest warunkiem przyjęcia zamówienia. Obecne API zwraca jednak błąd całej operacji, więc użytkownik ponawia zamówienie i może utworzyć duplikat. Nie ma jeszcze trwałego zadania ani potwierdzonego komunikatu do ponowienia wysyłki.",
+    "question": "Jaki wynik zwrócisz użytkownikowi i co będziesz ponawiać? Wyjaśnij, jak unikniesz drugiego zamówienia oraz utraty powiadomienia.",
+    "hints": ["Który skutek został już trwale osiągnięty?", "Czy ponowienie całego żądania jest tym samym co ponowienie e-maila?", "Co musi być zapisane trwale, aby awaria między bazą a kolejką nie zgubiła powiadomienia?"],
+    "analysis": "### Zamówienie już istnieje\n\nZwróć sukces przyjęcia zamówienia wraz z jego numerem. Poinformuj uczciwie, że potwierdzenie może dotrzeć później. Błąd pomocniczego e-maila nie zmienia zatwierdzonego wyniku biznesowego i nie powinien zachęcać użytkownika do ponownego złożenia zamówienia.\n\n### Ponawiaj właściwą pracę\n\nPonowienia dotyczą wysłania powiadomienia, nie utworzenia zamówienia. Zadanie powiadomienia musi być trwałe i obserwowalne: w prostym rozwiązaniu można zapisać rekord `notification_pending` w tej samej transakcji co zamówienie, a proces roboczy wysyła go później. Przy większej liczbie zdarzeń typowym rozwiązaniem jest transactional outbox. Worker powinien bezpiecznie obsługiwać ponowienia, bo dostarczenie co najmniej raz może oznaczać duplikat wiadomości.\n\nSamo zapisanie zamówienia, a potem zwykłe wysłanie komunikatu do kolejki to nadal dwa niezależne kroki. Awaria pomiędzy nimi może pozostawić zamówienie bez zadania powiadomienia. Outbox nie gwarantuje dokładnie jednego e-maila; pozwala nie zgubić zamiaru wysłania i wymaga idempotencji lub deduplikacji po stronie konsumenta.\n\n### Jak to sprawdzić\n\nZasymuluj niedostępność poczty oraz przerwanie procesu tuż po zatwierdzeniu zamówienia. Powinno powstać jedno zamówienie i jedno trwałe zadanie, API powinno zwrócić numer zamówienia, a po powrocie usługi wysyłka ma zostać wznowiona bez tworzenia kolejnego zamówienia. Gdyby powiadomienie było prawnym warunkiem przyjęcia operacji, kontrakt byłby inny — ale nie jest nim w tym scenariuszu.",
+    "quick": {"question": "Co powinien zrobić serwis po błędzie e-maila?", "hint": "Zamówienie i informacja o nim mają różne znaczenie biznesowe.", "correctId": "c", "options": [
+      {"id": "a", "text": "Usunąć zapisane zamówienie, bo bez e-maila cała operacja jest nieudana.", "explanation": "To zmienia osiągnięty wynik biznesowy z powodu awarii funkcji pomocniczej. W tym scenariuszu e-mail nie jest warunkiem przyjęcia zamówienia."},
+      {"id": "b", "text": "Zwrócić ogólny błąd i poprosić użytkownika o ponowne złożenie zamówienia.", "explanation": "Zamówienie już istnieje. Ponowienie całego żądania może utworzyć duplikat, zamiast naprawić nieudaną wysyłkę."},
+      {"id": "c", "text": "Potwierdzić zamówienie, trwale zapisać oczekujące powiadomienie i ponawiać tylko jego wysłanie.", "explanation": "To zachowuje prawdziwy wynik biznesowy, nie zachęca do duplikatu i daje kontrolowaną drogę do późniejszego wysłania e-maila."}
+    ]},
+    "coach": {"criteria": [
+      {"id": "order_outcome", "label": "Wynik zamówienia", "expected": "Rozpoznaje, że zatwierdzone zamówienie istnieje i powinno zostać potwierdzone niezależnie od e-maila."},
+      {"id": "duplicate_avoidance", "label": "Uniknięcie duplikatu", "expected": "Nie każe ponawiać utworzenia zamówienia; rozdziela tożsamość i wynik zamówienia od powiadomienia."},
+      {"id": "notification_retry", "label": "Trwałe ponowienie powiadomienia", "expected": "Proponuje trwałe zadanie lub outbox oraz ponowienie samej wysyłki z obserwowalnością i ochroną przed duplikatami."}
+    ]},
+    "related": [{"type": "UCZ SIĘ", "title": "Komunikacja asynchroniczna i niezależne ponawianie", "description": "Oddziel wynik od pomocniczego skutku", "href": "/podstawy-architektury/komunikacja-asynchroniczna-powiadomienia/"}]
+  },
+  {
     "id": "2026-10-01-wymiana-urzadzen",
     "week": "START · 2 TRYBY",
     "date": "2026-10-01",

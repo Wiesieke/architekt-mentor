@@ -1,0 +1,19 @@
+<p><strong>Scenariusz edukacyjny inspirowany praktyką.</strong> Zamówienie zostało zapisane, ale informacyjny e-mail nie wyszedł. To nie jest jedna nieudana operacja. To jeden zakończony wynik biznesowy i jeden niespełniony skutek pomocniczy.</p>
+<h3>Najpierw nazwij wynik</h3>
+<p>Jeżeli przyjęcie zamówienia kończy się zatwierdzeniem rekordu, ten moment jest granicą wyniku biznesowego. E-mail, SMS, indeks wyszukiwarki czy wpis analityczny mogą być skutkami tego wyniku. Nie wolno pozwolić, by awaria dodatku zmieniła prawdziwe „zamówienie przyjęte” w fałszywe „spróbuj ponownie”. Tak właśnie rodzą się duplikaty.</p>
+<p>Asynchroniczność nie oznacza jednak „wyślij coś na kolejkę i miej nadzieję”. Zapis zamówienia oraz publikacja komunikatu to dwa zapisy. Jeżeli proces umrze pomiędzy nimi, zamówienie istnieje, a wiadomości nie ma.</p>
+<h3>Trwały zamiar wykonania</h3>
+<p>Najprostszy wariant to rekord oczekującego powiadomienia zapisany w tej samej lokalnej transakcji co zamówienie. Proces roboczy odczytuje rekord, wysyła wiadomość i oznacza wynik. Gdy więcej odbiorców korzysta ze zdarzeń, tę samą zasadę realizuje <strong>transactional outbox</strong>: zmiana domenowa i wpis do skrzynki wychodzącej powstają atomowo, a osobny relay publikuje wpis dalej.</p>
+<p>Outbox zamyka lukę między bazą i brokerem, ale nie czyni systemu magicznie „exactly once”. Relay może opublikować tę samą wiadomość ponownie. Konsument potrzebuje stabilnego identyfikatora operacji oraz idempotencji albo deduplikacji. Dla e-maila warto również ustalić, czy drugi identyczny komunikat jest tolerowany, czy ma być powstrzymany.</p>
+<h3>Retry jest decyzją, nie odruchem</h3>
+<ul>
+  <li>ponawiaj tylko zadanie, które się nie udało, a nie całą operację biznesową;</li>
+  <li>stosuj ograniczoną liczbę prób, opóźnienie i jitter, aby nie dobić zależności podczas awarii;</li>
+  <li>po wyczerpaniu prób zachowaj zadanie do obsługi i uzgodnienia zamiast usuwać ślad;</li>
+  <li>mierz wiek najstarszego oczekującego zadania, liczbę prób i odsetek trwałych błędów;</li>
+  <li>pokaż użytkownikowi prawdę: zamówienie przyjęto, a potwierdzenie może przyjść później.</li>
+</ul>
+<h3>Jak sprawdzić decyzję</h3>
+<p>Testuj trzy awarie: poczta jest niedostępna, proces kończy się po commicie bazy, a relay publikuje komunikat dwukrotnie. Wynik ma być nudny: jedno zamówienie, trwałe zadanie, kontrolowane ponowienie i co najwyżej jedno widoczne powiadomienie. Architektura odporna bywa nudna. To komplement.</p>
+<p class="note"><strong>Granica zastosowania:</strong> jeśli powiadomienie jest prawnym lub biznesowym warunkiem przyjęcia operacji, nie jest skutkiem pomocniczym. Najpierw trzeba ustalić kontrakt, dopiero potem dobierać wzorzec.</p>
+<div class="source"><strong>Dalsza lektura:</strong> <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS Prescriptive Guidance: Transactional outbox pattern</a>. Dokumentacja opisuje atomowy zapis zdarzenia i potrzebę idempotentnego konsumenta.</div>

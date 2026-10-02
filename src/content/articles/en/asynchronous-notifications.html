@@ -1,0 +1,19 @@
+<p><strong>Practice-inspired educational scenario.</strong> An order has been saved, but its informational email was not sent. This is not one failed operation. It is one completed business outcome and one incomplete auxiliary effect.</p>
+<h3>Name the outcome first</h3>
+<p>If order acceptance ends when the order record commits, that is the boundary of the business outcome. Email, SMS, a search index update or an analytics record can be effects of that outcome. Failure of an add-on must not turn a truthful “order accepted” into a misleading “please try again”. That is how duplicates are born.</p>
+<p>Asynchronous does not mean “put something on a queue and hope”. Saving the order and publishing a message are two writes. If the process dies between them, the order exists and the message does not.</p>
+<h3>A durable intent to perform the work</h3>
+<p>The simplest design can insert a pending-notification record in the same local transaction as the order. A worker reads it, sends the notification and records the result. When more consumers need events, the <strong>transactional outbox</strong> applies the same rule: the domain change and an outbox record commit atomically, while a separate relay publishes the record.</p>
+<p>The outbox closes the gap between the database and broker, but it does not make the system magically exactly-once. A relay can publish the same record again. The consumer needs a stable operation identifier and idempotency or deduplication. For email, decide whether a duplicate message is tolerable or must be suppressed.</p>
+<h3>Retry is a decision, not a reflex</h3>
+<ul>
+  <li>retry only the failed task, not the whole business operation;</li>
+  <li>use bounded attempts, backoff and jitter so a dependency outage is not amplified;</li>
+  <li>after attempts are exhausted, retain the task for intervention and reconciliation rather than deleting the evidence;</li>
+  <li>measure the age of the oldest pending task, attempt counts and permanent failures;</li>
+  <li>tell the user the truth: the order was accepted and confirmation may arrive later.</li>
+</ul>
+<h3>How to verify the decision</h3>
+<p>Exercise three failures: mail is unavailable, the process terminates after the database commit, and the relay publishes twice. The outcome should be boring: one order, a durable task, controlled retries and at most one user-visible notification. Boring resilience is a compliment.</p>
+<p class="note"><strong>Boundary:</strong> if notification is a legal or business condition of accepting the operation, it is not an auxiliary effect. Establish that contract before choosing the pattern.</p>
+<div class="source"><strong>Further reading:</strong> <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">AWS Prescriptive Guidance: Transactional outbox pattern</a>. The guidance describes atomic event recording and the need for an idempotent consumer.</div>
