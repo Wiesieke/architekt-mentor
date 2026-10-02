@@ -9,7 +9,7 @@ const editionDate = new Intl.DateTimeFormat('pl-PL',{day:'numeric',month:'long',
 const editionCount = editions.filter(item => item.published === latestEditionDate).length;
 const labels = {
   pl: { skip: 'Przejdź do treści', practice: 'Ćwicz', tools: 'Narzędzia', learn: 'Ucz się', trends: 'W ruchu', business: 'Dla firm', puzzle: 'Łamigłówka', patterns: 'Antywzorce', basics: 'Podstawy', contact: 'Kontakt', partner: 'Współpraca' },
-  en: { skip: 'Skip to content', practice: 'Practice', tools: 'Tools', learn: 'Foundations', trends: 'In motion', business: 'For business', puzzle: 'Exercises', patterns: 'Anti-patterns', basics: 'Foundations', contact: 'Contact', partner: 'Partnerships' },
+  en: { skip: 'Skip to content', practice: 'Practice', tools: 'Tools', learn: 'Foundations', trends: 'In motion', business: 'For business', puzzle: 'Practice', patterns: 'Anti-patterns', basics: 'Foundations', contact: 'Contact', partner: 'Partnerships' },
 }[locale];
 const languageUrl = translationUrl ?? (locale === 'pl' ? '/en/' : '/pl/');
 ---
