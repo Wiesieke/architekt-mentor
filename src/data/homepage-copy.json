@@ -1,0 +1,140 @@
+{
+  "pl": {
+    "title": "Architektura IT w praktyce: ćwiczenia, wzorce i decyzje",
+    "description": "Magazyn architektury IT i architektury korporacyjnej. Praktyczne ćwiczenia, antywzorce, podstawy i analizy zmian technologicznych.",
+    "eyebrow": "Magazyn architektury IT w praktyce",
+    "headline": "Lepsza architektura zaczyna się od",
+    "emphasis": "lepszych pytań.",
+    "intro": "Ćwicz decyzje architektoniczne, poznawaj trwałe wzorce i sprawdzaj zmiany technologiczne. Każdy materiał łączy pojęcie z pytaniem, które możesz zadać w rzeczywistym projekcie.",
+    "cta": "Podejmij pierwszą decyzję architektoniczną →",
+    "how": "Zobacz, jak działa ArchitectMentor ↓",
+    "latest": "NAJNOWSZY ARTYKUŁ",
+    "read": "Przeczytaj artykuł →",
+    "start": "Zacznij tutaj",
+    "startTitle": "Zacznij od jednej decyzji architektonicznej",
+    "startIntro": "Pierwsza wizyta? Zacznij od ćwiczenia: podejmij decyzję przed przeczytaniem analizy, a potem skorzystaj z powiązanych materiałów, jeśli chcesz zgłębić temat.",
+    "paths": [
+      {
+        "label": "01 · ĆWICZ",
+        "title": "Podejmij decyzję",
+        "description": "Przeanalizuj scenariusz, odpowiedz na pytanie mentora i porównaj swoje rozumowanie z analizą doświadczonego architekta.",
+        "action": "Przejdź do ćwiczenia →"
+      },
+      {
+        "label": "02 · UCZ SIĘ",
+        "title": "Wzorce i metody",
+        "description": "C4, ADR, wzorce odporności i ramy wyjaśnione przez decyzje, do których się przydają.",
+        "action": "Poznaj podstawy →"
+      },
+      {
+        "label": "03 · ŚLEDŹ ZMIANY",
+        "title": "Architektura w ruchu",
+        "description": "Daty i źródła pierwotne, a następnie interpretacja oraz praktyczne pytanie.",
+        "action": "Przejrzyj artykuły →"
+      },
+      {
+        "label": "04 · PROJEKTUJ",
+        "title": "Zapisz swoją decyzję",
+        "description": "Przygotuj ADR lokalnie lub zamień brief w szkic HLD do przeglądu.",
+        "action": "Otwórz narzędzia →"
+      }
+    ],
+    "publication": "Najnowsza publikacja",
+    "newTitle": "Co dodaliśmy w tym wydaniu?",
+    "newIntro": "Każdy materiał prowadzi od konkretnej sytuacji do decyzji, którą można sprawdzić.",
+    "materials": "materiałów",
+    "newsletterLabel": "Newsletter",
+    "newsletterTitle": "Praktyczna architektura w Twojej skrzynce",
+    "newsletterText": "Zapisz się, aby otrzymywać wybrane materiały i komentarz redakcyjny.",
+    "subscribe": "Zapisz się →",
+    "pattern": "Zacznij od wzorca",
+    "about": "O mnie",
+    "aboutTitle": "Cztery dekady w IT. Nadal zaczynam od pytań.",
+    "bio": "Nazywam się Wiesław Ejsymont. Informatyką zajmuję się od ponad 40 lat, w tym od ponad 20 lat architekturą rozwiązań i architekturą korporacyjną. Zaczynałem w czasach komputerów klasy IBM PC 286. Przez kolejne dekady rozwijałem swoje kompetencje wraz z kolejnymi przełomami technologicznymi — od pracy z serwerami z Solarisem, sieciami i programowania w asemblerze, C oraz Javie, przez rozwój internetu i coraz bardziej złożonych systemów, po obecną falę rozwoju AI. Zastosowania IT poznawałem w przemyśle, telekomunikacji i lotnictwie. Z czasem coraz bardziej zajmowało mnie to, jak wykorzystać zmieniające się technologie do budowania rozwiązań służących całej organizacji. Nowe narzędzia są ciekawe; skutki decyzji zostają na dłużej. Dlatego w ArchitectMentor pytam o cel, ryzyko i sposób sprawdzenia, czy rozwiązanie naprawdę działa.",
+    "contact": "Porozmawiajmy →",
+    "tutorialLabel": "Architekt i AI",
+    "tutorialTitle": "Jak architekt pracuje z AI",
+    "tutorialText": "Od briefu do sprawdzonej decyzji: założenia, warianty, diagramy i dowody.",
+    "tutorialCta": "Przejdź do tutoriali →",
+    "eventsLabel": "Wydarzenia",
+    "eventsTitle": "Warto wziąć udział",
+    "eventsText": "Wybrane wydarzenia z programem, warunkami udziału i komentarzem o wartości dla architekta.",
+    "eventsCta": "Zobacz wydarzenia →",
+    "kinds": {
+      "ĆWICZENIE": "ĆWICZENIE",
+      "ANTYWZORZEC": "ANTYWZORZEC",
+      "PODSTAWY": "PODSTAWY",
+      "W RUCHU": "W RUCHU",
+      "ARCHITEKT I AI": "ARCHITEKT I AI"
+    }
+  },
+  "en": {
+    "title": "Practical IT architecture: patterns and decisions",
+    "description": "ArchitectMentor: a practical magazine on enterprise and solution architecture, exercises, technology developments and decisions.",
+    "eyebrow": "Practical architecture magazine",
+    "headline": "Better architecture begins with",
+    "emphasis": "better questions.",
+    "intro": "Explore architecture decisions, durable patterns and technology developments. Each article connects a concept to a question you can ask in a real project.",
+    "cta": "Try your first architecture decision →",
+    "how": "See how ArchitectMentor works ↓",
+    "latest": "LATEST ARTICLE",
+    "read": "Read the article →",
+    "start": "Start here",
+    "startTitle": "Start with one architecture decision",
+    "startIntro": "New to ArchitectMentor? Begin with Practice: make a decision before reading the analysis, then follow the links only if you want to go deeper.",
+    "paths": [
+      {
+        "label": "01 · PRACTICE",
+        "title": "Make a decision",
+        "description": "Work through a scenario, answer a mentor question, then compare your reasoning with a senior architect.",
+        "action": "Try an exercise →"
+      },
+      {
+        "label": "02 · LEARN",
+        "title": "Patterns and methods",
+        "description": "C4, ADR, resilience patterns and frameworks explained through the decisions they support.",
+        "action": "Explore foundations →"
+      },
+      {
+        "label": "03 · FOLLOW CHANGE",
+        "title": "Architecture in motion",
+        "description": "Dates and primary sources, followed by an interpretation and a practical question.",
+        "action": "Browse articles →"
+      },
+      {
+        "label": "04 · DESIGN",
+        "title": "Record your decision",
+        "description": "Draft an ADR locally, or turn a brief into an HLD outline for review.",
+        "action": "Open the tools →"
+      }
+    ],
+    "publication": "Latest publication",
+    "newTitle": "What did we add in this edition?",
+    "newIntro": "Each material connects a concrete situation with a decision you can verify.",
+    "materials": "materials",
+    "newsletterLabel": "Newsletter",
+    "newsletterTitle": "Useful architecture in your inbox",
+    "newsletterText": "Subscribe to receive selected reading and editorial commentary.",
+    "subscribe": "Subscribe →",
+    "pattern": "Start with a pattern",
+    "about": "About me",
+    "aboutTitle": "Four decades in IT. I still start with questions.",
+    "bio": "I’m Wiesław Ejsymont. I have worked in IT for over 40 years, including more than 20 years in solution and enterprise architecture. I started my career in the era of IBM PC 286 computers. Over the following decades, I kept developing my skills through successive technological shifts — from Solaris servers, networks and programming in assembly, C and Java, through the growth of the internet and increasingly complex systems, to today’s wave of AI. I have seen IT applied in industry, telecommunications and aviation. Over time, I became increasingly interested in how to use evolving technologies to build solutions that serve an entire organisation. New tools are interesting; the consequences of decisions last longer. At ArchitectMentor, I ask about the goal, the risk and how we will know whether a solution works.",
+    "contact": "Get in touch →",
+    "tutorialLabel": "Architect + AI",
+    "tutorialTitle": "How an architect works with AI",
+    "tutorialText": "From a brief to a reviewed decision: assumptions, alternatives, diagrams and evidence.",
+    "tutorialCta": "Explore the tutorials →",
+    "eventsLabel": "Events",
+    "eventsTitle": "Worth attending",
+    "eventsText": "Selected events with programme details, participation terms and a comment on their value for architects.",
+    "eventsCta": "See the selection →",
+    "kinds": {
+      "ĆWICZENIE": "PRACTICE",
+      "ANTYWZORZEC": "ANTI-PATTERN",
+      "PODSTAWY": "FOUNDATIONS",
+      "W RUCHU": "IN MOTION",
+      "ARCHITEKT I AI": "ARCHITECT + AI"
+    }
+  }
+}
