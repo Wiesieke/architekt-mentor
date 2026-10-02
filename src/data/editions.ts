@@ -1,6 +1,7 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  {kind:'ARCHITEKT I AI',published:'2026-10-02',title:'AI wygenerowało HLD — jak sprawdzić, czy jest użyteczne?',summary:'Tutorial 01 · brief · przegląd · diagram · test',href:'/architektura-it-ai/hld-ai-przeglad/'},
   { kind:'ĆWICZENIE', published:'2026-10-02', title:'Czy awaria powiadomienia powinna blokować zamówienie?', summary:'Łatwy · szybka decyzja lub mentor', href:'/lamiglowka/' },
   { kind:'ANTYWZORZEC', published:'2026-10-02', title:'Powiadomienie steruje wynikiem zamówienia', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-10-02-powiadomienie-steruje-transakcja/' },
   { kind:'PODSTAWY', published:'2026-10-02', title:'Komunikacja asynchroniczna: oddziel zamówienie od powiadomienia', summary:'Trwałe zadanie · outbox · właściwy retry', href:'/podstawy-architektury/komunikacja-asynchroniczna-powiadomienia/' },

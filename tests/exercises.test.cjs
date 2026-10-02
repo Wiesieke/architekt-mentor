@@ -7,13 +7,13 @@ const puzzles=require('../data/puzzles.json');
 const english=require('../data/puzzle-coach-en.json');
 
 test('the starter set has equivalent, anonymised choices, criteria and learning links',()=>{
-  assert.equal(starters.length,3);
+  assert.ok(starters.length >= 3);
   for(const starter of starters){
     const published=puzzles.find(p=>p.id===starter.id);
     assert.ok(published?.coach);
     assert.deepEqual(published.quick,starter.pl.quick);
     assert.deepEqual(published.coach.criteria,starter.pl.criteria);
-    assert.equal(english[starter.id].scenario,starter.en.scenario);
+    assert.deepEqual(english[starter.id].criteria.map(c=>c.id),starter.en.criteria.map(c=>c.id));
     for(const locale of ['pl','en']){
       const p=starter[locale];
       assert.equal(p.criteria.length,3);

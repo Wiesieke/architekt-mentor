@@ -7,7 +7,7 @@ function storageUrl() {
 }
 
 function validPath(path, locale) {
-  return typeof path === 'string' && /^(?:\/(?:podstawy-architektury|architektura-w-ruchu|antywzorce)|\/en\/(?:foundations|architecture-in-motion|anti-patterns))\/[a-z0-9-]+\/$/.test(path) &&
+  return typeof path === 'string' && /^(?:\/(?:podstawy-architektury|architektura-w-ruchu|architektura-it-ai|antywzorce)|\/en\/(?:foundations|architecture-in-motion|architecture-with-ai|anti-patterns))\/[a-z0-9-]+\/$/.test(path) &&
     (locale === 'en' ? path.startsWith('/en/') : locale === 'pl' && !path.startsWith('/en/'));
 }
 

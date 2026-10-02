@@ -9,11 +9,12 @@ import Studio from '../../../layouts/Studio.astro';
     <p class="intro">Describe a business need to receive a draft HLD with assumptions and questions to resolve before design approval.</p>
     <p class="note">Your brief is sent to an AI provider. Do not enter confidential information or other people’s personal data. An architect must review the result.</p>
     <div class="settings">
-      <label>Model <select id="model"><option value="gpt-4.1">GPT-4.1</option><option value="gpt-4.1-mini">GPT-4.1 mini</option></select></label>
+      <label>Model <select id="model"><option value="gpt-4.1">GPT-4.1</option><option value="gpt-4.1-mini">GPT-4.1 mini</option><option value="gpt-6.1-sol">GPT-6.1 Sol</option></select></label>
       <label>Scope <select id="mode"><option value="skeletal">Outline</option><option value="full">Full</option></select></label>
       <label>Diagram <select id="diagram"><option value="yes">Yes</option><option value="no">No</option></select></label>
       <label>Response token limit <input id="maxTokens" type="number" value="6000" min="500" max="16000" step="1000" /></label>
     </div>
+    <p class="note">GPT-4.1 is the default. GPT-6.1 Sol is an additional option for comparing results and may take longer. Its output limit also includes reasoning tokens. Review every result.</p>
     <div class="workspace">
       <section class="pane" aria-label="Business brief">
         <h2>Business brief</h2>
