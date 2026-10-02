@@ -1,0 +1,196 @@
+[
+  {
+    "id": "ai-diagrams",
+    "title": "Generative AI for Software Architecture Diagrams",
+    "organizer": "O’Reilly Media",
+    "startDate": "2026-10-15",
+    "lastDate": "2026-10-15",
+    "startAt": "2026-10-15T16:00:00Z",
+    "endAt": "2026-10-15T20:00:00Z",
+    "timeZone": "UTC",
+    "format": "online",
+    "region": "global",
+    "cost": "subscription",
+    "url": "https://www.oreilly.com/live-events/generative-ai-for-software-architecture-diagrams/0642572001457/0642572445782/",
+    "registrationUrl": "https://www.oreilly.com/live-events/generative-ai-for-software-architecture-diagrams/0642572001457/0642572445782/",
+    "checked": "2026-10-02",
+    "nextCheck": "2026-10-05",
+    "status": "scheduled",
+    "sponsor": null,
+    "pl": {
+      "facts": [
+        "15.10.2026 · 18:00–22:00 Europe/Warsaw (CEST), 16:00–20:00 UTC",
+        "Online · język angielski potwierdzony",
+        "Średni · prowadząca Jacqui Read",
+        "Dostęp w abonamencie O’Reilly; aktualna kwota niepotwierdzona. Brak potwierdzenia osobnego biletu.",
+        "Zapisy przez konto O’Reilly; dostępność miejsc wymaga sprawdzenia."
+      ],
+      "programme": "Dla architektów, analityków i programistów dokumentujących systemy. Program porównuje Mermaid, PlantUML i Structurizr oraz pokazuje ćwiczenia z diagramami zapisanymi jako kod i użyciem modeli językowych.",
+      "recommendation": "Polecamy ze względu na możliwość uporządkowania pracy nad diagramami HLD. Po warsztacie warto sprawdzić własny diagram: czy poprawnie się renderuje, przedstawia właściwe granice odpowiedzialności i zgadza się z opisem systemu."
+    },
+    "en": {
+      "facts": [
+        "15 Oct 2026 · 16:00–20:00 UTC; 18:00–22:00 Europe/Warsaw (CEST)",
+        "Online · English confirmed",
+        "Intermediate · Jacqui Read",
+        "Included in O’Reilly subscription plans; current subscription price unconfirmed. Separate ticket not confirmed.",
+        "Register through an O’Reilly account; seat availability requires checking."
+      ],
+      "programme": "For architects, analysts and developers documenting systems. The course compares Mermaid, PlantUML and Structurizr, with exercises in diagrams as code and language-model assistance.",
+      "recommendation": "A useful companion to reviewing AI-generated HLDs. Afterwards, examine one of your own diagrams for rendering errors, responsibility boundaries and agreement with the system description."
+    },
+    "sources": [
+      "https://www.oreilly.com/live-events/generative-ai-for-software-architecture-diagrams/0642572001457/0642572445782/",
+      "https://www.oreilly.com/online-learning/pricing"
+    ],
+    "learningUrl": {
+      "pl": "/architektura-it-ai/hld-ai-przeglad/",
+      "en": "/en/architecture-with-ai/review-ai-generated-hld/"
+    }
+  },
+  {
+    "id": "architect-program",
+    "title": "InfoQ Certified Architect Program",
+    "organizer": "InfoQ / QCon (C4Media)",
+    "startDate": "2026-10-09",
+    "lastDate": "2026-11-13",
+    "startAt": "2026-10-09T14:00:00Z",
+    "endAt": null,
+    "timeZone": "America/New_York",
+    "format": "online",
+    "region": "global",
+    "cost": "paid",
+    "url": "https://certification.qconferences.com/architecture",
+    "registrationUrl": "https://certification.qconferences.com/architecture",
+    "checked": "2026-10-02",
+    "nextCheck": "2026-10-05",
+    "status": "scheduled",
+    "sponsor": null,
+    "pl": {
+      "facts": [
+        "Start 09.10.2026 · 16:00–20:00 Europe/Warsaw; 10:00 ET (Nowy Jork)",
+        "Online, Zoom · język niepotwierdzony",
+        "Dla doświadczonych architektów · Luca Mezzalira",
+        "1470 USD; podatki i końcowe opłaty niepotwierdzone.",
+        "Sesje: 9, 23, 30.10 oraz 6, 13.11. Godziny po zmianie czasu wymagają potwierdzenia. Zapisy oznaczone jako otwarte."
+      ],
+      "programme": "Dla doświadczonych architektów i liderów technicznych. Program obejmuje odporność systemów rozproszonych, zdecentralizowane decyzje, platformy i AI, pracę w grupie oraz projekt końcowy.",
+      "recommendation": "Wartość widzimy w ćwiczeniu uzasadniania decyzji na własnym problemie. To intensywny, kosztowny wariant rozwoju; dla początkujących lepszym startem będą krótsze warsztaty i ćwiczenia magazynu."
+    },
+    "en": {
+      "facts": [
+        "Starts 9 Oct 2026 · 10:00 ET (New York); 16:00–20:00 Europe/Warsaw",
+        "Online, Zoom · language unconfirmed",
+        "Experienced architects · Luca Mezzalira",
+        "USD 1,470; taxes and final fees unconfirmed.",
+        "Sessions: Oct 9, 23, 30 and Nov 6, 13. Confirm later times across daylight-saving changes. Registration listed as open."
+      ],
+      "programme": "For experienced architects and technical leaders. The cohort covers distributed-system resilience, decentralized decisions, platforms and AI, with peer discussion and a capstone.",
+      "recommendation": "Its main appeal is practising the justification of decisions using a real work problem. This is an intensive, costly option; beginners should start with shorter workshops and magazine exercises."
+    },
+    "sources": [
+      "https://certification.qconferences.com/architecture"
+    ],
+    "learningUrl": {
+      "pl": "/podstawy-architektury/idempotencja-lookup-kompensacja/",
+      "en": "/en/foundations/idempotency-lookup-compensation/"
+    }
+  },
+  {
+    "id": "jdd-2026",
+    "title": "JDD 2026",
+    "organizer": "PROIDEA",
+    "startDate": "2026-10-20",
+    "lastDate": "2026-10-21",
+    "startAt": "2026-10-20T07:00:00Z",
+    "endAt": null,
+    "timeZone": "Europe/Warsaw",
+    "format": "in-person",
+    "region": "poland",
+    "cost": "paid",
+    "url": "https://jdd.org.pl/",
+    "registrationUrl": "https://eventory.cc/event/jdd-2026/tickets",
+    "checked": "2026-10-02",
+    "nextCheck": "2026-10-05",
+    "status": "scheduled",
+    "sponsor": null,
+    "pl": {
+      "facts": [
+        "20–21.10.2026 · start 20.10 o 09:00 CEST (Europe/Warsaw)",
+        "Hotel Metropolo, Kraków · stacjonarnie · język niepotwierdzony",
+        "Backend, JVM i architektura · dla praktyków",
+        "1399 PLN netto do 16.10.2026; kwota brutto i opłaty końcowe niepotwierdzone.",
+        "Bilety przez Eventory. Szczegółowa agenda i jej języki wymagają przeglądu. Nie potwierdzono transmisji online."
+      ],
+      "programme": "Dla architektów i liderów związanych z backendem oraz JVM. Organizator zapowiada architekturę rozproszoną, chmurę, niezawodność, bezpieczeństwo i inżynierię wspieraną AI.",
+      "recommendation": "Dobra kandydatura dla czytelników szukających kontaktu z praktyką w Polsce. Przed zakupem trzeba ocenić konkretne sesje i ich język; szeroki opis konferencji nie wystarcza do wyboru ścieżki."
+    },
+    "en": {
+      "facts": [
+        "20–21 Oct 2026 · starts 20 Oct at 09:00 CEST (Europe/Warsaw)",
+        "Hotel Metropolo, Kraków, Poland · in person · language unconfirmed",
+        "Backend, JVM and architecture · for practitioners",
+        "PLN 1,399 net until 16 Oct; gross price and final fees unconfirmed.",
+        "Tickets via Eventory. Review individual sessions and languages. Online streaming not confirmed."
+      ],
+      "programme": "For architects and leads working with backend systems and the JVM. The organizer lists distributed architecture, cloud, reliability, security and AI-assisted engineering.",
+      "recommendation": "A relevant Polish option for connecting architecture with production practice. Review individual sessions and their language before buying; broad conference themes alone do not establish a useful personal learning path."
+    },
+    "sources": [
+      "https://jdd.org.pl/",
+      "https://jdd.org.pl/faq"
+    ],
+    "learningUrl": {
+      "pl": "/podstawy-architektury/",
+      "en": "/en/foundations/"
+    }
+  },
+  {
+    "id": "ai-cost-attribution",
+    "title": "From Tokens to Features: Architecting Cost Attribution for AI-Assisted Engineering",
+    "organizer": "InfoQ",
+    "startDate": "2026-10-29",
+    "lastDate": "2026-10-29",
+    "startAt": null,
+    "endAt": null,
+    "timeZone": null,
+    "format": "online",
+    "region": "global",
+    "cost": "unknown",
+    "url": "https://events.infoq.com/",
+    "registrationUrl": "https://events.infoq.com/",
+    "checked": "2026-10-02",
+    "nextCheck": "2026-10-05",
+    "status": "scheduled",
+    "sponsor": "Harness",
+    "pl": {
+      "facts": [
+        "29.10.2026 · godzina i strefa czasowa niepotwierdzone",
+        "Online, webinar z Q&A · język niepotwierdzony",
+        "Koszt AI i obserwowalność · dla architektów i liderów",
+        "Koszt niepotwierdzony; nie oznaczamy jako bezpłatne.",
+        "InfoQ informuje o otwartych zapisach. Warunki formularza wymagają ponownego sprawdzenia."
+      ],
+      "programme": "Dla architektów i liderów oceniających ekonomię pracy z AI. Tematem jest przypisywanie użycia i kosztów modeli do pracy deweloperskiej oraz dostarczonych funkcji.",
+      "recommendation": "Przydatny punkt wyjścia do pytania „ile kosztuje użyteczny rezultat?”, także przy generatorze HLD. Oddzielaj uniwersalne metody pomiaru od prezentacji produktu sponsora."
+    },
+    "en": {
+      "facts": [
+        "29 Oct 2026 · time and time zone unconfirmed",
+        "Online, live webinar with Q&A · language unconfirmed",
+        "AI cost and observability · for architects and leads",
+        "Cost unconfirmed; not labelled free.",
+        "InfoQ lists registration as open. Registration-form terms need to be checked again."
+      ],
+      "programme": "For architects and leads assessing AI economics. The webinar addresses attributing model usage and spending to engineering work and delivered features.",
+      "recommendation": "Relevant to measuring the cost of a useful outcome, including HLD generation. Separate transferable measurement methods from the sponsor’s product presentation."
+    },
+    "sources": [
+      "https://events.infoq.com/"
+    ],
+    "learningUrl": {
+      "pl": "/architektura-it-ai/hld-ai-przeglad/",
+      "en": "/en/architecture-with-ai/review-ai-generated-hld/"
+    }
+  }
+]

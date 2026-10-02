@@ -127,3 +127,12 @@ Baza `serwer428682_architektmentor` jest oddzielna od WordPressa. Vercel **nie �
 Stan testów 28.09.2026: uwierzytelniony test połączenia z MySQL przeszedł (`SELECT 1`), a zapis fikcyjnego HLD przez pośrednik PHP zwrócił 201. Nadal wymagane są test z podglądu Vercel, test zapisu odpowiedzi na łamigłówkę, harmonogram usuwania oraz informacja o prywatności. Po zmianie sekretu Vercel potrzebne jest nowe wdrożenie.
 
 Wskazówka: w LH.pl zdalne połączenie z MySQL może pozostać wyłączone; pośrednik PHP uruchamia się na serwerze bazy. Nie publikuj prawdziwego pliku konfiguracyjnego ani tokenu w GitHubie czy w rozmowie.
+
+
+## Worth attending events pilot
+
+The bilingual educational events section is available at `/en/events/` and `/wydarzenia/`. Its first four entries were verified against official organizer sources on 2 October 2026. Unknown language, prices and times remain explicitly labelled. Programme claims are separated from independent editorial recommendations, and organizer sponsorship is disclosed.
+
+Edit `data/events.json`; follow `docs/events-pilot.md` for the four-week editorial plan, source checks, expiry and commercial disclosure rules. `docs/master-context.md` records project continuity. Past entries move to the browser archive using confirmed end times or a documented local end-of-day rule; unknown time zones require review. No event newsletter is sent by this feature.
+
+`/api/event-interest` writes allowlisted action signals to Vercel logs without adding visitor identifiers. These are action counts, not unique readers or registrations; there is no persistent metrics database yet. Export logs within the hosting retention period for weekly review. Validation: `node --test tests/events.test.cjs`.
