@@ -201,3 +201,16 @@ Pilotaż obejmuje 2–29 października: 4 wpisy w pierwszym tygodniu, następnie
 Endpoint /api/event-interest zapisuje w logach Vercel tylko identyfikator wydarzenia, język i rodzaj działania: wyświetlenie karty, szczegóły, kliknięcie organizatora, materiału lub zainteresowania. Nie dodajemy identyfikatora odwiedzającego, e-maila, nazwy ani swobodnego tekstu i nie ustawiamy cookies pomiarowych. Hosting może prowadzić własne metadane żądań.
 
 Pierwszy pomiar liczy działania, nie unikalne osoby, rejestracje ani faktyczny udział. Brak trwałej bazy statystyk i dashboardu. Logi trzeba pobierać do tygodniowego przeglądu w granicach retencji planu hostingu; nie zakładamy dostępu do pełnych 4 tygodni. Po pilotażu oceniamy zainteresowanie, jakość informacji, korekty i czas redakcji. Dopiero potem rozważamy trwałe agregaty i jawne partnerstwa.
+
+
+## Zasady jakości zatwierdzone 2 października 2026
+
+Obowiązuje docs/editorial-policy.md. Codzienny rytm dotyczy przygotowania szkiców, a publikacja wymaga osobistego przeglądu konkretnego materiału i zatwierdzenia danej wersji przez Wiesława. Ta zasada zastępuje wcześniejsze ogólne upoważnienie do automatycznego scalania wydań i tutoriali. Automatyzacje pozostawiają draft PR oraz zestawienie źródeł, kontroli i niewiadomych. AI nie może podpisać się jako ludzki recenzent. Merytoryczna zmiana po akceptacji wymaga ponownego przeglądu.
+
+Każdy materiał musi wnosić konkretną wartość edukacyjną. Weryfikujemy źródła pierwotne, pochodzenie przykładu, fakty, daty, anonimizację, równoważność PL/EN, diagramy i działanie ćwiczeń. Nie wymyślamy doświadczeń autora, źródeł ani wyników testów. Etykieta „inspirowany praktyką” wymaga potwierdzonego źródła; bez niego stosujemy jawne oznaczenie scenariusza fikcyjnego albo modelowego. Poprawiamy istniejące materiały zamiast powielać treści. Brak minimalnej liczby publikacji; jakość ma pierwszeństwo przed kalendarzem.
+
+Publiczny opis zasad: /jak-powstaja-materialy/ oraz /en/editorial-policy/. Oznaczenie przeglądu dodajemy tylko po rzeczywistym zatwierdzeniu. Starszych publikacji nie oznaczamy wstecz jako zweryfikowanych; ich przegląd pozostaje zadaniem do wykonania. Wyniki generatora HLD są projektami do przeglądu użytkownika, nie zatwierdzonymi architekturami. Plan pilotażu wydarzeń pozostaje w dokumentacji, a cytowany blok operacyjny usunięto z publicznych stron PL/EN.
+
+Aktualizacja generatora HLD z 2 października: limit funkcji 300 s, wywołania OpenAI 270 s, początkowy budżet pełnego HLD 12 000 tokenów (mini 8 000), licznik czasu i jawne błędy timeout/truncation. Test fikcyjnego pełnego HLD z Sol zakończył się HTTP 200 po 158,5 s, z dwoma diagramami. To dowód działania jednego wywołania, nie gwarancja poprawności architektonicznej każdego wyniku.
+
+Przegląd dla Wiesława: podsumowanie wydania zawiera czytelny podgląd Vercel Preview, draft PR, wersję/commit, pary PL/EN, źródła i krótką listę pytań do przeglądu. Wiesław czyta podgląd i akceptuje konkretną wersję w rozmowie lub PR; może zgłosić korekty albo zatwierdzić tylko nazwane materiały. Publikujemy wyłącznie zatwierdzony zakres. Niedostępny podgląd wymaga czytelnego szkicu jako zastępstwa, nie linku do starej produkcji.
