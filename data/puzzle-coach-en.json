@@ -1,4 +1,13 @@
 {
+  "2026-10-02-email-po-zamowieniu": {
+    "scenario": "Practice-inspired educational scenario. An order has committed and received an order number. A subsequent informational email failed. Email is not a condition of acceptance, and no durable notification task has yet been confirmed.",
+    "question": "What result would you return to the user, and what would you retry? Explain how you would avoid both a second order and a lost notification.",
+    "criteria": [
+      {"id": "order_outcome", "label": "Order outcome", "expected": "Recognises that the committed order exists and should be confirmed independently of email delivery."},
+      {"id": "duplicate_avoidance", "label": "Duplicate avoidance", "expected": "Does not retry order creation; separates the order's identity and outcome from its notification."},
+      {"id": "notification_retry", "label": "Durable notification retry", "expected": "Proposes a durable task or outbox and retries only delivery, with observability and duplicate protection."}
+    ]
+  },
   "2026-10-01-cache-bez-tenanta": {
     "scenario": "Fictional multi-tenant SaaS. Report numbers are local to each tenant. The shared cache uses only the report number and can return a cached response before the tenant-filtered database query runs.",
     "question": "Where did tenant isolation break? How will you change authorisation, cache keys and tests so the fix covers the full path?",

@@ -1,0 +1,15 @@
+<p><strong>Announcement date: 1 October 2026.</strong> GitHub announced the retirement of GitHub Actions runner images based on macOS 14. This is not trivia about an operating-system number. For a pipeline that builds and signs applications, it is an expiry date for part of the execution environment.</p>
+<h3>What GitHub announced</h3>
+<ul>
+  <li>images selected by <code>macos-14</code>, <code>macos-14-large</code> and <code>macos-14-xlarge</code> are scheduled for retirement on 2 November 2026;</li>
+  <li>GitHub plans brownouts on 5, 12, 16, 19, 23, 26, 29 and 30 October;</li>
+  <li>the recommended migration is to <code>macos-latest</code> or macOS 15 arm64 runners, depending on the job's requirements;</li>
+  <li>macOS 14 runner capacity may be reduced during the retirement period, which can increase queue time.</li>
+</ul>
+<p>These are facts from the <a href="https://github.blog/changelog/2026-10-01-github-actions-macos-14-runner-image-retirement/">GitHub Changelog published on 1 October 2026</a>. Check the exact toolset for replacement images in <a href="https://github.com/actions/runner-images">actions/runner-images</a>.</p>
+<h3>Architecture interpretation</h3>
+<p>Inventory workflows, reusable workflows and actions that may select these labels indirectly. Then run representative builds on the target image: compile, test, package, sign and publish. A green unit-test job does not prove that the final release step works.</p>
+<p>Moving to <code>macos-latest</code> reduces manual migrations but lets GitHub advance the image version. That is a deliberate trade-off, not free stability. If a compiler, Xcode version or signing tool is part of a controlled supply chain, pin it explicitly and observe image updates.</p>
+<p>The pipeline needs an owner, a migration date, a test and a fallback. A runner is a production dependency even though it serves no user traffic. Without it, you cannot ship a fix — a fact that tends to become interesting only during an incident.</p>
+<p class="note"><strong>Question for your project:</strong> can you identify every pipeline that depends on the macOS 14 image and prove that an artifact from the replacement image can also be signed and published?</p>
+<div class="source"><strong>Primary sources:</strong> <a href="https://github.blog/changelog/2026-10-01-github-actions-macos-14-runner-image-retirement/">GitHub Changelog, 1 October 2026</a>; <a href="https://github.com/actions/runner-images">GitHub Actions runner images</a>. “Architecture interpretation” is the author's analysis.</div>
