@@ -5,9 +5,9 @@ import PuzzleExercise from '../components/PuzzleExercise.astro';
 import puzzles from '../../data/puzzles.json';
 import { marked } from 'marked';
 
-const { puzzle } = Astro.props as { puzzle: (typeof puzzles)[number] };
+const { puzzle, permanent = false } = Astro.props as { puzzle: (typeof puzzles)[number]; permanent?: boolean };
 const latestPuzzle = [...puzzles].filter(item => item.coach).sort((a,b) => b.date.localeCompare(a.date))[0];
-const englishUrl = puzzle.id === latestPuzzle.id ? '/en/practice/' : `/en/practice/${puzzle.id}/`;
+const englishUrl = permanent ? `/en/practice/${puzzle.id}/` : puzzle.id === latestPuzzle.id ? '/en/practice/' : `/en/practice/${puzzle.id}/`;
 const paragraphs = puzzle.scenario.split(/\n\n+/);
 const analysis = marked.parse(puzzle.analysis);
 interface DecisionRecord { status:string; context:string; decision:string; rationale:string; consequences:string[]; verification:string; openQuestions:string[] }

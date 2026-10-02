@@ -4,4 +4,4 @@ import { englishPuzzles } from '../../../data/puzzles-en';
 export function getStaticPaths(){return englishPuzzles.map(p => ({params:{id:p.id},props:{puzzle:p}}));}
 const { puzzle } = Astro.props as {puzzle:(typeof englishPuzzles)[number]};
 ---
-<EnglishPuzzleExercise puzzle={puzzle} />
+<EnglishPuzzleExercise puzzle={puzzle} permanent />

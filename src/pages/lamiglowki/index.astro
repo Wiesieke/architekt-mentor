@@ -2,8 +2,7 @@
 import Studio from '../../layouts/Studio.astro';
 import puzzles from '../../../data/puzzles.json';
 const items = [...puzzles].sort((a,b) => b.date.localeCompare(a.date));
-const latest = items.find(item => item.coach)!;
-const puzzleUrl = (id: string) => id === latest.id ? '/lamiglowka/' : `/lamiglowki/${id}/`;
+const puzzleUrl = (id: string) => `/lamiglowki/${id}/`;
 ---
 <Studio translationUrl="/en/practice/archive/" title="Łamigłówki architektoniczne" description="Archiwum praktycznych łamigłówek: scenariusz, decyzja, pytania i analiza seniora." active="practice">
   <div class="container archive"><div class="eyebrow">Ćwicz decyzje</div><h1>Łamigłówki architektoniczne</h1><p>Zacznij od ćwiczeń łatwych i średnich: szybka decyzja z wyjaśnieniem albo warsztat z mentorem. Starsze ćwiczenia zaawansowane pozostają dostępne.</p>

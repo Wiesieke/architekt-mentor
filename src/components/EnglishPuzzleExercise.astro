@@ -3,11 +3,11 @@ import Studio from '../layouts/Studio.astro';
 import QuickDecision from './QuickDecision.astro';
 import { marked } from 'marked';
 import { englishPuzzleUrl, englishPuzzles } from '../data/puzzles-en';
-const { puzzle } = Astro.props as { puzzle:(typeof englishPuzzles)[number] };
+const { puzzle, permanent = false } = Astro.props as { puzzle:(typeof englishPuzzles)[number]; permanent?: boolean };
 const scenario = marked.parse(puzzle.scenario);
 const analysis = marked.parse(puzzle.analysis);
 const isLatest = englishPuzzleUrl(puzzle.id) === '/en/practice/';
-const polishUrl = isLatest ? '/lamiglowka/' : `/lamiglowki/${puzzle.id}/`;
+const polishUrl = permanent ? `/lamiglowki/${puzzle.id}/` : isLatest ? '/lamiglowka/' : `/lamiglowki/${puzzle.id}/`;
 const decisionRecord = puzzle.decisionRecord;
 ---
 <Studio locale="en" translationUrl={polishUrl} title={puzzle.title} description={`Architecture exercise: ${puzzle.question}`} published={puzzle.date} active="practice">
