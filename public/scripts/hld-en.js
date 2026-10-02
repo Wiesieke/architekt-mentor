@@ -19,10 +19,14 @@ async function renderMarkdown(raw){
 }
 
 async function generate(){
+  if(genBtn.disabled) return;
   const brief=briefEl.value.trim();
   if(!brief){ setStatus("Enter a brief on the left.","err"); return; }
   genBtn.disabled=true; setExportsEnabled(false); lastMarkdown="";
-  setStatus("Generating… this can take a little while.","run");
+  const startedAt=Date.now();
+  const progress=()=>setStatus(`Generating HLD… ${Math.floor((Date.now()-startedAt)/1000)} s. For a full document, allow several minutes. Keep this page open.`,"run");
+  progress();
+  const progressTimer=setInterval(progress,1000);
   preview.innerHTML='<p class="placeholder">Generating…</p>';
   try{
     const res=await fetch("/api/generate",{
@@ -38,6 +42,7 @@ async function generate(){
         saveHld:$("saveHld").checked
       })
     });
+    clearInterval(progressTimer);
     const data=await res.json();
     if(!res.ok){ throw new Error(data.error||("HTTP "+res.status)); }
     if(!data.text || !data.text.trim()){ throw new Error("Empty response."); }
@@ -50,7 +55,7 @@ async function generate(){
   }catch(e){
     preview.innerHTML='<p class="placeholder">—</p>';
     setStatus("Error: "+String(e.message||e),"err");
-  }finally{ genBtn.disabled=false; }
+  }finally{ clearInterval(progressTimer); genBtn.disabled=false; }
 }
 genBtn.addEventListener("click",generate);
 briefEl.addEventListener("keydown",e=>{ if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault(); generate(); }});

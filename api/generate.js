@@ -76,6 +76,8 @@ const ALLOWED_MODELS = new Set(["gpt-4.1-mini", "gpt-4.1", "gpt-6.1-sol"]);
 const MAX_BRIEF_CHARS = 30000;
 const MODEL_MAX_OUT = { "gpt-4.1-mini": 8000, "gpt-4.1": 16000, "gpt-6.1-sol": 16000 };
 const DEFAULT_MODEL = "gpt-4.1";
+// Leave 30 seconds for parsing, optional storage and the HTTP response.
+const REQUEST_TIMEOUT_MS = 270_000;
 
 // ---- Prosty limit zapytań (best-effort, w pamięci instancji) ----
 const WINDOW_MS = 60_000, LIMIT = 8;
@@ -114,6 +116,7 @@ module.exports = async (req, res) => {
 
   const userMessage = `BRIEF:\n${brief}\n\nMODE: ${mode}\nDIAGRAM: ${diagram}`;
 
+  const startedAt = Date.now();
   try {
     const r = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -121,7 +124,7 @@ module.exports = async (req, res) => {
         authorization: "Bearer " + process.env.OPENAI_API_KEY,
         "content-type": "application/json"
       },
-      signal: AbortSignal.timeout(55000),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       body: JSON.stringify({
         model, store: false, max_output_tokens: maxTokens,
         ...(model === "gpt-6.1-sol" ? { reasoning: { effort: "low" } } : { temperature: 0.3 }),
@@ -131,20 +134,24 @@ module.exports = async (req, res) => {
     });
     const data = await r.json();
     if (!r.ok) {
-      console.error("HLD API status:", r.status);
+      console.error("HLD API error", { model, mode, status: r.status, code: data.error?.code, elapsedMs: Date.now() - startedAt });
       res.status(r.status === 429 ? 429 : 502).json({ error: "Nie udało się przygotować HLD. Spróbuj ponownie." }); return;
     }
     const parts = (data.output || []).filter(item => item.type === "message").flatMap(item => item.content || []);
     if (data.status !== "completed" || parts.some(item => item.type === "refusal")) {
-      console.error("HLD incomplete output", { status: data.status || "unknown" });
+      console.error("HLD incomplete output", { model, mode, status: data.status || "unknown", reason: data.incomplete_details?.reason, elapsedMs: Date.now() - startedAt });
       res.status(502).json({ error: "HLD nie został ukończony. Spróbuj ponownie." }); return;
     }
     const text = parts.filter(item => item.type === "output_text").map(item => item.text).join("\n").trim();
     if (!text) { res.status(502).json({ error: "Nie udało się odczytać HLD. Spróbuj ponownie." }); return; }
     const storage = await storeWithConsent({ consent: body.saveHld === true, type: "hld", brief, hld: text, model, mode, diagram });
+    console.info("HLD completed", { model, mode, elapsedMs: Date.now() - startedAt, outputTokens: data.usage?.output_tokens });
     res.status(200).json({ text, usage: data.usage || null, ...storage });
   } catch (e) {
-    console.error("HLD request failed:", e?.name || "Error");
+    console.error("HLD request failed", { model, mode, error: e?.name || "Error", elapsedMs: Date.now() - startedAt });
+    if (e?.name === "TimeoutError" || e?.name === "AbortError") {
+      res.status(504).json({ error: body.locale === "en" ? "HLD generation exceeded the time limit (4.5 minutes). Try a shorter brief or another model." : "Generowanie HLD przekroczyło limit czasu (4,5 minuty). Spróbuj krótszego briefu lub innego modelu.", code: "generation_timeout" }); return;
+    }
     res.status(502).json({ error: "Generator jest chwilowo niedostępny. Spróbuj ponownie." });
   }
 };

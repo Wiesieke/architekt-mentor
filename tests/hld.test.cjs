@@ -3,15 +3,15 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 async function generate(options={}){
- let request,stored,url;const module={exports:{}};
+ let request,stored,url,timeoutMs;const module={exports:{}};
  vm.runInNewContext(fs.readFileSync('api/generate.js','utf8'),{
-  module,process:{env:{OPENAI_API_KEY:'test-only'}},AbortSignal,console:{error(){}},
+  module,process:{env:{OPENAI_API_KEY:'test-only'}},AbortSignal:{timeout(ms){timeoutMs=ms;return AbortSignal.timeout(ms);}},console:{error(){},info(){}},
   require:()=>({storeWithConsent:async record=>{stored=record;return {saved:null};}}),
-  fetch:async(endpoint,init)=>{url=endpoint;request=JSON.parse(init.body);return {ok:true,json:async()=>({status:options.status||'completed',output:[{type:'message',content:options.refusal?[{type:'refusal',refusal:'No'}]:[{type:'output_text',text:'# HLD\nA useful draft architecture.'}]}]})};},
+  fetch:async(endpoint,init)=>{if(options.timeout){const e=new Error("Timeout");e.name="TimeoutError";throw e;}url=endpoint;request=JSON.parse(init.body);return {ok:true,json:async()=>({status:options.status||'completed',output:[{type:'message',content:options.refusal?[{type:'refusal',refusal:'No'}]:[{type:'output_text',text:'# HLD\nA useful draft architecture.'}]}]})};},
  });
  const res={status(code){this.code=code;return this;},json(data){this.data=data;return this;}};
- await module.exports({method:'POST',headers:{},body:{brief:'A public educational booking application.',locale:options.locale||'pl',model:options.model||'gpt-4.1',maxTokens:999999,saveHld:false}},res);
- return {res,request,stored,url};
+ await module.exports({method:'POST',headers:{},body:{brief:'A public educational booking application.',locale:options.locale||'pl',model:options.model||'gpt-4.1',mode:options.mode||'skeletal',maxTokens:999999,saveHld:false}},res);
+ return {res,request,stored,url,timeoutMs};
 }
 for(const model of ['gpt-4.1','gpt-4.1-mini','gpt-6.1-sol'])for(const locale of ['pl','en'])test(`${model} ${locale}: OpenAI HLD response keeps the public output contract`,async()=>{
  const r=await generate({model,locale});assert.equal(r.res.code,200);assert.match(r.res.data.text,/HLD/);
@@ -25,4 +25,17 @@ for(const options of [{status:'incomplete'},{refusal:true}])test(`HLD ${JSON.str
 });
 test('an unsupported client model falls back to the allowed OpenAI default',async()=>{
  const r=await generate({model:'claude-sonnet-4-6'});assert.equal(r.request.model,'gpt-4.1');
+});
+
+test('full Sol HLD has time to finish within the deployed function budget',async()=>{
+ const r=await generate({model:'gpt-6.1-sol',mode:'full'});
+ assert.equal(r.res.code,200);assert.match(r.request.input,/MODE: full/);
+ assert.equal(r.timeoutMs,270000);
+ const seconds=JSON.parse(fs.readFileSync('vercel.json','utf8')).functions['api/generate.js'].maxDuration;
+ assert.equal(seconds,300);assert.ok(seconds*1000-r.timeoutMs>=30000);
+});
+test('provider timeout is explicit and never stores an unfinished HLD',async()=>{
+ for(const locale of ['pl','en']){const r=await generate({timeout:true,locale,mode:'full',model:'gpt-6.1-sol'});
+ assert.equal(r.res.code,504);assert.equal(r.res.data.code,'generation_timeout');assert.equal(r.stored,undefined);
+ assert.match(r.res.data.error,locale==='en'?/time limit/:/limit czasu/);}
 });

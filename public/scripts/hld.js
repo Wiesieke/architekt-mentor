@@ -19,10 +19,14 @@ async function renderMarkdown(raw){
 }
 
 async function generate(){
+  if(genBtn.disabled) return;
   const brief=briefEl.value.trim();
   if(!brief){ setStatus("Wpisz brief po lewej.","err"); return; }
   genBtn.disabled=true; setExportsEnabled(false); lastMarkdown="";
-  setStatus("Generuję… to potrwa kilka–kilkanaście sekund.","run");
+  const startedAt=Date.now();
+  const progress=()=>setStatus(`Generuję HLD… ${Math.floor((Date.now()-startedAt)/1000)} s. Pełny dokument może wymagać kilku minut. Pozostaw tę stronę otwartą.`,"run");
+  progress();
+  const progressTimer=setInterval(progress,1000);
   preview.innerHTML='<p class="placeholder">Generuję…</p>';
   try{
     const res=await fetch("/api/generate",{
@@ -37,6 +41,7 @@ async function generate(){
         saveHld:$("saveHld").checked
       })
     });
+    clearInterval(progressTimer);
     const data=await res.json();
     if(!res.ok){ throw new Error(data.error||("HTTP "+res.status)); }
     if(!data.text || !data.text.trim()){ throw new Error("Pusta odpowiedź."); }
@@ -49,7 +54,7 @@ async function generate(){
   }catch(e){
     preview.innerHTML='<p class="placeholder">—</p>';
     setStatus("Błąd: "+String(e.message||e),"err");
-  }finally{ genBtn.disabled=false; }
+  }finally{ clearInterval(progressTimer); genBtn.disabled=false; }
 }
 genBtn.addEventListener("click",generate);
 briefEl.addEventListener("keydown",e=>{ if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault(); generate(); }});

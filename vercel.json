@@ -27,7 +27,7 @@
     }
   ],
   "functions": {
-    "api/generate.js": { "maxDuration": 60 },
+    "api/generate.js": { "maxDuration": 300 },
     "api/comments.js": {
       "maxDuration": 60
     }
