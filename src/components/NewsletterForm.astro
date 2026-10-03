@@ -11,5 +11,38 @@ const bootstrap = ready ? `(function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].
 {ready ? <>
   <div class="newsletter-form"><div class="ml-embedded" data-form={form}></div></div>
   <script is:inline set:html={bootstrap} />
+  {locale === 'pl' && <script is:inline>
+    const host = document.currentScript?.previousElementSibling;
+    const replacements = new Map([
+      ['Email', 'E-mail'],
+      ['Subscribe', 'Zapisz się'],
+      ['Sign up', 'Zapisz się'],
+      ['Signup', 'Zapisz się'],
+      ['Thank you!', 'Dziękujemy!'],
+      ['Please enter a valid email address.', 'Wpisz poprawny adres e-mail.'],
+      ['This field is required.', 'To pole jest wymagane.']
+    ]);
+    const translate = () => {
+      if (!host) return;
+      host.querySelectorAll('input').forEach((input) => {
+        if (input.getAttribute('placeholder') === 'Email') input.setAttribute('placeholder', 'E-mail');
+        if (input.getAttribute('aria-label') === 'Email') input.setAttribute('aria-label', 'E-mail');
+      });
+      host.querySelectorAll('input[type="submit"]').forEach((input) => {
+        if (['Subscribe','Sign up','Signup'].includes(input.value)) input.value = 'Zapisz się';
+      });
+      const walker = document.createTreeWalker(host, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach((node) => {
+        const raw = node.textContent || '';
+        const value = raw.trim();
+        if (replacements.has(value)) node.textContent = raw.replace(value, replacements.get(value));
+        else if (/^Signup for\b/i.test(value)) node.textContent = raw.replace(value, 'Zapisz się do newslettera ArchitectMentor');
+      });
+    };
+    translate();
+    if (host) new MutationObserver(translate).observe(host, {childList:true, subtree:true});
+  </script>}
 </> : <p class="muted">{locale === 'pl' ? 'Formularz zapisu uruchomimy po zakończeniu konfiguracji.' : 'The signup form will open after setup is complete.'}</p>}
 <style>.newsletter-form{background:#fff;border:1px solid var(--line);border-radius:12px;padding:clamp(16px,3vw,28px);min-height:125px}</style>
