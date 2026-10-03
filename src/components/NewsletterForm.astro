@@ -12,7 +12,7 @@ const bootstrap = ready ? `(function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].
   <div class="newsletter-form"><div class="ml-embedded" data-form={form}></div></div>
   <script is:inline set:html={bootstrap} />
   {locale === 'pl' && <script is:inline>
-    const host = document.currentScript?.previousElementSibling;
+    const host = document.querySelector('.newsletter-form');
     const replacements = new Map([
       ['Email', 'E-mail'],
       ['Subscribe', 'Zapisz się'],
