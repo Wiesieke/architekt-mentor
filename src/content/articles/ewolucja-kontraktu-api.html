@@ -7,11 +7,11 @@
   <thead><tr><th>Warstwa</th><th>Pytanie</th><th>Przykład ryzyka</th></tr></thead>
   <tbody>
     <tr><td>Źródłowa</td><td>Czy kod klienta nadal się kompiluje?</td><td>Generator SDK zmienia sygnaturę lub typ.</td></tr>
-    <tr><td>Na przewodzie</td><td>Czy stary klient potrafi odebrać i zdeserializować nową odpowiedź?</td><td>Tryb ścisły odrzuca nieznane pole.</td></tr>
+    <tr><td>Format przesyłanych danych</td><td>Czy stary klient potrafi odebrać i zdeserializować nową odpowiedź?</td><td>Tryb ścisły odrzuca nieznane pole.</td></tr>
     <tr><td>Semantyczna</td><td>Czy klient nadal otrzymuje zachowanie, którego rozsądnie oczekiwał?</td><td>Nowa wartość enum albo zmieniona wartość domyślna uruchamia złą gałąź logiki.</td></tr>
   </tbody>
 </table>
-<p>Google AIP-180 rozdziela właśnie zgodność źródłową, zgodność na przewodzie i zgodność semantyczną. Podkreśla też, że katalog zmian zgodnych i niezgodnych jest wskazówką, a nie dowodem dla każdego stosu technologicznego.</p>
+<p>Google AIP-180 rozdziela właśnie zgodność źródłową, zgodność formatu przesyłanych danych i zgodność semantyczną. Podkreśla też, że katalog zmian zgodnych i niezgodnych jest wskazówką, a nie dowodem dla każdego stosu technologicznego.</p>
 
 <h3>Opcjonalne nie znaczy obojętne</h3>
 <p>Opcjonalne pole żądania oznacza, że stary klient nie musi go wysyłać. Opcjonalne pole odpowiedzi oznacza, że serwer nie zawsze je zwróci. Żadne z tych zdań nie dowodzi jeszcze, że konkretny klient zaakceptuje nieznaną właściwość albo poprawnie obsłuży nową wartość.</p>
@@ -29,13 +29,13 @@
   </tbody>
 </table>
 
-<h3>Proces, który daje dowód</h3>
+<h3>Jak sprawdzić zgodność zmiany API</h3>
 <ol>
-  <li><strong>Nazwij obietnicę.</strong> Zapisz reguły ewolucji: czy klienci mają ignorować nieznane pola, czy enum jest rozszerzalny i jak długo wspierana jest wersja.</li>
+  <li><strong>Określ zasady zgodności.</strong> Zapisz, czy aplikacje korzystające z API powinny ignorować nieznane pola w odpowiedzi, czy dopuszczalne jest dodawanie nowych wartości do pól wyliczeniowych (enum) oraz jak długo wspierana jest dana wersja API.</li>
   <li><strong>Zrób spis konsumentów.</strong> Właściciel, wersja biblioteki, sposób deserializacji i termin aktualizacji są ważniejsze od liczby endpointów.</li>
   <li><strong>Testuj reprezentatywne wersje.</strong> Odtwórz odpowiedź z nowym polem w testach kontraktowych i uruchom najstarszego wspieranego klienta.</li>
   <li><strong>Ogranicz zasięg.</strong> Wdróż zmianę etapami, obserwuj błędy deserializacji i miej możliwość wycofania ekspozycji pola.</li>
-  <li><strong>Wersjonuj, gdy zmienia się obietnica.</strong> Nowa wersja jest właściwa, gdy nie można zachować zachowania istniejącego kontraktu lub kontrolować aktualizacji konsumentów.</li>
+  <li><strong>Wersjonuj, gdy nie można zachować dotychczasowych zasad zgodności.</strong> Nowa wersja jest właściwa, gdy nie można zachować zachowania istniejącego kontraktu lub kontrolować aktualizacji konsumentów.</li>
 </ol>
 
 <div class="example"><strong>Fikcyjny przykład edukacyjny:</strong> serwer dodaje <code>deliveryWindow</code> do odpowiedzi zamówienia. OpenAPI nie oznacza pola jako wymagane, ale starsza aplikacja mobilna odrzuca każdą nieznaną właściwość. Przed szerokim wdrożeniem zespół uruchamia test ze wspieraną wersją klienta, aktualizuje regułę deserializacji i dopiero potem stopniowo udostępnia pole.</div>

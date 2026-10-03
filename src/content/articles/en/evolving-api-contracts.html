@@ -29,13 +29,13 @@
   </tbody>
 </table>
 
-<h3>A process that produces evidence</h3>
+<h3>How to verify an API change</h3>
 <ol>
-  <li><strong>Name the promise.</strong> Record evolution rules: whether clients ignore unknown fields, whether enums are extensible and how long a version is supported.</li>
+  <li><strong>Define compatibility rules.</strong> Record evolution rules: whether clients ignore unknown fields, whether enums are extensible and how long a version is supported.</li>
   <li><strong>Inventory consumers.</strong> Owner, library version, deserialization mode and upgrade window matter more than the endpoint count.</li>
   <li><strong>Test representative versions.</strong> Replay a response containing the new field in contract tests and run the oldest supported client.</li>
   <li><strong>Limit exposure.</strong> Roll out gradually, observe deserialization failures and retain a way to stop exposing the field.</li>
-  <li><strong>Version when the promise changes.</strong> Introduce a new version when existing behaviour cannot be preserved or consumer upgrades cannot be controlled.</li>
+  <li><strong>Version when existing compatibility rules cannot be maintained.</strong> Introduce a new version when existing behaviour cannot be preserved or consumer upgrades cannot be controlled.</li>
 </ol>
 
 <div class="example"><strong>Fictional educational example:</strong> a server adds <code>deliveryWindow</code> to an order response. OpenAPI does not mark it as required, but an older mobile app rejects every unknown property. Before broad rollout, the team tests a supported client version, changes its deserialization rule and only then exposes the field progressively.</div>

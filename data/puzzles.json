@@ -3,7 +3,7 @@
     "id": "2026-10-03-opcjonalne-pole-api",
     "week": "Publikacja codzienna / 2026",
     "date": "2026-10-03",
-    "title": "Opcjonalne pole, zepsuty klient. Czy kontrakt jest zgodny?",
+    "title": "Nowe opcjonalne pole w API. Czy aplikacja nadal odczyta odpowiedź?",
     "difficulty": "Średni",
     "goal": "Odróżnić addytywną zmianę schematu od zgodności działających konsumentów i zaplanować dowód przed wdrożeniem.",
     "scenario": "Fikcyjny scenariusz edukacyjny\n\nAPI zamówień zwraca pola `id`, `status` i `total`. Zespół chce dodać opcjonalne pole odpowiedzi `deliveryWindow`. Nie zmienia znaczenia dotychczasowych pól. Plik OpenAPI przechodzi kontrolę zmian bez błędu. Jedna nadal wspierana wersja aplikacji mobilnej używa jednak ścisłej deserializacji i odrzuca odpowiedź zawierającą nieznaną właściwość. Tej wersji nie można zaktualizować przed planowanym wdrożeniem serwera. Kontrakt nie określał dotąd, czy klient ma ignorować nieznane pola.",
@@ -13,7 +13,7 @@
       "Która wersja klienta nadal należy do wspieranego kontraktu?",
       "Jak można ograniczyć ekspozycję pola i sprawdzić zmianę bez ryzykowania całej populacji?"
     ],
-    "analysis": "### Schemat to początek, nie werdykt\n\nDodanie opcjonalnego pola jest zmianą addytywną w opisie API, ale znany wspierany klient odrzuca taką odpowiedź. Dla obecnego zestawu konsumentów szerokie wdrożenie nie jest więc zgodne operacyjnie. Brak wcześniejszej reguły o ignorowaniu nieznanych pól oznacza, że nie wolno po cichu przerzucić kosztu na klienta.\n\n### Ogranicz zmianę i zbierz dowód\n\nNie udostępniaj pola wszystkim, dopóki wspierany klient pozostaje ścisły. Możesz zatrzymać ekspozycję pola, uzależnić ją od jawnie negocjowanej wersji lub profilu odpowiedzi albo wydać nową wersję kontraktu, jeśli zachowania nie da się pogodzić. Równolegle popraw klienta i zapisz regułę ewolucji dla przyszłych wersji.\n\nUruchom test kontraktowy z dokładnie tą wersją aplikacji: odpowiedź zawiera `deliveryWindow`, a klient ma poprawnie odczytać dotychczasowe pola. Następnie wykonaj ograniczone wdrożenie i obserwuj błędy deserializacji oraz wersje klientów. Sam zielony diff OpenAPI sprawdza model, nie użytkownika.\n\n### Granica decyzji\n\nGdyby producent kontrolował wszystkich konsumentów i mógł wymusić ich jednoczesną aktualizację, koordynowane wdrożenie mogłoby wystarczyć. Tutaj tak nie jest. Wersjonowanie nie jest karą za zmianę; jest narzędziem wtedy, gdy nie można utrzymać wcześniejszej obietnicy.",
+    "analysis": "### Schemat to początek, nie werdykt\n\nDodanie opcjonalnego pola jest zmianą addytywną w opisie API, ale znany wspierany klient odrzuca taką odpowiedź. Dla obecnego zestawu konsumentów szerokie wdrożenie nie jest więc zgodne operacyjnie. Brak wcześniejszej reguły o ignorowaniu nieznanych pól oznacza, że nie wolno po cichu przerzucić kosztu na klienta.\n\n### Ogranicz zmianę i zbierz dowód\n\nNie udostępniaj pola wszystkim, dopóki wspierany klient pozostaje ścisły. Możesz zatrzymać ekspozycję pola, uzależnić ją od jawnie negocjowanej wersji lub profilu odpowiedzi albo wydać nową wersję kontraktu, jeśli zachowania nie da się pogodzić. Równolegle popraw klienta i zapisz regułę ewolucji dla przyszłych wersji.\n\nUruchom test kontraktowy z dokładnie tą wersją aplikacji: odpowiedź zawiera `deliveryWindow`, a klient ma poprawnie odczytać dotychczasowe pola. Następnie wykonaj ograniczone wdrożenie i obserwuj błędy deserializacji oraz wersje klientów. Sam zielony diff OpenAPI sprawdza model, nie użytkownika.\n\n### Granica decyzji\n\nGdyby producent kontrolował wszystkich konsumentów i mógł wymusić ich jednoczesną aktualizację, koordynowane wdrożenie mogłoby wystarczyć. Tutaj tak nie jest. Wersjonowanie nie jest karą za zmianę; jest narzędziem wtedy, gdy nie można utrzymać dotychczasowych zasad zgodności.",
     "quick": {
       "question": "Jaka jest najlepsza decyzja przy podanych założeniach?",
       "hint": "Sprawdź nie tylko zmianę schematu, lecz także najstarszego wspieranego konsumenta.",
@@ -32,7 +32,7 @@
       ]
     },
     "related": [
-      {"type":"UCZ SIĘ","title":"Ewolucja kontraktu API","description":"Sprawdź zgodność źródłową, na przewodzie i semantyczną","href":"/podstawy-architektury/ewolucja-kontraktu-api/"}
+      {"type":"UCZ SIĘ","title":"Ewolucja kontraktu API","description":"Sprawdź zgodność źródłową, zgodność formatu przesyłanych danych i zgodność semantyczną","href":"/podstawy-architektury/ewolucja-kontraktu-api/"}
     ]
   },
   {
