@@ -1,6 +1,9 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'ĆWICZENIE', published:'2026-10-03', title:'Nowe opcjonalne pole w API. Czy aplikacja nadal odczyta odpowiedź?', summary:'Średni · szybka decyzja lub mentor', href:'/lamiglowki/2026-10-03-opcjonalne-pole-api/' },
+  { kind:'ANTYWZORZEC', published:'2026-10-03', title:'Zgodne, bo generator nie zgłosił błędu', summary:'Schemat · ukryty kontrakt · test konsumenta', href:'/antywzorce/2026-10-03-zgodnosc-tylko-w-schemacie/' },
+  { kind:'PODSTAWY', published:'2026-10-03', title:'Ewolucja kontraktu API: zgodność trzeba udowodnić', summary:'Kod · format danych · semantyka · weryfikacja', href:'/podstawy-architektury/ewolucja-kontraktu-api/' },
   {kind:'ARCHITEKT I AI',published:'2026-10-02',title:'AI wygenerowało HLD — jak sprawdzić, czy jest użyteczne?',summary:'Tutorial 01 · brief · przegląd · diagram · test',href:'/architektura-it-ai/hld-ai-przeglad/'},
   { kind:'ĆWICZENIE', published:'2026-10-02', title:'Czy awaria powiadomienia powinna blokować zamówienie?', summary:'Łatwy · szybka decyzja lub mentor', href:'/lamiglowka/' },
   { kind:'ANTYWZORZEC', published:'2026-10-02', title:'Powiadomienie steruje wynikiem zamówienia', summary:'Objawy · konsekwencje · lepsza decyzja', href:'/antywzorce/2026-10-02-powiadomienie-steruje-transakcja/' },

@@ -1,3 +1,4 @@
+import apiEvolution from '../content/articles/en/evolving-api-contracts.html?raw';
 import asyncNotifications from '../content/articles/en/asynchronous-notifications.html?raw';
 import macos14 from '../content/articles/en/github-actions-macos-14-retirement.html?raw';
 import aiReview from '../content/articles/en/review-ai-generated-hld.html?raw';
@@ -26,6 +27,7 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'evolving-api-contracts', plSlug:'ewolucja-kontraktu-api', title:'Evolving an API contract: compatibility needs evidence', description:'Why an optional field can still break a client, and how to verify source, wire and semantic compatibility.', topic:'APIs and compatibility', published:'2026-10-03', body:apiEvolution },
   {section:'architecture-with-ai',slug:'review-ai-generated-hld',plSlug:'hld-ai-przeglad',title:'AI drafted an HLD — how do you check whether it is useful?',description:'Tutorial: from a brief and questions to a failure case, a diagram, verification and an ADR.',topic:'Tutorial 01 · HLD review',published:'2026-10-02',body:aiReview},
   { section:'foundations', slug:'asynchronous-notifications', plSlug:'komunikacja-asynchroniczna-powiadomienia', title:'Asynchronous communication: separate the order from its notification', description:'Durably record auxiliary work, retry the right step and avoid duplicating the business operation.', topic:'Integration and resilience', published:'2026-10-02', body:asyncNotifications },
   { section:'architecture-in-motion', slug:'github-actions-macos-14-retirement', plSlug:'github-actions-macos-14-wycofanie', title:'GitHub Actions retires macOS 14: CI has a lifecycle too', description:'The 2 November retirement and October brownouts call for testing the full build, signing and publication chain.', topic:'CI/CD and lifecycle', published:'2026-10-02', eventDate:'2026-10-01', body:macos14 },
