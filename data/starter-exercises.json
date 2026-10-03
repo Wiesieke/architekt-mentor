@@ -5,7 +5,7 @@
       "title": "Nowe opcjonalne pole w API. Czy aplikacja nadal odczyta odpowiedź?",
       "difficulty": "Średni",
       "goal": "Odróżnić addytywną zmianę schematu od zgodności działających konsumentów i zaplanować dowód przed wdrożeniem.",
-      "scenario": "Fikcyjny scenariusz edukacyjny\n\nAPI zamówień zwraca pola `id`, `status` i `total`. Zespół chce dodać opcjonalne pole odpowiedzi `deliveryWindow`. Nie zmienia znaczenia dotychczasowych pól. Plik OpenAPI przechodzi kontrolę zmian bez błędu. Jedna nadal wspierana wersja aplikacji mobilnej używa jednak ścisłej deserializacji i odrzuca odpowiedź zawierającą nieznaną właściwość. Tej wersji nie można zaktualizować przed planowanym wdrożeniem serwera. Kontrakt nie określał dotąd, czy klient ma ignorować nieznane pola.",
+      "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nAPI zamówień zwraca pola `id`, `status` i `total`. Zespół chce dodać opcjonalne pole odpowiedzi `deliveryWindow`. Nie zmienia znaczenia dotychczasowych pól. Plik OpenAPI przechodzi kontrolę zmian bez błędu. Jedna nadal wspierana wersja aplikacji mobilnej używa jednak ścisłej deserializacji i odrzuca odpowiedź zawierającą nieznaną właściwość. Tej wersji nie można zaktualizować przed planowanym wdrożeniem serwera. Kontrakt nie określał dotąd, czy klient ma ignorować nieznane pola.",
       "question": "Czy wdrożysz pole dla wszystkich klientów? W 2–3 zdaniach podaj decyzję, sposób ograniczenia ryzyka i dowód, którego potrzebujesz przed szerszym wdrożeniem.",
       "hints": [
         "Czy przejście kontroli OpenAPI dowodzi zachowania konkretnego deserializatora?",
@@ -58,7 +58,7 @@
       "title": "New optional API field. Can the application still read the response?",
       "difficulty": "Intermediate",
       "goal": "Distinguish an additive schema change from compatibility of running consumers and plan evidence before rollout.",
-      "scenario": "Fictional educational scenario\n\nAn orders API returns `id`, `status` and `total`. The team wants to add an optional response field named `deliveryWindow`. Existing fields keep their meaning, and the OpenAPI change check passes. One still-supported mobile-app version, however, uses strict deserialization and rejects a response containing an unknown property. That version cannot be updated before the planned server deployment. The contract has never stated whether clients must ignore unknown fields.",
+      "scenario": "Practice-inspired educational scenario\n\nAn orders API returns `id`, `status` and `total`. The team wants to add an optional response field named `deliveryWindow`. Existing fields keep their meaning, and the OpenAPI change check passes. One still-supported mobile-app version, however, uses strict deserialization and rejects a response containing an unknown property. That version cannot be updated before the planned server deployment. The contract has never stated whether clients must ignore unknown fields.",
       "question": "Would you expose the field to every client? In 2–3 sentences, state your decision, how you would limit risk and what evidence you need before broader rollout.",
       "hints": [
         "Does a passing OpenAPI check prove the behaviour of a particular deserializer?",
@@ -116,17 +116,50 @@
       "goal": "Oddziel wynik operacji biznesowej od awarii pomocniczego powiadomienia.",
       "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nSerwis zapisał zamówienie i nadał mu numer. Transakcja w bazie została zatwierdzona. Następnie serwis próbował synchronicznie wysłać informacyjny e-mail, lecz usługa pocztowa zwróciła błąd. E-mail nie jest warunkiem przyjęcia zamówienia. Obecne API zwraca jednak błąd całej operacji, więc użytkownik ponawia zamówienie i może utworzyć duplikat. Nie ma jeszcze trwałego zadania ani potwierdzonego komunikatu do ponowienia wysyłki.",
       "question": "Jaki wynik zwrócisz użytkownikowi i co będziesz ponawiać? Wyjaśnij, jak unikniesz drugiego zamówienia oraz utraty powiadomienia.",
-      "hints": ["Który skutek został już trwale osiągnięty?", "Czy ponowienie całego żądania jest tym samym co ponowienie e-maila?", "Co musi być zapisane trwale, aby awaria między bazą a kolejką nie zgubiła powiadomienia?"],
+      "hints": [
+        "Który skutek został już trwale osiągnięty?",
+        "Czy ponowienie całego żądania jest tym samym co ponowienie e-maila?",
+        "Co musi być zapisane trwale, aby awaria między bazą a kolejką nie zgubiła powiadomienia?"
+      ],
       "analysis": "### Zamówienie już istnieje\n\nZwróć sukces przyjęcia zamówienia wraz z jego numerem. Poinformuj uczciwie, że potwierdzenie może dotrzeć później. Błąd pomocniczego e-maila nie zmienia zatwierdzonego wyniku biznesowego i nie powinien zachęcać użytkownika do ponownego złożenia zamówienia.\n\n### Ponawiaj właściwą pracę\n\nPonowienia dotyczą wysłania powiadomienia, nie utworzenia zamówienia. Zadanie powiadomienia musi być trwałe i obserwowalne: w prostym rozwiązaniu można zapisać rekord `notification_pending` w tej samej transakcji co zamówienie, a proces roboczy wysyła go później. Przy większej liczbie zdarzeń typowym rozwiązaniem jest transactional outbox. Worker powinien bezpiecznie obsługiwać ponowienia, bo dostarczenie co najmniej raz może oznaczać duplikat wiadomości.\n\nSamo zapisanie zamówienia, a potem zwykłe wysłanie komunikatu do kolejki to nadal dwa niezależne kroki. Awaria pomiędzy nimi może pozostawić zamówienie bez zadania powiadomienia. Outbox nie gwarantuje dokładnie jednego e-maila; pozwala nie zgubić zamiaru wysłania i wymaga idempotencji lub deduplikacji po stronie konsumenta.\n\n### Jak to sprawdzić\n\nZasymuluj niedostępność poczty oraz przerwanie procesu tuż po zatwierdzeniu zamówienia. Powinno powstać jedno zamówienie i jedno trwałe zadanie, API powinno zwrócić numer zamówienia, a po powrocie usługi wysyłka ma zostać wznowiona bez tworzenia kolejnego zamówienia. Gdyby powiadomienie było prawnym warunkiem przyjęcia operacji, kontrakt byłby inny — ale nie jest nim w tym scenariuszu.",
-      "quick": {"question": "Co powinien zrobić serwis po błędzie e-maila?", "hint": "Zamówienie i informacja o nim mają różne znaczenie biznesowe.", "correctId": "c", "options": [
-        {"id": "a", "text": "Usunąć zapisane zamówienie, bo bez e-maila cała operacja jest nieudana.", "explanation": "To zmienia osiągnięty wynik biznesowy z powodu awarii funkcji pomocniczej. W tym scenariuszu e-mail nie jest warunkiem przyjęcia zamówienia."},
-        {"id": "b", "text": "Zwrócić ogólny błąd i poprosić użytkownika o ponowne złożenie zamówienia.", "explanation": "Zamówienie już istnieje. Ponowienie całego żądania może utworzyć duplikat, zamiast naprawić nieudaną wysyłkę."},
-        {"id": "c", "text": "Potwierdzić zamówienie, trwale zapisać oczekujące powiadomienie i ponawiać tylko jego wysłanie.", "explanation": "To zachowuje prawdziwy wynik biznesowy, nie zachęca do duplikatu i daje kontrolowaną drogę do późniejszego wysłania e-maila."}
-      ]},
+      "quick": {
+        "question": "Co powinien zrobić serwis po błędzie e-maila?",
+        "hint": "Zamówienie i informacja o nim mają różne znaczenie biznesowe.",
+        "correctId": "c",
+        "options": [
+          {
+            "id": "a",
+            "text": "Usunąć zapisane zamówienie, bo bez e-maila cała operacja jest nieudana.",
+            "explanation": "To zmienia osiągnięty wynik biznesowy z powodu awarii funkcji pomocniczej. W tym scenariuszu e-mail nie jest warunkiem przyjęcia zamówienia."
+          },
+          {
+            "id": "b",
+            "text": "Zwrócić ogólny błąd i poprosić użytkownika o ponowne złożenie zamówienia.",
+            "explanation": "Zamówienie już istnieje. Ponowienie całego żądania może utworzyć duplikat, zamiast naprawić nieudaną wysyłkę."
+          },
+          {
+            "id": "c",
+            "text": "Potwierdzić zamówienie, trwale zapisać oczekujące powiadomienie i ponawiać tylko jego wysłanie.",
+            "explanation": "To zachowuje prawdziwy wynik biznesowy, nie zachęca do duplikatu i daje kontrolowaną drogę do późniejszego wysłania e-maila."
+          }
+        ]
+      },
       "criteria": [
-        {"id": "order_outcome", "label": "Wynik zamówienia", "expected": "Rozpoznaje, że zatwierdzone zamówienie istnieje i powinno zostać potwierdzone niezależnie od e-maila."},
-        {"id": "duplicate_avoidance", "label": "Uniknięcie duplikatu", "expected": "Nie każe ponawiać utworzenia zamówienia; rozdziela tożsamość i wynik zamówienia od powiadomienia."},
-        {"id": "notification_retry", "label": "Trwałe ponowienie powiadomienia", "expected": "Proponuje trwałe zadanie lub outbox oraz ponowienie samej wysyłki z obserwowalnością i ochroną przed duplikatami."}
+        {
+          "id": "order_outcome",
+          "label": "Wynik zamówienia",
+          "expected": "Rozpoznaje, że zatwierdzone zamówienie istnieje i powinno zostać potwierdzone niezależnie od e-maila."
+        },
+        {
+          "id": "duplicate_avoidance",
+          "label": "Uniknięcie duplikatu",
+          "expected": "Nie każe ponawiać utworzenia zamówienia; rozdziela tożsamość i wynik zamówienia od powiadomienia."
+        },
+        {
+          "id": "notification_retry",
+          "label": "Trwałe ponowienie powiadomienia",
+          "expected": "Proponuje trwałe zadanie lub outbox oraz ponowienie samej wysyłki z obserwowalnością i ochroną przed duplikatami."
+        }
       ],
       "learnSlug": "komunikacja-asynchroniczna-powiadomienia"
     },
@@ -136,17 +169,50 @@
       "goal": "Separate the business outcome from failure of an auxiliary notification.",
       "scenario": "Practice-inspired educational scenario\n\nA service saved an order and assigned its number. The database transaction committed. It then tried to send an informational email synchronously, but the mail service returned an error. The email is not a condition for accepting the order. The current API nevertheless reports that the whole operation failed, so the user may submit again and create a duplicate. No durable task or confirmed queue message yet exists for retrying the notification.",
       "question": "What result would you return to the user, and what would you retry? Explain how you would avoid both a second order and a lost notification.",
-      "hints": ["Which outcome has already been committed?", "Is retrying the whole request the same as retrying the email?", "What must be durable so a failure between the database and the queue cannot lose the notification?"],
+      "hints": [
+        "Which outcome has already been committed?",
+        "Is retrying the whole request the same as retrying the email?",
+        "What must be durable so a failure between the database and the queue cannot lose the notification?"
+      ],
       "analysis": "### The order already exists\n\nReturn successful order acceptance with the order number. State honestly that confirmation may arrive later. Failure of an auxiliary email does not change the committed business outcome and should not invite the customer to place the order again.\n\n### Retry the right work\n\nRetry notification delivery, not order creation. The notification task must be durable and observable. A simple design can insert a `notification_pending` record in the same transaction as the order, then let a worker deliver it. With more event types, a transactional outbox is a common implementation. The worker must tolerate retries because at-least-once delivery can produce duplicate attempts.\n\nSaving the order and then making an ordinary queue publish is still a dual write. A failure between the two operations can leave an order without a notification task. An outbox does not guarantee exactly one email; it preserves the intent to send and still requires an idempotent consumer or deduplication.\n\n### How to verify it\n\nSimulate mail unavailability and terminate the process immediately after the order commit. There should be one order and one durable notification task, the API should return the order number, and delivery should resume without creating another order. If notification were a legal condition of acceptance, the contract would be different — but that is not this scenario.",
-      "quick": {"question": "What should the service do after the email fails?", "hint": "The order and the information about it have different business meanings.", "correctId": "c", "options": [
-        {"id": "a", "text": "Delete the saved order because the whole operation failed without an email.", "explanation": "This reverses a completed business outcome because an auxiliary feature failed. Email is not an acceptance condition here."},
-        {"id": "b", "text": "Return a generic error and ask the user to submit the order again.", "explanation": "The order already exists. Retrying the whole request can create a duplicate instead of repairing notification delivery."},
-        {"id": "c", "text": "Confirm the order, durably record a pending notification and retry only its delivery.", "explanation": "This preserves the true business outcome, avoids inviting a duplicate and provides a controlled path to later email delivery."}
-      ]},
+      "quick": {
+        "question": "What should the service do after the email fails?",
+        "hint": "The order and the information about it have different business meanings.",
+        "correctId": "c",
+        "options": [
+          {
+            "id": "a",
+            "text": "Delete the saved order because the whole operation failed without an email.",
+            "explanation": "This reverses a completed business outcome because an auxiliary feature failed. Email is not an acceptance condition here."
+          },
+          {
+            "id": "b",
+            "text": "Return a generic error and ask the user to submit the order again.",
+            "explanation": "The order already exists. Retrying the whole request can create a duplicate instead of repairing notification delivery."
+          },
+          {
+            "id": "c",
+            "text": "Confirm the order, durably record a pending notification and retry only its delivery.",
+            "explanation": "This preserves the true business outcome, avoids inviting a duplicate and provides a controlled path to later email delivery."
+          }
+        ]
+      },
       "criteria": [
-        {"id": "order_outcome", "label": "Order outcome", "expected": "Recognises that the committed order exists and should be confirmed independently of email delivery."},
-        {"id": "duplicate_avoidance", "label": "Duplicate avoidance", "expected": "Does not retry order creation; separates the order's identity and outcome from its notification."},
-        {"id": "notification_retry", "label": "Durable notification retry", "expected": "Proposes a durable task or outbox and retries only delivery, with observability and duplicate protection."}
+        {
+          "id": "order_outcome",
+          "label": "Order outcome",
+          "expected": "Recognises that the committed order exists and should be confirmed independently of email delivery."
+        },
+        {
+          "id": "duplicate_avoidance",
+          "label": "Duplicate avoidance",
+          "expected": "Does not retry order creation; separates the order's identity and outcome from its notification."
+        },
+        {
+          "id": "notification_retry",
+          "label": "Durable notification retry",
+          "expected": "Proposes a durable task or outbox and retries only delivery, with observability and duplicate protection."
+        }
       ],
       "learnSlug": "asynchronous-notifications"
     }
