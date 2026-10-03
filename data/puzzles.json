@@ -6,7 +6,7 @@
     "title": "Nowe opcjonalne pole w API. Czy aplikacja nadal odczyta odpowiedź?",
     "difficulty": "Średni",
     "goal": "Odróżnić addytywną zmianę schematu od zgodności działających konsumentów i zaplanować dowód przed wdrożeniem.",
-    "scenario": "Fikcyjny scenariusz edukacyjny\n\nAPI zamówień zwraca pola `id`, `status` i `total`. Zespół chce dodać opcjonalne pole odpowiedzi `deliveryWindow`. Nie zmienia znaczenia dotychczasowych pól. Plik OpenAPI przechodzi kontrolę zmian bez błędu. Jedna nadal wspierana wersja aplikacji mobilnej używa jednak ścisłej deserializacji i odrzuca odpowiedź zawierającą nieznaną właściwość. Tej wersji nie można zaktualizować przed planowanym wdrożeniem serwera. Kontrakt nie określał dotąd, czy klient ma ignorować nieznane pola.",
+    "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nAPI zamówień zwraca pola `id`, `status` i `total`. Zespół chce dodać opcjonalne pole odpowiedzi `deliveryWindow`. Nie zmienia znaczenia dotychczasowych pól. Plik OpenAPI przechodzi kontrolę zmian bez błędu. Jedna nadal wspierana wersja aplikacji mobilnej używa jednak ścisłej deserializacji i odrzuca odpowiedź zawierającą nieznaną właściwość. Tej wersji nie można zaktualizować przed planowanym wdrożeniem serwera. Kontrakt nie określał dotąd, czy klient ma ignorować nieznane pola.",
     "question": "Czy wdrożysz pole dla wszystkich klientów? W 2–3 zdaniach podaj decyzję, sposób ograniczenia ryzyka i dowód, którego potrzebujesz przed szerszym wdrożeniem.",
     "hints": [
       "Czy przejście kontroli OpenAPI dowodzi zachowania konkretnego deserializatora?",
@@ -19,20 +19,49 @@
       "hint": "Sprawdź nie tylko zmianę schematu, lecz także najstarszego wspieranego konsumenta.",
       "correctId": "b",
       "options": [
-        {"id":"a","text":"Wdrożyć pole wszystkim, bo jest opcjonalne i kontrola OpenAPI nie wykryła złamania kontraktu.","explanation":"Kontrola opisuje zmianę modelu, ale znany wspierany klient odrzuca nieznane pole. Mamy już dowód, że szerokie wdrożenie przerwie jego działanie."},
-        {"id":"b","text":"Wstrzymać powszechną ekspozycję, przetestować wspieranego klienta i wdrożyć pole dopiero po aktualizacji klienta albo przez jawnie oddzielony kontrakt.","explanation":"Ta decyzja uwzględnia rzeczywiste zachowanie konsumenta, ogranicza zasięg i wymaga dowodu przed rozszerzeniem zmiany."},
-        {"id":"c","text":"Usunąć kontrolę ścisłej deserializacji z serwera, bo to serwer odpowiada za format JSON.","explanation":"Problem występuje w aplikacji mobilnej, a nie w deserializacji serwera. Zmiana niewłaściwego komponentu nie przywróci kompatybilności klienta."}
+        {
+          "id": "a",
+          "text": "Wdrożyć pole wszystkim, bo jest opcjonalne i kontrola OpenAPI nie wykryła złamania kontraktu.",
+          "explanation": "Kontrola opisuje zmianę modelu, ale znany wspierany klient odrzuca nieznane pole. Mamy już dowód, że szerokie wdrożenie przerwie jego działanie."
+        },
+        {
+          "id": "b",
+          "text": "Wstrzymać powszechną ekspozycję, przetestować wspieranego klienta i wdrożyć pole dopiero po aktualizacji klienta albo przez jawnie oddzielony kontrakt.",
+          "explanation": "Ta decyzja uwzględnia rzeczywiste zachowanie konsumenta, ogranicza zasięg i wymaga dowodu przed rozszerzeniem zmiany."
+        },
+        {
+          "id": "c",
+          "text": "Usunąć kontrolę ścisłej deserializacji z serwera, bo to serwer odpowiada za format JSON.",
+          "explanation": "Problem występuje w aplikacji mobilnej, a nie w deserializacji serwera. Zmiana niewłaściwego komponentu nie przywróci kompatybilności klienta."
+        }
       ]
     },
     "coach": {
       "criteria": [
-        {"id":"compatibility_scope","label":"Zakres zgodności","expected":"Rozpoznaje, że opcjonalność pola i zielona kontrola schematu nie dowodzą zgodności wspieranego klienta ze ścisłą deserializacją."},
-        {"id":"rollout_boundary","label":"Granica wdrożenia","expected":"Nie eksponuje pola wszystkim; proponuje aktualizację klienta, negocjowany profil lub nową wersję kontraktu adekwatną do ograniczeń."},
-        {"id":"consumer_evidence","label":"Dowód po stronie konsumenta","expected":"Wymaga testu z najstarszą wspieraną wersją i kontrolowanego wdrożenia z obserwacją błędów deserializacji."}
+        {
+          "id": "compatibility_scope",
+          "label": "Zakres zgodności",
+          "expected": "Rozpoznaje, że opcjonalność pola i zielona kontrola schematu nie dowodzą zgodności wspieranego klienta ze ścisłą deserializacją."
+        },
+        {
+          "id": "rollout_boundary",
+          "label": "Granica wdrożenia",
+          "expected": "Nie eksponuje pola wszystkim; proponuje aktualizację klienta, negocjowany profil lub nową wersję kontraktu adekwatną do ograniczeń."
+        },
+        {
+          "id": "consumer_evidence",
+          "label": "Dowód po stronie konsumenta",
+          "expected": "Wymaga testu z najstarszą wspieraną wersją i kontrolowanego wdrożenia z obserwacją błędów deserializacji."
+        }
       ]
     },
     "related": [
-      {"type":"UCZ SIĘ","title":"Ewolucja kontraktu API","description":"Sprawdź zgodność źródłową, zgodność formatu przesyłanych danych i zgodność semantyczną","href":"/podstawy-architektury/ewolucja-kontraktu-api/"}
+      {
+        "type": "UCZ SIĘ",
+        "title": "Ewolucja kontraktu API",
+        "description": "Sprawdź zgodność źródłową, zgodność formatu przesyłanych danych i zgodność semantyczną",
+        "href": "/podstawy-architektury/ewolucja-kontraktu-api/"
+      }
     ]
   },
   {
@@ -44,19 +73,61 @@
     "goal": "Oddziel wynik operacji biznesowej od awarii pomocniczego powiadomienia.",
     "scenario": "Scenariusz edukacyjny inspirowany praktyką\n\nSerwis zapisał zamówienie i nadał mu numer. Transakcja w bazie została zatwierdzona. Następnie serwis próbował synchronicznie wysłać informacyjny e-mail, lecz usługa pocztowa zwróciła błąd. E-mail nie jest warunkiem przyjęcia zamówienia. Obecne API zwraca jednak błąd całej operacji, więc użytkownik ponawia zamówienie i może utworzyć duplikat. Nie ma jeszcze trwałego zadania ani potwierdzonego komunikatu do ponowienia wysyłki.",
     "question": "Jaki wynik zwrócisz użytkownikowi i co będziesz ponawiać? Wyjaśnij, jak unikniesz drugiego zamówienia oraz utraty powiadomienia.",
-    "hints": ["Który skutek został już trwale osiągnięty?", "Czy ponowienie całego żądania jest tym samym co ponowienie e-maila?", "Co musi być zapisane trwale, aby awaria między bazą a kolejką nie zgubiła powiadomienia?"],
+    "hints": [
+      "Który skutek został już trwale osiągnięty?",
+      "Czy ponowienie całego żądania jest tym samym co ponowienie e-maila?",
+      "Co musi być zapisane trwale, aby awaria między bazą a kolejką nie zgubiła powiadomienia?"
+    ],
     "analysis": "### Zamówienie już istnieje\n\nZwróć sukces przyjęcia zamówienia wraz z jego numerem. Poinformuj uczciwie, że potwierdzenie może dotrzeć później. Błąd pomocniczego e-maila nie zmienia zatwierdzonego wyniku biznesowego i nie powinien zachęcać użytkownika do ponownego złożenia zamówienia.\n\n### Ponawiaj właściwą pracę\n\nPonowienia dotyczą wysłania powiadomienia, nie utworzenia zamówienia. Zadanie powiadomienia musi być trwałe i obserwowalne: w prostym rozwiązaniu można zapisać rekord `notification_pending` w tej samej transakcji co zamówienie, a proces roboczy wysyła go później. Przy większej liczbie zdarzeń typowym rozwiązaniem jest transactional outbox. Worker powinien bezpiecznie obsługiwać ponowienia, bo dostarczenie co najmniej raz może oznaczać duplikat wiadomości.\n\nSamo zapisanie zamówienia, a potem zwykłe wysłanie komunikatu do kolejki to nadal dwa niezależne kroki. Awaria pomiędzy nimi może pozostawić zamówienie bez zadania powiadomienia. Outbox nie gwarantuje dokładnie jednego e-maila; pozwala nie zgubić zamiaru wysłania i wymaga idempotencji lub deduplikacji po stronie konsumenta.\n\n### Jak to sprawdzić\n\nZasymuluj niedostępność poczty oraz przerwanie procesu tuż po zatwierdzeniu zamówienia. Powinno powstać jedno zamówienie i jedno trwałe zadanie, API powinno zwrócić numer zamówienia, a po powrocie usługi wysyłka ma zostać wznowiona bez tworzenia kolejnego zamówienia. Gdyby powiadomienie było prawnym warunkiem przyjęcia operacji, kontrakt byłby inny — ale nie jest nim w tym scenariuszu.",
-    "quick": {"question": "Co powinien zrobić serwis po błędzie e-maila?", "hint": "Zamówienie i informacja o nim mają różne znaczenie biznesowe.", "correctId": "c", "options": [
-      {"id": "a", "text": "Usunąć zapisane zamówienie, bo bez e-maila cała operacja jest nieudana.", "explanation": "To zmienia osiągnięty wynik biznesowy z powodu awarii funkcji pomocniczej. W tym scenariuszu e-mail nie jest warunkiem przyjęcia zamówienia."},
-      {"id": "b", "text": "Zwrócić ogólny błąd i poprosić użytkownika o ponowne złożenie zamówienia.", "explanation": "Zamówienie już istnieje. Ponowienie całego żądania może utworzyć duplikat, zamiast naprawić nieudaną wysyłkę."},
-      {"id": "c", "text": "Potwierdzić zamówienie, trwale zapisać oczekujące powiadomienie i ponawiać tylko jego wysłanie.", "explanation": "To zachowuje prawdziwy wynik biznesowy, nie zachęca do duplikatu i daje kontrolowaną drogę do późniejszego wysłania e-maila."}
-    ]},
-    "coach": {"criteria": [
-      {"id": "order_outcome", "label": "Wynik zamówienia", "expected": "Rozpoznaje, że zatwierdzone zamówienie istnieje i powinno zostać potwierdzone niezależnie od e-maila."},
-      {"id": "duplicate_avoidance", "label": "Uniknięcie duplikatu", "expected": "Nie każe ponawiać utworzenia zamówienia; rozdziela tożsamość i wynik zamówienia od powiadomienia."},
-      {"id": "notification_retry", "label": "Trwałe ponowienie powiadomienia", "expected": "Proponuje trwałe zadanie lub outbox oraz ponowienie samej wysyłki z obserwowalnością i ochroną przed duplikatami."}
-    ]},
-    "related": [{"type": "UCZ SIĘ", "title": "Komunikacja asynchroniczna i niezależne ponawianie", "description": "Oddziel wynik od pomocniczego skutku", "href": "/podstawy-architektury/komunikacja-asynchroniczna-powiadomienia/"}]
+    "quick": {
+      "question": "Co powinien zrobić serwis po błędzie e-maila?",
+      "hint": "Zamówienie i informacja o nim mają różne znaczenie biznesowe.",
+      "correctId": "c",
+      "options": [
+        {
+          "id": "a",
+          "text": "Usunąć zapisane zamówienie, bo bez e-maila cała operacja jest nieudana.",
+          "explanation": "To zmienia osiągnięty wynik biznesowy z powodu awarii funkcji pomocniczej. W tym scenariuszu e-mail nie jest warunkiem przyjęcia zamówienia."
+        },
+        {
+          "id": "b",
+          "text": "Zwrócić ogólny błąd i poprosić użytkownika o ponowne złożenie zamówienia.",
+          "explanation": "Zamówienie już istnieje. Ponowienie całego żądania może utworzyć duplikat, zamiast naprawić nieudaną wysyłkę."
+        },
+        {
+          "id": "c",
+          "text": "Potwierdzić zamówienie, trwale zapisać oczekujące powiadomienie i ponawiać tylko jego wysłanie.",
+          "explanation": "To zachowuje prawdziwy wynik biznesowy, nie zachęca do duplikatu i daje kontrolowaną drogę do późniejszego wysłania e-maila."
+        }
+      ]
+    },
+    "coach": {
+      "criteria": [
+        {
+          "id": "order_outcome",
+          "label": "Wynik zamówienia",
+          "expected": "Rozpoznaje, że zatwierdzone zamówienie istnieje i powinno zostać potwierdzone niezależnie od e-maila."
+        },
+        {
+          "id": "duplicate_avoidance",
+          "label": "Uniknięcie duplikatu",
+          "expected": "Nie każe ponawiać utworzenia zamówienia; rozdziela tożsamość i wynik zamówienia od powiadomienia."
+        },
+        {
+          "id": "notification_retry",
+          "label": "Trwałe ponowienie powiadomienia",
+          "expected": "Proponuje trwałe zadanie lub outbox oraz ponowienie samej wysyłki z obserwowalnością i ochroną przed duplikatami."
+        }
+      ]
+    },
+    "related": [
+      {
+        "type": "UCZ SIĘ",
+        "title": "Komunikacja asynchroniczna i niezależne ponawianie",
+        "description": "Oddziel wynik od pomocniczego skutku",
+        "href": "/podstawy-architektury/komunikacja-asynchroniczna-powiadomienia/"
+      }
+    ]
   },
   {
     "id": "2026-10-01-wymiana-urzadzen",
