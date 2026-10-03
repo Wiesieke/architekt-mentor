@@ -1,0 +1,47 @@
+<p>Dodanie pola do odpowiedzi API wygląda niewinnie: niczego nie usuwamy, więc powinno być zgodne wstecz. Powinno. Słowo „powinno” bywa jednak najdroższą częścią projektu integracyjnego.</p>
+
+<div class="note"><strong>Cel nauki:</strong> odróżnić zgodność opisu i formatu od zgodności działających konsumentów oraz zaplanować zmianę kontraktu na podstawie dowodów.</div>
+
+<h3>Trzy warstwy zgodności</h3>
+<table>
+  <thead><tr><th>Warstwa</th><th>Pytanie</th><th>Przykład ryzyka</th></tr></thead>
+  <tbody>
+    <tr><td>Źródłowa</td><td>Czy kod klienta nadal się kompiluje?</td><td>Generator SDK zmienia sygnaturę lub typ.</td></tr>
+    <tr><td>Na przewodzie</td><td>Czy stary klient potrafi odebrać i zdeserializować nową odpowiedź?</td><td>Tryb ścisły odrzuca nieznane pole.</td></tr>
+    <tr><td>Semantyczna</td><td>Czy klient nadal otrzymuje zachowanie, którego rozsądnie oczekiwał?</td><td>Nowa wartość enum albo zmieniona wartość domyślna uruchamia złą gałąź logiki.</td></tr>
+  </tbody>
+</table>
+<p>Google AIP-180 rozdziela właśnie zgodność źródłową, zgodność na przewodzie i zgodność semantyczną. Podkreśla też, że katalog zmian zgodnych i niezgodnych jest wskazówką, a nie dowodem dla każdego stosu technologicznego.</p>
+
+<h3>Opcjonalne nie znaczy obojętne</h3>
+<p>Opcjonalne pole żądania oznacza, że stary klient nie musi go wysyłać. Opcjonalne pole odpowiedzi oznacza, że serwer nie zawsze je zwróci. Żadne z tych zdań nie dowodzi jeszcze, że konkretny klient zaakceptuje nieznaną właściwość albo poprawnie obsłuży nową wartość.</p>
+<p>Zmiana addytywna jest zwykle bezpieczniejsza od usunięcia pola, ale może ujawnić ukryty kontrakt: ścisłą deserializację, wyczerpujący <code>switch</code> po enumie, limit długości w bazie albo logikę zależną od nieudokumentowanego formatu. Kontrakt API obejmuje zachowanie, nie tylko plik OpenAPI.</p>
+
+<h3>Macierz przed wdrożeniem</h3>
+<table>
+  <thead><tr><th>Zmiana</th><th>Ocena początkowa</th><th>Co sprawdzić</th></tr></thead>
+  <tbody>
+    <tr><td>Nowe opcjonalne pole odpowiedzi</td><td>Zwykle addytywna</td><td>Nieznane pola, generowane modele, proxy i walidatory.</td></tr>
+    <tr><td>Nowa wartość enum w odpowiedzi</td><td>Podwyższone ryzyko</td><td>Domyślna gałąź i zachowanie kodu generowanego.</td></tr>
+    <tr><td>Zmiana wartości domyślnej</td><td>Semantycznie niezgodna</td><td>Klienci, którzy nie wysyłają pola.</td></tr>
+    <tr><td>Opcjonalne pole staje się wymagane</td><td>Niezgodna</td><td>Wszyscy istniejący producenci żądań.</td></tr>
+    <tr><td>Zmiana formatu istniejącej wartości</td><td>Semantycznie ryzykowna</td><td>Parsery, walidacja, indeksy i długości kolumn.</td></tr>
+  </tbody>
+</table>
+
+<h3>Proces, który daje dowód</h3>
+<ol>
+  <li><strong>Nazwij obietnicę.</strong> Zapisz reguły ewolucji: czy klienci mają ignorować nieznane pola, czy enum jest rozszerzalny i jak długo wspierana jest wersja.</li>
+  <li><strong>Zrób spis konsumentów.</strong> Właściciel, wersja biblioteki, sposób deserializacji i termin aktualizacji są ważniejsze od liczby endpointów.</li>
+  <li><strong>Testuj reprezentatywne wersje.</strong> Odtwórz odpowiedź z nowym polem w testach kontraktowych i uruchom najstarszego wspieranego klienta.</li>
+  <li><strong>Ogranicz zasięg.</strong> Wdróż zmianę etapami, obserwuj błędy deserializacji i miej możliwość wycofania ekspozycji pola.</li>
+  <li><strong>Wersjonuj, gdy zmienia się obietnica.</strong> Nowa wersja jest właściwa, gdy nie można zachować zachowania istniejącego kontraktu lub kontrolować aktualizacji konsumentów.</li>
+</ol>
+
+<div class="example"><strong>Fikcyjny przykład edukacyjny:</strong> serwer dodaje <code>deliveryWindow</code> do odpowiedzi zamówienia. OpenAPI nie oznacza pola jako wymagane, ale starsza aplikacja mobilna odrzuca każdą nieznaną właściwość. Przed szerokim wdrożeniem zespół uruchamia test ze wspieraną wersją klienta, aktualizuje regułę deserializacji i dopiero potem stopniowo udostępnia pole.</div>
+
+<h3>Granica tej rady</h3>
+<p>Nie każda integracja wymaga publicznego wersjonowania. Gdy producent kontroluje wszystkich konsumentów i może wymusić ich jednoczesną aktualizację, prostszy proces może wystarczyć. Nadal trzeba jednak sprawdzić rzeczywisty zestaw wersji podczas wdrożenia. „To tylko pole” nie jest strategią migracji.</p>
+
+<p><a href="/lamiglowki/2026-10-03-opcjonalne-pole-api/">Przećwicz decyzję o nowym polu →</a></p>
+<div class="source"><strong>Źródła pierwotne (sprawdzone 3.10.2026):</strong> <a href="https://google.aip.dev/180">Google AIP-180 — Backwards compatibility</a>; <a href="https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md">Microsoft Azure REST API Guidelines — kontrakty i wersjonowanie</a>. Tabele, przykład i procedura weryfikacji są autorskim opracowaniem edukacyjnym.</div>

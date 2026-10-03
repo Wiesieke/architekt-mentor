@@ -1,0 +1,47 @@
+<p>Adding a response field looks harmless: nothing has been removed, so the change should be backward compatible. It should. In integration work, “should” is often the most expensive word in the plan.</p>
+
+<div class="note"><strong>Learning goal:</strong> distinguish compatibility of a description or wire format from compatibility of running consumers, then plan an API change using evidence.</div>
+
+<h3>Three layers of compatibility</h3>
+<table>
+  <thead><tr><th>Layer</th><th>Question</th><th>Example risk</th></tr></thead>
+  <tbody>
+    <tr><td>Source</td><td>Does client code still compile?</td><td>An SDK generator changes a signature or type.</td></tr>
+    <tr><td>Wire</td><td>Can an old client receive and deserialize the new response?</td><td>Strict mode rejects an unknown property.</td></tr>
+    <tr><td>Semantic</td><td>Does the client still receive the behaviour a reasonable developer expected?</td><td>A new enum value or changed default selects the wrong branch.</td></tr>
+  </tbody>
+</table>
+<p>Google AIP-180 makes this distinction between source, wire and semantic compatibility. It also warns that compatibility guidance is indicative rather than proof for every technology stack.</p>
+
+<h3>Optional does not mean irrelevant</h3>
+<p>An optional request field means an old client need not send it. An optional response field means the server may omit it. Neither statement proves that a particular client accepts an unknown property or handles a new value safely.</p>
+<p>An additive change is usually safer than removing a field, but it can expose a hidden contract: strict deserialization, an exhaustive enum switch, a database length limit or logic coupled to an undocumented format. An API contract includes behaviour, not just an OpenAPI file.</p>
+
+<h3>A pre-release matrix</h3>
+<table>
+  <thead><tr><th>Change</th><th>Initial assessment</th><th>What to verify</th></tr></thead>
+  <tbody>
+    <tr><td>New optional response field</td><td>Usually additive</td><td>Unknown fields, generated models, proxies and validators.</td></tr>
+    <tr><td>New response enum value</td><td>Elevated risk</td><td>Fallback branches and generated-code behaviour.</td></tr>
+    <tr><td>Changed default value</td><td>Semantically incompatible</td><td>Clients that omit the field.</td></tr>
+    <tr><td>Optional field becomes required</td><td>Incompatible</td><td>Every existing request producer.</td></tr>
+    <tr><td>Existing value changes format</td><td>Semantically risky</td><td>Parsers, validation, indexes and column lengths.</td></tr>
+  </tbody>
+</table>
+
+<h3>A process that produces evidence</h3>
+<ol>
+  <li><strong>Name the promise.</strong> Record evolution rules: whether clients ignore unknown fields, whether enums are extensible and how long a version is supported.</li>
+  <li><strong>Inventory consumers.</strong> Owner, library version, deserialization mode and upgrade window matter more than the endpoint count.</li>
+  <li><strong>Test representative versions.</strong> Replay a response containing the new field in contract tests and run the oldest supported client.</li>
+  <li><strong>Limit exposure.</strong> Roll out gradually, observe deserialization failures and retain a way to stop exposing the field.</li>
+  <li><strong>Version when the promise changes.</strong> Introduce a new version when existing behaviour cannot be preserved or consumer upgrades cannot be controlled.</li>
+</ol>
+
+<div class="example"><strong>Fictional educational example:</strong> a server adds <code>deliveryWindow</code> to an order response. OpenAPI does not mark it as required, but an older mobile app rejects every unknown property. Before broad rollout, the team tests a supported client version, changes its deserialization rule and only then exposes the field progressively.</div>
+
+<h3>Boundary of this advice</h3>
+<p>Not every integration needs public versioning. When the producer controls every consumer and can enforce a coordinated update, a simpler process may be enough. The team must still verify the actual version mix during deployment. “It is only a field” is not a migration strategy.</p>
+
+<p><a href="/en/practice/2026-10-03-opcjonalne-pole-api/">Practise the new-field decision →</a></p>
+<div class="source"><strong>Primary sources (checked 3 October 2026):</strong> <a href="https://google.aip.dev/180">Google AIP-180 — Backwards compatibility</a>; <a href="https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md">Microsoft Azure REST API Guidelines — contracts and versioning</a>. The matrices, example and verification procedure are original educational material.</div>

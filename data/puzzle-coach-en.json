@@ -1,4 +1,13 @@
 {
+  "2026-10-03-opcjonalne-pole-api": {
+    "scenario": "Fictional educational scenario. An orders API adds an optional `deliveryWindow` response field. A still-supported mobile app uses strict deserialization and rejects unknown properties; it cannot be updated before the server rollout. The contract never stated whether clients must ignore unknown fields.",
+    "question": "Would you expose the field to every client? In 2–3 sentences, state your decision, how you would limit risk and what evidence you need before broader rollout.",
+    "criteria": [
+      {"id":"compatibility_scope","label":"Compatibility scope","expected":"Recognises that an optional field and a green schema check do not prove compatibility with a supported strict-deserialization client."},
+      {"id":"rollout_boundary","label":"Rollout boundary","expected":"Does not expose the field universally; proposes a client update, negotiated profile or separate contract version suited to the constraint."},
+      {"id":"consumer_evidence","label":"Consumer evidence","expected":"Requires a test with the oldest supported version and a controlled rollout that observes deserialization failures."}
+    ]
+  },
   "2026-10-02-email-po-zamowieniu": {
     "scenario": "Practice-inspired educational scenario. An order has committed and received an order number. A subsequent informational email failed. Email is not a condition of acceptance, and no durable notification task has yet been confirmed.",
     "question": "What result would you return to the user, and what would you retry? Explain how you would avoid both a second order and a lost notification.",

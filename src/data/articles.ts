@@ -1,3 +1,4 @@
+import apiEvolution from '../content/articles/ewolucja-kontraktu-api.html?raw';
 import asyncNotifications from '../content/articles/komunikacja-asynchroniczna-powiadomienia.html?raw';
 import macos14 from '../content/articles/github-actions-macos-14-wycofanie.html?raw';
 import aiReview from '../content/articles/hld-ai-przeglad.html?raw';
@@ -33,6 +34,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'ewolucja-kontraktu-api', title:'Ewolucja kontraktu API: zgodność trzeba udowodnić', description:'Dlaczego opcjonalne pole może zepsuć klienta i jak sprawdzić zgodność źródłową, na przewodzie oraz semantyczną.', topic:'API i kompatybilność', published:'2026-10-03', body:apiEvolution },
   {section:'architektura-it-ai',slug:'hld-ai-przeglad',title:'AI wygenerowało HLD — jak sprawdzić, czy jest użyteczne?',description:'Tutorial: od briefu i pytań do kontrprzykładu, diagramu, testu awarii i ADR.',topic:'Tutorial 01 · przegląd HLD',published:'2026-10-02',body:aiReview},
   { section:'podstawy-architektury', slug:'komunikacja-asynchroniczna-powiadomienia', title:'Komunikacja asynchroniczna: oddziel zamówienie od powiadomienia', description:'Jak trwale zapisać pomocniczą pracę, ponawiać właściwy krok i nie utworzyć duplikatu operacji biznesowej.', topic:'Integracja i odporność', published:'2026-10-02', body:asyncNotifications },
   { section:'architektura-w-ruchu', slug:'github-actions-macos-14-wycofanie', title:'GitHub Actions wycofuje macOS 14: CI też ma cykl życia', description:'Wycofanie 2 listopada i październikowe brownouty wymagają testu całego łańcucha budowania, podpisywania i publikacji.', topic:'CI/CD i cykl życia', published:'2026-10-02', eventDate:'2026-10-01', body:macos14 },
