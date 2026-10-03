@@ -3,12 +3,14 @@ import Studio from '../../layouts/Studio.astro';
 import Comments from '../../components/Comments.astro';
 import patterns from '../../../data/antywzorce.json';
 import { marked } from 'marked';
+import { editionLearningLinks } from '../../data/edition-links';
 export function getStaticPaths(){ return patterns.map(pattern => ({params:{id:pattern.id},props:{pattern}})); }
 const { pattern } = Astro.props as {pattern:(typeof patterns)[number]};
 const content = marked.parse(pattern.content);
+const editionRelated = editionLearningLinks('pl', pattern.date, `/antywzorce/${pattern.id}/`);
 ---
 <Studio translationUrl={`/en/anti-patterns/${pattern.id}/`} title={pattern.title} description={pattern.summary} published={pattern.date}>
- <div class="container page"><a class="back" href="/antywzorce/">← Wszystkie antywzorce</a><div class="eyebrow">Antywzorzec architektoniczny</div><h1>{pattern.title}</h1><p class="intro">{pattern.summary}</p><article class="body" set:html={content} /><Comments articlePath={`/antywzorce/${pattern.id}/`} /><div class="more"><a href="/podstawy-architektury/">Poznaj wzorce architektoniczne →</a><a href="/lamiglowka/">Przećwicz decyzję →</a></div></div>
+ <div class="container page"><a class="back" href="/antywzorce/">← Wszystkie antywzorce</a><div class="eyebrow">Antywzorzec architektoniczny</div><h1>{pattern.title}</h1><p class="intro">{pattern.summary}</p><article class="body" set:html={content} /><Comments articlePath={`/antywzorce/${pattern.id}/`} /><div class="more">{editionRelated.length ? editionRelated.map(item => <a href={item.href}>{item.title} →</a>) : <><a href="/podstawy-architektury/">Poznaj wzorce architektoniczne →</a><a href="/lamiglowka/">Przećwicz decyzję →</a></>}</div></div>
 </Studio>
 <style>
  .page{max-width:860px;padding-top:55px;padding-bottom:90px}.back{display:inline-block;color:#136d73;font-weight:700;font-size:13px;margin-bottom:36px}.page h1{font-size:clamp(34px,5vw,55px);max-width:21ch;margin:18px 0}.intro{color:#536577;font-size:18px}.body{background:#fff;border:1px solid #dce4df;border-radius:14px;padding:clamp(22px,5vw,45px);margin-top:28px}.body :global(p),.body :global(li){color:#3d5261;line-height:1.8}.body :global(h2){font-size:23px;margin-top:32px}.body :global(h3){font-size:20px}.body :global(blockquote){border-left:3px solid #e1a35d;background:#fbf7eb;padding:10px 20px;margin-left:0}.body :global(ul),.body :global(ol){padding-left:23px}.more{display:flex;flex-wrap:wrap;gap:22px;margin-top:25px}.more a{font-weight:700;color:#136d73}@media(max-width:540px){.page{padding-top:28px}.back{margin-bottom:22px}}

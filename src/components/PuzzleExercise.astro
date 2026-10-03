@@ -4,6 +4,7 @@ import QuickDecision from './QuickDecision.astro';
 import PuzzleExercise from '../components/PuzzleExercise.astro';
 import puzzles from '../../data/puzzles.json';
 import { marked } from 'marked';
+import { editionLearningLinks } from '../data/edition-links';
 
 const { puzzle, permanent = false } = Astro.props as { puzzle: (typeof puzzles)[number]; permanent?: boolean };
 const latestPuzzle = [...puzzles].filter(item => item.coach).sort((a,b) => b.date.localeCompare(a.date))[0];
@@ -13,10 +14,11 @@ const analysis = marked.parse(puzzle.analysis);
 interface DecisionRecord { status:string; context:string; decision:string; rationale:string; consequences:string[]; verification:string; openQuestions:string[] }
 const decisionRecord = (puzzle as typeof puzzle & {decisionRecord?:DecisionRecord}).decisionRecord;
 interface Related {type:string;title:string;description:string;href:string}
-const related = (puzzle as typeof puzzle & {related?:Related[]}).related ?? [
+const editionRelated = permanent ? editionLearningLinks('pl', puzzle.date, `/lamiglowki/${puzzle.id}/`) : [];
+const related = editionRelated.length ? editionRelated.map(item => ({type:item.kind,title:item.title,description:'Przejdź do powiązanego materiału',href:item.href})) : ((puzzle as typeof puzzle & {related?:Related[]}).related ?? [
   {type:'ANTYWZORCE',title:'Rozpoznaj typowe pułapki',description:'Zobacz inne sytuacje →',href:'/antywzorce/'},
   {type:'PODSTAWY',title:'Poznaj wzorce architektoniczne',description:'Wróć do podstaw →',href:'/podstawy-architektury/'},
-];
+]);
 const recordMarkdown = decisionRecord ? [
   `# ADR: ${puzzle.title}`, '', `Status: ${decisionRecord.status}`, '',
   '## Kontekst', decisionRecord.context, '',

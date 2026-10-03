@@ -3,12 +3,14 @@ import Studio from '../layouts/Studio.astro';
 import QuickDecision from './QuickDecision.astro';
 import { marked } from 'marked';
 import { englishPuzzleUrl, englishPuzzles } from '../data/puzzles-en';
+import { editionLearningLinks } from '../data/edition-links';
 const { puzzle, permanent = false } = Astro.props as { puzzle:(typeof englishPuzzles)[number]; permanent?: boolean };
 const scenario = marked.parse(puzzle.scenario);
 const analysis = marked.parse(puzzle.analysis);
 const isLatest = englishPuzzleUrl(puzzle.id) === '/en/practice/';
 const polishUrl = permanent ? `/lamiglowki/${puzzle.id}/` : isLatest ? '/lamiglowka/' : `/lamiglowki/${puzzle.id}/`;
 const decisionRecord = puzzle.decisionRecord;
+const editionRelated = permanent ? editionLearningLinks('en', puzzle.date, `/en/practice/${puzzle.id}/`) : [];
 ---
 <Studio locale="en" translationUrl={polishUrl} title={puzzle.title} description={`Architecture exercise: ${puzzle.question}`} published={puzzle.date} active="practice">
  <div class="exercise-head"><div class="container"><a class="back" href="/en/practice/archive/">← All exercises</a><div class="eyebrow">Decision workshop · {puzzle.week}</div><h1>{puzzle.title}</h1><p>Identify the risk, make a decision and compare your reasoning with a senior architect’s analysis.</p></div></div>
@@ -21,7 +23,7 @@ const decisionRecord = puzzle.decisionRecord;
   <section class="panel" id="senior"><div class="label">03 · SENIOR ANALYSIS</div><div class="body"><h2>Compare your reasoning</h2><p>Read the full analysis at any time, including without AI feedback.</p><button id="reveal" class="button secondary" type="button" aria-expanded="false" aria-controls="analysis">Show analysis ↓</button><div id="analysis" class="markdown analysis" hidden set:html={analysis} /></div></section>
   {isLatest && decisionRecord && <section class="panel"><div class="label">04 · EXAMPLE DECISION RECORD</div><div class="body"><h2>What could an ADR capture?</h2><p>This fictional example is a starting point for discussion, not an approved project decision.</p><dl><dt>Status</dt><dd>Example for discussion</dd><dt>Context</dt><dd>{decisionRecord.context}</dd><dt>Decision</dt><dd>{decisionRecord.decision}</dd><dt>Consequences</dt><dd>{decisionRecord.consequences}</dd><dt>Verification</dt><dd>{decisionRecord.verification}</dd><dt>Open questions</dt><dd>{decisionRecord.openQuestions}</dd></dl><a href="/en/tools/adr/">Write your own ADR →</a></div></section>}
   {puzzle.quick && <section class="panel"><div class="label">KEEP LEARNING</div><div class="body"><h2>Understand the principle and its limits</h2><a href={`/en/foundations/${puzzle.learnSlug}/`}>Read the related learning material →</a></div></section>}
-  <div class="next"><a href="/en/anti-patterns/">Explore related anti-patterns →</a><a href="/en/foundations/">Review the foundations →</a></div>
+  {editionRelated.length ? <div class="next">{editionRelated.map(item => <a href={item.href}>{item.title} →</a>)}</div> : <div class="next"><a href="/en/anti-patterns/">Explore related anti-patterns →</a><a href="/en/foundations/">Review the foundations →</a></div>}
  </div>
 </Studio>
 <script>
