@@ -66,6 +66,12 @@
       "PODSTAWY": "PODSTAWY",
       "W RUCHU": "W RUCHU",
       "ARCHITEKT I AI": "ARCHITEKT I AI"
+    },
+    "materialForms": {
+      "one": "materiał",
+      "few": "materiały",
+      "many": "materiałów",
+      "other": "materiału"
     }
   },
   "en": {
@@ -135,6 +141,10 @@
       "PODSTAWY": "FOUNDATIONS",
       "W RUCHU": "IN MOTION",
       "ARCHITEKT I AI": "ARCHITECT + AI"
+    },
+    "materialForms": {
+      "one": "material",
+      "other": "materials"
     }
   }
 }

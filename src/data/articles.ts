@@ -1,3 +1,4 @@
+import installationTokens from '../content/articles/github-tokeny-instalacyjne-format.html?raw';
 import apiEvolution from '../content/articles/ewolucja-kontraktu-api.html?raw';
 import asyncNotifications from '../content/articles/komunikacja-asynchroniczna-powiadomienia.html?raw';
 import macos14 from '../content/articles/github-actions-macos-14-wycofanie.html?raw';
@@ -34,6 +35,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'architektura-w-ruchu', slug:'github-tokeny-instalacyjne-format', title:'GitHub zmienił format tokenów: sprawdź całą ścieżkę poświadczenia', description:'Dłuższy token instalacyjny może ujawnić limity magazynu, proxy i reguł maskowania. Plan sprawdzenia integracji bez ujawniania sekretów.', topic:'Integracja i bezpieczeństwo', published:'2026-10-04', eventDate:'2026-10-02', body:installationTokens },
   { section:'podstawy-architektury', slug:'ewolucja-kontraktu-api', title:'Ewolucja kontraktu API: zgodność trzeba udowodnić', description:'Dlaczego dodanie opcjonalnego pola do odpowiedzi API może zakłócić działanie aplikacji, która z niego korzysta? Jak sprawdzić zgodność źródłową, zgodność formatu przesyłanych danych oraz zgodność semantyczną?', topic:'API i kompatybilność', published:'2026-10-03', body:apiEvolution },
   {section:'architektura-it-ai',slug:'hld-ai-przeglad',title:'AI wygenerowało HLD — jak sprawdzić, czy jest użyteczne?',description:'Tutorial: od briefu i pytań do kontrprzykładu, diagramu, testu awarii i ADR.',topic:'Tutorial 01 · przegląd HLD',published:'2026-10-02',body:aiReview},
   { section:'podstawy-architektury', slug:'komunikacja-asynchroniczna-powiadomienia', title:'Komunikacja asynchroniczna: oddziel zamówienie od powiadomienia', description:'Jak trwale zapisać pomocniczą pracę, ponawiać właściwy krok i nie utworzyć duplikatu operacji biznesowej.', topic:'Integracja i odporność', published:'2026-10-02', body:asyncNotifications },
