@@ -1,6 +1,7 @@
 ---
 import Studio from '../layouts/Studio.astro';
 import StarterExercises from './StarterExercises.astro';
+import PortalSearch from './PortalSearch.astro';
 import { homepageData } from '../data/homepage';
 import translations from '../data/homepage-copy.json';
 interface Props { locale: 'pl' | 'en' }
@@ -12,6 +13,7 @@ const materialLabel = copy.materialForms[materialForm as keyof typeof copy.mater
 ---
 <Studio locale={locale} title={copy.title} description={copy.description} translationUrl={data.translationUrl} modified={data.date}>
   <section class="hero"><div class="container hero-grid"><div><div class="eyebrow">{copy.eyebrow}</div><h1>{copy.headline} <em>{copy.emphasis}</em></h1><p>{copy.intro}</p><div class="actions"><a class="button" href={data.practiceUrl}>{copy.cta}</a><a href="#start">{copy.how}</a></div></div><div class="focus"><small>{copy.latest} · {data.featured.kind}</small><h2><a href={data.featured.href}>{data.featured.title}</a></h2><p>{data.featured.description}</p><a href={data.featured.href}>{copy.read}</a></div></div></section>
+  <PortalSearch locale={locale} />
   <section class="container paths" id="start"><div class="eyebrow">{copy.start}</div><h2>{copy.startTitle}</h2><p class="path-intro">{copy.startIntro}</p><div class="cards">{copy.paths.map((path,i)=><a class:list={{'featured-path':i===0}} href={data.pathUrls[i]}><small>{path.label}</small><h3>{path.title}</h3><p>{path.description}</p><span>{path.action}</span></a>)}</div></section>
   <section class="weekly" id="latest"><div class="container"><div class="eyebrow">{copy.publication} · <time datetime={data.date}>{data.dateLabel}</time></div><h2>{copy.newTitle}</h2><p>{data.edition.length} {materialLabel}. {copy.newIntro}</p><div class="weekly-grid">{data.edition.map(item=><a href={item.href} data-edition-kind={item.kind}><small>{copy.kinds[item.kind as keyof typeof copy.kinds]}</small><strong>{item.title}</strong><span>{item.summary}</span></a>)}</div></div></section>
   <StarterExercises locale={locale} />

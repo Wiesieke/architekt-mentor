@@ -1,11 +1,4 @@
 ---
-import Studio from '../../../layouts/Studio.astro';
-import { englishArticles, englishArticleUrl } from '../../../data/articles-en';
-const items = englishArticles.filter(article => article.section === 'foundations');
+import LearningCatalogue from '../../../components/LearningCatalogue.astro';
 ---
-<Studio locale="en" translationUrl="/podstawy-architektury/" title="Architecture foundations" description="Practical architecture foundations: descriptions, C4, ADR, frameworks, patterns and HLD reviews.">
-  <div class="container archive"><div class="eyebrow">Magazine · durable knowledge</div><h1>Architecture foundations</h1><p>Patterns and methods that help name risks, compare options and explain decisions.</p><div class="cards">{items.map(item => <article><div class="meta">{item.topic}</div><h2><a href={englishArticleUrl(item)}>{item.title}</a></h2><p>{item.description}</p><a class="read" href={englishArticleUrl(item)}>Read the article →</a></article>)}</div></div>
-</Studio>
-<style>
-  .archive{padding-top:67px;padding-bottom:95px}.archive h1{font-size:clamp(37px,5vw,57px);margin:18px 0}.archive>p{max-width:68ch;color:#536577}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:42px}.cards article{background:#fff;border:1px solid #dce4df;border-radius:12px;padding:30px}.cards .meta{font-size:11px;color:#136d73;font-weight:800}.cards h2{font-size:23px;margin:13px 0}.cards h2 a{text-decoration:none}.cards h2 a:hover{text-decoration:underline}.cards p{font-size:14px;color:#536577}.read{font-size:13px;color:#136d73;font-weight:700}@media(max-width:660px){.archive{padding-top:34px}.cards{grid-template-columns:1fr;margin-top:25px}.cards article{padding:22px}}
-</style>
+<LearningCatalogue locale="en" />
