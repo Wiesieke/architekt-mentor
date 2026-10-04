@@ -28,7 +28,7 @@ const copy=locale==='pl'?{title:'Znajdź temat w magazynie',label:'Szukaj artyku
   const update=()=>{
    const terms=normalize(input.value).trim().split(/\s+/).filter(Boolean);
    const active=terms.length>0||!!select.value;
-   const matches=active?cards.filter(card=>(!select.value||card.dataset.kind===select.value)&&terms.every(term=>normalize(card.dataset.search??'').includes(term))):[];
+   const matches=active?cards.filter(card=>(!select.value||card.dataset.kind===select.value)&&terms.every(term=>normalize(card.dataset.search??'').split(/[^\p{L}\p{N}]+/u).some(word=>word.startsWith(term)))):[];
    cards.forEach(card=>card.hidden=true);
    matches.slice(0,limit).forEach(card=>card.hidden=false);
    results.hidden=matches.length===0; more.hidden=matches.length<=limit;

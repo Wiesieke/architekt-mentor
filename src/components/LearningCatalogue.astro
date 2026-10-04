@@ -66,7 +66,7 @@ const dateLabel = (date: string) => new Intl.DateTimeFormat(locale, {day:'numeri
    root.querySelectorAll<HTMLDetailsElement>('[data-group]').forEach(group => {
     let count = 0;
     group.querySelectorAll<HTMLElement>('[data-learning-card]').forEach(card => {
-     const match = (!select.value || group.dataset.group === select.value) && (!level?.value || card.dataset.level===level.value) && terms.every(term => normalize(card.dataset.search ?? '').includes(term));
+     const match = (!select.value || group.dataset.group === select.value) && (!level?.value || card.dataset.level===level.value) && terms.every(term => normalize(card.dataset.search ?? '').split(/[^\p{L}\p{N}]+/u).some(word=>word.startsWith(term)));
      card.hidden = !match;
      if (match) count++;
     });
