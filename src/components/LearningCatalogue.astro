@@ -44,7 +44,7 @@ const dateLabel = (date: string) => new Intl.DateTimeFormat(locale, {day:'numeri
   {groups.map((g,i) => <details class="learning-group" data-group={g.id} open={i===0}>
    <summary><h2>{g.title} <span class="group-count">({g.items.length})</span></h2><span class="toggle" aria-hidden="true">＋</span></summary>
    <div class="cards">{g.items.map(item => <article data-learning-card data-level={'difficulty' in item?item.difficulty:undefined} data-search={`${item.title} ${item.description} ${item.topic} ${g.title}`}>
-    <div class="meta"><span>{item.topic}{'difficulty' in item && item.difficulty && <> · {item.difficulty}</>}</span>{item.published && <time datetime={item.published}>{dateLabel(item.published)}</time>}</div>
+    <div class="meta"><span>{item.topic}{'difficulty' in item && item.difficulty && <> · {item.difficulty}</>}</span>{item.published && <time datetime={item.published}>{dateLabel(item.published)}</time>}{'eventDate' in item && item.eventDate && <span>{locale==='pl'?'Wydarzenie:':'Event:'} <time datetime={item.eventDate}>{dateLabel(item.eventDate)}</time></span>}</div>
     <h3><a href={item.href}>{item.title}</a></h3><p>{item.description}</p><a class="read" href={item.href}>{copy.read}</a>
    </article>)}</div>
   </details>)}
