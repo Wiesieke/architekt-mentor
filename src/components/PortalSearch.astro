@@ -1,0 +1,47 @@
+---
+import { searchCatalogue } from '../data/catalogue';
+interface Props {locale:'pl'|'en'}
+const {locale}=Astro.props;
+const rows=searchCatalogue(locale);
+const kinds=[...new Set(rows.map(r=>r.kind))];
+const copy=locale==='pl'?{title:'Znajdź temat w magazynie',label:'Szukaj artykułów, ćwiczeń i antywzorców',placeholder:'np. API, idempotencja, odtwarzanie',kind:'Rodzaj materiału',all:'Wszystkie materiały',reset:'Wyczyść',hint:'Wpisz hasło. Szukamy w polskiej edycji, w tytułach, opisach i tematach.',found:'Znalezione materiały',empty:'Brak wyników. Spróbuj krótszego hasła lub innego rodzaju materiału.',more:'Pokaż więcej wyników'}:{title:'Find a topic in the magazine',label:'Search articles, exercises and anti-patterns',placeholder:'e.g. API, idempotency, recovery',kind:'Material type',all:'All materials',reset:'Clear',hint:'Enter a term. Search covers the English edition: titles, descriptions and topics.',found:'Matching materials',empty:'No results. Try a shorter term or another material type.',more:'Show more results'};
+---
+<section class="container portal-search" data-portal-search>
+ <h2>{copy.title}</h2>
+ <form role="search" hidden><label class="query">{copy.label}<input type="search" name="q" placeholder={copy.placeholder} /></label><label>{copy.kind}<select><option value="">{copy.all}</option>{kinds.map(kind=><option>{kind}</option>)}</select></label><button type="reset">{copy.reset}</button></form>
+ <p role="status" aria-live="polite" data-hint={copy.hint} data-found={copy.found} data-empty={copy.empty}>{copy.hint}</p>
+ <div class="results" hidden>{rows.map(row=><article data-result data-kind={row.kind} data-search={`${row.title} ${row.description} ${row.topic} ${row.kind}`} hidden><small>{row.kind} · {row.topic}</small><h3><a href={row.href}>{row.title}</a></h3><p>{row.description}</p></article>)}</div>
+ <button type="button" data-more hidden>{copy.more}</button>
+ <noscript><p>{locale==='pl'?'Przeglądaj materiały w działach Ucz się, Ćwicz, Antywzorce i Architektura w ruchu.':'Browse Foundations, Practice, Anti-patterns and Architecture in motion.'}</p></noscript>
+</section>
+<script>
+ document.querySelectorAll<HTMLElement>('[data-portal-search]').forEach(root=>{
+  const form=root.querySelector<HTMLFormElement>('form')!;
+  const input=form.querySelector<HTMLInputElement>('input')!;
+  const select=form.querySelector<HTMLSelectElement>('select')!;
+  const status=root.querySelector<HTMLElement>('[role=status]')!;
+  const results=root.querySelector<HTMLElement>('.results')!;
+  const more=root.querySelector<HTMLButtonElement>('[data-more]')!;
+  const cards=Array.from(root.querySelectorAll<HTMLElement>('[data-result]'));
+  const normalize=(s:string)=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ł/g,'l');
+  let limit=8;
+  const update=()=>{
+   const terms=normalize(input.value).trim().split(/\s+/).filter(Boolean);
+   const active=terms.length>0||!!select.value;
+   const matches=active?cards.filter(card=>(!select.value||card.dataset.kind===select.value)&&terms.every(term=>normalize(card.dataset.search??'').includes(term))):[];
+   cards.forEach(card=>card.hidden=true);
+   matches.slice(0,limit).forEach(card=>card.hidden=false);
+   results.hidden=matches.length===0; more.hidden=matches.length<=limit;
+   status.textContent=!active?status.dataset.hint!:matches.length?`${status.dataset.found}: ${matches.length}`:status.dataset.empty!;
+  };
+  form.hidden=false;
+  const changed=()=>{limit=8;update()};
+  input.addEventListener('input',changed);select.addEventListener('change',changed);
+  form.addEventListener('submit',e=>e.preventDefault());
+  form.addEventListener('reset',()=>{input.value='';select.value='';changed()});
+  more.addEventListener('click',()=>{limit+=8;update()});
+ });
+</script>
+<style>
+ [hidden]{display:none!important}.portal-search{padding-block:38px}.portal-search h2{font-size:clamp(25px,3vw,36px)}form{display:flex;gap:14px;align-items:end}label{display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:700;min-width:0}.query{flex:1}input,select,button{font:inherit;padding:12px;border:1px solid #829b9c;border-radius:6px;background:#fff;min-width:0;box-sizing:border-box}button{color:#136d73;cursor:pointer;white-space:nowrap}input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #136d73;outline-offset:3px}[role=status]{color:#536577;font-size:14px}.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.results article{background:#fff;border:1px solid #dce4df;padding:22px;border-radius:10px}.results small{color:#136d73}.results h3{font-size:20px}.results h3 a{text-decoration:none}.results p{color:#536577}[data-more]{margin-top:18px}@media(max-width:700px){form{flex-direction:column;align-items:stretch}.results{grid-template-columns:1fr}}
+</style>

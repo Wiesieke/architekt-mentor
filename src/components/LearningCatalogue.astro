@@ -1,9 +1,9 @@
 ---
 import Studio from '../layouts/Studio.astro';
-import { learningCatalogue } from '../data/learning';
-interface Props { locale: 'pl' | 'en' }
-const { locale } = Astro.props;
-const { rows, groups } = learningCatalogue(locale);
+import { catalogue, type CatalogueKind } from '../data/catalogue';
+interface Props { locale: 'pl' | 'en'; kind?: CatalogueKind }
+const { locale, kind = 'learning' } = Astro.props;
+const { rows, groups } = catalogue(kind, locale);
 const copy = locale === 'pl' ? {
  title: 'Podstawy architektury', description: 'Praktyczne podstawy architektury: integracja, odporność, analiza, bezpieczeństwo, jakość i modele.',
  eyebrow: 'Ucz się · wiedza trwała', intro: 'Wybierz obszar lub znajdź temat. W każdej grupie najnowsze artykuły są na początku.',
@@ -15,60 +15,77 @@ const copy = locale === 'pl' ? {
  latest: 'Latest article', search: 'Search titles, descriptions and topics', placeholder: 'e.g. API, retries, C4',
  group: 'Area', all: 'All areas', count: 'Matching articles', empty: 'No matching articles. Try another term or area.', reset: 'Clear filters', read: 'Read →',
 };
+const titles = {practice:{pl:'Ćwiczenia architektoniczne',en:'Architecture exercises'},antipatterns:{pl:'Antywzorce',en:'Anti-patterns'},motion:{pl:'Architektura w ruchu',en:'Architecture in motion'},ai:{pl:'Architekt i AI',en:'Architect + AI'}};
+if(kind!=='learning') {
+ copy.title=titles[kind][locale];
+ copy.description=locale==='pl'?'Znajdź materiał według tematu lub wyszukaj po tytule i opisie.':'Find material by topic or search titles and descriptions.';
+ copy.eyebrow=copy.title;
+ copy.intro=kind==='motion'?(locale==='pl'?'Analizy pogrupowane według tygodnia publikacji. Dla starszych tekstów bez daty publikacji używamy daty wydarzenia.':'Analyses grouped by publication week. Older articles without a publication date use the event date.'):(locale==='pl'?'Wybierz obszar, rozwiń grupę lub wyszukaj temat. Najnowsze materiały są na początku grup.':'Choose an area, expand a group or search a topic. Newest materials come first within each group.');
+ copy.latest=locale==='pl'?'Najnowszy materiał':'Latest material';
+ copy.group=kind==='motion'?(locale==='pl'?'Tydzień':'Week'):copy.group;
+ copy.all=kind==='motion'?(locale==='pl'?'Wszystkie tygodnie':'All weeks'):copy.all;
+}
+const paths={learning:['/podstawy-architektury/','/en/foundations/'],practice:['/lamiglowki/','/en/practice/archive/'],antipatterns:['/antywzorce/','/en/anti-patterns/'],motion:['/architektura-w-ruchu/','/en/architecture-in-motion/'],ai:['/architektura-it-ai/','/en/architecture-with-ai/']};
+const levels=[...new Set(rows.map(r=>('difficulty' in r?r.difficulty:'')).filter(Boolean))];
 const dateLabel = (date: string) => new Intl.DateTimeFormat(locale, {day:'numeric', month:'long', year:'numeric', timeZone:'UTC'}).format(new Date(`${date}T12:00:00Z`));
 ---
-<Studio locale={locale} title={copy.title} description={copy.description} translationUrl={locale === 'pl' ? '/en/foundations/' : '/podstawy-architektury/'}>
+<Studio locale={locale} title={copy.title} description={copy.description} translationUrl={paths[kind][locale==='pl'?1:0]}>
  <div class="container catalogue" data-learning-catalogue>
   <div class="eyebrow">{copy.eyebrow}</div><h1>{copy.title}</h1><p class="intro">{copy.intro}</p>
-  <aside class="latest"><span>{copy.latest} · <time datetime={rows[0].published}>{dateLabel(rows[0].published)}</time></span><a href={rows[0].href}>{rows[0].title} →</a></aside>
+  <aside class="latest"><span>{copy.latest} · {rows[0].published && <time datetime={rows[0].published}>{dateLabel(rows[0].published)}</time>}</span><a href={rows[0].href}>{rows[0].title} →</a></aside>
   <form class="filters" role="search" hidden>
    <label class="search">{copy.search}<input type="search" name="q" placeholder={copy.placeholder} autocomplete="off" /></label>
    <label>{copy.group}<select name="group"><option value="">{copy.all}</option>{groups.map(g => <option value={g.id}>{g.title} ({g.items.length})</option>)}</select></label>
+   {levels.length>0 && <label>{locale==='pl'?'Poziom':'Level'}<select name="level"><option value="">{locale==='pl'?'Wszystkie poziomy':'All levels'}</option>{levels.map(level=><option value={level}>{level}</option>)}</select></label>}
    <button type="reset">{copy.reset}</button>
   </form>
   <p class="result-count" role="status" aria-live="polite" hidden>{copy.count}: <span data-count>{rows.length}</span></p>
   <p class="empty" hidden>{copy.empty}</p>
-  {groups.map(g => <section class="learning-group" data-group={g.id} aria-labelledby={`group-${g.id}`}>
-   <h2 id={`group-${g.id}`}>{g.title} <span class="group-count">({g.items.length})</span></h2>
-   <div class="cards">{g.items.map(item => <article data-learning-card data-search={`${item.title} ${item.description} ${item.topic} ${g.title}`}>
-    <div class="meta"><span>{item.topic}</span>{item.published && <time datetime={item.published}>{dateLabel(item.published)}</time>}</div>
+  {groups.map((g,i) => <details class="learning-group" data-group={g.id} open={i===0}>
+   <summary><h2>{g.title} <span class="group-count">({g.items.length})</span></h2><span class="toggle" aria-hidden="true">＋</span></summary>
+   <div class="cards">{g.items.map(item => <article data-learning-card data-level={'difficulty' in item?item.difficulty:undefined} data-search={`${item.title} ${item.description} ${item.topic} ${g.title}`}>
+    <div class="meta"><span>{item.topic}{'difficulty' in item && item.difficulty && <> · {item.difficulty}</>}</span>{item.published && <time datetime={item.published}>{dateLabel(item.published)}</time>}</div>
     <h3><a href={item.href}>{item.title}</a></h3><p>{item.description}</p><a class="read" href={item.href}>{copy.read}</a>
    </article>)}</div>
-  </section>)}
+  </details>)}
  </div>
 </Studio>
 <script>
  document.querySelectorAll<HTMLElement>('[data-learning-catalogue]').forEach(root => {
   const form = root.querySelector<HTMLFormElement>('form')!;
   const input = form.querySelector<HTMLInputElement>('input')!;
-  const select = form.querySelector<HTMLSelectElement>('select')!;
+  const select = form.querySelector<HTMLSelectElement>('[name=group]')!;
+  const level = form.querySelector<HTMLSelectElement>('[name=level]');
+  const initialOpen = new Map(Array.from(root.querySelectorAll<HTMLDetailsElement>('[data-group]')).map(g=>[g,g.open]));
   const status = root.querySelector<HTMLElement>('.result-count')!;
   const empty = root.querySelector<HTMLElement>('.empty')!;
   const normalize = (value: string) => value.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l');
   const update = () => {
    const terms = normalize(input.value).trim().split(/\s+/).filter(Boolean);
    let total = 0;
-   root.querySelectorAll<HTMLElement>('[data-group]').forEach(group => {
+   root.querySelectorAll<HTMLDetailsElement>('[data-group]').forEach(group => {
     let count = 0;
     group.querySelectorAll<HTMLElement>('[data-learning-card]').forEach(card => {
-     const match = (!select.value || group.dataset.group === select.value) && terms.every(term => normalize(card.dataset.search ?? '').includes(term));
+     const match = (!select.value || group.dataset.group === select.value) && (!level?.value || card.dataset.level===level.value) && terms.every(term => normalize(card.dataset.search ?? '').includes(term));
      card.hidden = !match;
      if (match) count++;
     });
     group.hidden = count === 0;
+    const filtering=!!select.value || !!level?.value || terms.length>0;
+    group.open=filtering ? count>0 : initialOpen.get(group)??false;
     group.querySelector('.group-count')!.textContent = `(${count})`;
     total += count;
    });
    status.querySelector('[data-count]')!.textContent = String(total);
    empty.hidden = total > 0;
-   root.querySelector<HTMLElement>('.latest')!.hidden = !!select.value || terms.length > 0;
+   root.querySelector<HTMLElement>('.latest')!.hidden = !!select.value || !!level?.value || terms.length > 0;
   };
   form.hidden = false; status.hidden = false;
   form.addEventListener('submit', event => event.preventDefault());
-  input.addEventListener('input', update); select.addEventListener('change', update);
-  form.addEventListener('reset', () => { input.value = ''; select.value = ''; update(); });
+  input.addEventListener('input', update); select.addEventListener('change', update); level?.addEventListener('change',update);
+  form.addEventListener('reset', () => { input.value = ''; select.value = ''; if(level)level.value=''; update(); });
  });
 </script>
 <style>
- [hidden]{display:none!important}.catalogue{padding-top:60px;padding-bottom:90px}.catalogue h1{font-size:clamp(34px,5vw,54px);margin:18px 0}.intro{max-width:68ch;color:#536577}.latest{margin:28px 0;padding:22px;border-left:4px solid #136d73;background:#eaf2ef;border-radius:8px}.latest span{display:block;font-size:13px;color:#536577;margin-bottom:8px}.latest a{font-size:20px;font-weight:800;text-decoration:none}.filters{display:flex;align-items:end;gap:16px;padding:22px;background:#fff;border:1px solid #dce4df;border-radius:12px}.filters label{display:flex;flex-direction:column;gap:8px;font-weight:700;font-size:14px;min-width:0}.search{flex:1}.filters input,.filters select{font:inherit;font-weight:400;border:1px solid #829b9c;border-radius:6px;padding:12px;background:#fff;min-width:0;width:100%;box-sizing:border-box}.filters button{font:inherit;border:1px solid #136d73;border-radius:6px;padding:12px;color:#136d73;background:#fff;cursor:pointer;white-space:nowrap}.result-count{font-size:14px;color:#536577}.learning-group{margin-top:38px}.learning-group h2{font-size:25px}.group-count{font-size:16px;color:#536577;font-weight:400}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.cards article{padding:26px;background:#fff;border:1px solid #dce4df;border-radius:12px;min-width:0}.meta{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;font-size:12px;color:#136d73}.meta time{color:#536577}.cards h3{font-size:22px}.cards h3 a{text-decoration:none}.cards p{color:#536577}.read{color:#136d73;font-weight:700}a,input,select,button{overflow-wrap:anywhere}input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #136d73;outline-offset:3px}@media(max-width:700px){.catalogue{padding-top:32px}.cards{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}.cards article{padding:22px}}
+ [hidden]{display:none!important}.catalogue{padding-top:60px;padding-bottom:90px}.catalogue h1{font-size:clamp(34px,5vw,54px);margin:18px 0}.intro{max-width:68ch;color:#536577}.latest{margin:28px 0;padding:22px;border-left:4px solid #136d73;background:#eaf2ef;border-radius:8px}.latest span{display:block;font-size:13px;color:#536577;margin-bottom:8px}.latest a{font-size:20px;font-weight:800;text-decoration:none}.filters{display:flex;align-items:end;gap:16px;padding:22px;background:#fff;border:1px solid #dce4df;border-radius:12px}.filters label{display:flex;flex-direction:column;gap:8px;font-weight:700;font-size:14px;min-width:0}.search{flex:1}.filters input,.filters select{font:inherit;font-weight:400;border:1px solid #829b9c;border-radius:6px;padding:12px;background:#fff;min-width:0;width:100%;box-sizing:border-box}.filters button{font:inherit;border:1px solid #136d73;border-radius:6px;padding:12px;color:#136d73;background:#fff;cursor:pointer;white-space:nowrap}.result-count{font-size:14px;color:#536577}.learning-group{margin-top:38px}.learning-group summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px;background:#eaf2ef;border-radius:9px;cursor:pointer;list-style:none}.learning-group summary::-webkit-details-marker{display:none}.learning-group h2{font-size:23px;margin:0}.learning-group summary:focus-visible{outline:3px solid #136d73;outline-offset:3px}.toggle{font-size:26px}.learning-group[open] .toggle{font-size:0}.learning-group[open] .toggle:after{content:"−";font-size:26px}.learning-group .cards{margin-top:18px}.group-count{font-size:16px;color:#536577;font-weight:400}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.cards article{padding:26px;background:#fff;border:1px solid #dce4df;border-radius:12px;min-width:0}.meta{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;font-size:12px;color:#136d73}.meta time{color:#536577}.cards h3{font-size:22px}.cards h3 a{text-decoration:none}.cards p{color:#536577}.read{color:#136d73;font-weight:700}a,input,select,button{overflow-wrap:anywhere}input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #136d73;outline-offset:3px}@media(max-width:700px){.catalogue{padding-top:32px}.cards{grid-template-columns:1fr}.filters{flex-direction:column;align-items:stretch}.cards article{padding:22px}}
 </style>
