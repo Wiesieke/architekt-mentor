@@ -1,0 +1,25 @@
+{
+  "project": "ArchitectMentor",
+  "authorizedBy": "Wiesław Ejsymont",
+  "recordedAt": "2026-10-09T15:47:23+02:00",
+  "evidence": "odblokuj ta blokadę Publikację blokuje obowiązująca w tym repo zasada Twojego przeglądu konkretnej wersji.",
+  "scope": [
+    "articles",
+    "exercises",
+    "anti-patterns",
+    "tutorials",
+    "event recommendations",
+    "PL/EN",
+    "existing drafts after fresh checks"
+  ],
+  "mode": "publish-after-quality-and-technical-checks",
+  "personalReviewRequired": false,
+  "personalApproval": null,
+  "supersedes": "Mandatory review of each final revision adopted on 2026-10-02",
+  "excludes": [
+    "newsletter/email sends",
+    "commercial commitments",
+    "confidential material"
+  ],
+  "scheduleChanged": false
+}
