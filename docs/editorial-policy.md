@@ -10,11 +10,13 @@ Publish to help a reader make a concrete architectural decision. Each item must 
 
 Check technical claims in primary sources. Link to relevant documentation, incidents or organizer pages; record dates and distinguish fact, interpretation and assumption. Never invent references, benchmark results, model calls, client projects, outcomes or first-hand experience. Use “Practice-inspired educational scenario” only when a confirmed source supports the scenario. Otherwise explicitly use “Fictional educational scenario” or “Composite educational scenario”. Remove confidential and identifying details; anonymization alone does not prove a source is safe to publish.
 
-## Human review is the publication gate
+## Publication authorization and quality gate
 
-AI may research, draft, translate and perform preliminary checks. These checks are not human editorial approval. Wiesław must review the specific final material before publication. Existing general permission to publish on a schedule does not satisfy this gate. Daily and weekly runs prepare draft PRs and a review summary; they must not merge, deploy the content to production or send a newsletter while awaiting approval.
+Effective 9 October 2026, Wiesław authorizes ArchitectMentor publication without his separate review of each final revision. This supersedes the mandatory personal-review gate adopted on 2 October. It covers articles, exercises, anti-patterns, tutorials and event recommendations in PL/EN, including existing draft candidates after fresh checks. The authorization evidence is recorded in `docs/publication-authorization.json`.
 
-Approval must identify the material or PR and revision reviewed. Subsequent substantive edits require renewed review. Technical fixes to an approved article may proceed within the authorized scope; a new claim, changed recommendation or new scenario is substantive. Record approval in the PR or review record, not in a fabricated byline. Never add a “Reviewed by” label to an item without evidence of that review. Existing articles are not retroactively marked reviewed.
+AI may research, draft, translate, check and publish through a branch/PR, verified Preview, passing applicable tests/build and production verification. Every material must pass the checklist below; unresolved factual, confidentiality, educational or technical issues still block publication. Recheck substantive edits and the final revision. Authorization does not itself certify any candidate as ready.
+
+Record cycle authorization separately from human review. Never fill a human reviewer, reviewed revision or personal approval without actual evidence, and never add a “Reviewed by” label merely because publication was authorized. Previous publications and review records remain unchanged. Newsletter/email sends, commercial commitments and publication of confidential source material require separate authorization. Generated HLDs still require the user's architectural review.
 
 ## Publication checklist
 
@@ -27,7 +29,7 @@ Approval must identify the material or PR and revision reviewed. Subsequent subs
 - Exercise choices, feedback and evaluation criteria agree; links and build pass.
 - Title and promises match the content. HLD output is a draft requiring review, not organizational approval.
 - No unnecessary duplication, keyword padding or public indexing of raw user-generated HLDs.
-- Human approval of this revision is recorded before production publication.
+- Applicable publication authorization, exact checked revision, actual checks and deployed revision are recorded.
 
 ## Review record (include in the draft PR)
 
@@ -36,12 +38,16 @@ Learning goal and original contribution:
 Provenance (confirmed practice / composite / fictional / sourced report):
 Primary sources and dates checked:
 Checks completed and remaining uncertainties:
-Human reviewer: pending
-Reviewed revision: pending
-Decision: draft / changes requested / approved
-Approval evidence: pending
+Publication authorization: docs/publication-authorization.json
+Checked revision: exact commit SHA
+Decision: draft / blocked / ready / published
+Human reviewer: null unless an actual review occurred
+Human-reviewed revision: null unless an actual review occurred
+Personal approval evidence: null unless actually provided
+Quality/technical checks: actual outcomes, failures and limitations
+Deployed revision and production verification: pending until deployed
 
-Pending is an actual blocking state. A checkbox completed by AI cannot replace the human fields. After approval, publish only the reviewed content, verify production and record the deployed revision.
+An unresolved quality or technical check is a blocking state. Absent personal review is not a blocker under the current authorization. AI checks remain AI checks; record their outcomes honestly. Publish only the checked scope, verify production and record the deployed revision.
 
 ## Corrections, transparency and commercial relationships
 
@@ -49,13 +55,15 @@ Explain AI assistance and responsibility on /jak-powstaja-materialy/ and /en/edi
 
 ## Existing catalogue and recurring work
 
-Maintain a review backlog for existing materials, starting with factual claims, first-hand narratives, external news and diagram accuracy. Do not claim the backlog is completed. Prepare daily; publish after the gate, even when this reduces frequency. Events follow the same review rule, with organizer facts checked again before publication. The event pilot plan and technical measurement details belong in internal documentation, with appropriate data notices on the dedicated public page.
+Maintain a review backlog for existing materials, starting with factual claims, first-hand narratives, external news and diagram accuracy. Do not claim the backlog is completed. The existing task schedule controls preparation; this policy does not create a new schedule. Publish after the quality and technical gate, even when this reduces frequency. Check organizer facts again before publishing event recommendations. The event pilot plan and technical measurement details belong in internal documentation, with appropriate data notices on the dedicated public page.
 
 Reference guidance checked 2 October 2026:
 - https://developers.google.com/search/docs/fundamentals/using-gen-ai-content
 - https://developers.google.com/search/docs/essentials/spam-policies
 - https://developers.google.com/search/docs/fundamentals/creating-helpful-content
 
-## How Wiesław reviews a draft
+## Publication report and optional personal review
 
-The run summary must include permanent titles and PL/EN pairs, a readable Vercel Preview URL, the draft GitHub PR, the reviewed commit, and a short review checklist. Verify that Preview actually displays the draft; never present the production page as a preview of unpublished content. State any access restriction and provide a readable draft as a fallback. Wiesław can review prose in Preview without reading code. His response in the conversation or on the PR can approve a specific PR/revision, request edits or approve only named materials. Record that response and the revision before merging. Partial approval requires publishing only approved items, with a separate commit/PR if needed. Recheck the final diff against the approval; substantive later edits require a new review.
+The run summary includes titles and permanent PL/EN pairs, a verified readable Preview URL, GitHub PR, exact checked/deployed commit, primary sources, checks and remaining limitations. Never present production as a preview of unpublished content. If Preview is unavailable, record that technical block and keep the candidate unpublished.
+
+Wiesław may request edits, review a specific revision or narrow/revoke authorization at any time. Record an actual personal review only when it happens. Under the current authorization, a missing personal review does not prevent publishing a candidate that passes all other gates. Preserve the evidence of checks and corrections for each release.

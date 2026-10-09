@@ -205,7 +205,7 @@ Pierwszy pomiar liczy działania, nie unikalne osoby, rejestracje ani faktyczny 
 
 ## Zasady jakości zatwierdzone 2 października 2026
 
-Obowiązuje docs/editorial-policy.md. Codzienny rytm dotyczy przygotowania szkiców, a publikacja wymaga osobistego przeglądu konkretnego materiału i zatwierdzenia danej wersji przez Wiesława. Ta zasada zastępuje wcześniejsze ogólne upoważnienie do automatycznego scalania wydań i tutoriali. Automatyzacje pozostawiają draft PR oraz zestawienie źródeł, kontroli i niewiadomych. AI nie może podpisać się jako ludzki recenzent. Merytoryczna zmiana po akceptacji wymaga ponownego przeglądu.
+Obowiązuje docs/editorial-policy.md. Wymóg osobistego przeglądu każdej końcowej wersji z 2 października został zastąpiony upoważnieniem Wiesława z 9 października 2026: „odblokuj ta blokadę Publikację blokuje obowiązująca w tym repo zasada Twojego przeglądu konkretnej wersji.” Publikujemy materiały ArchitectMentor bez osobnego pytania po rzeczywistej kontroli jakości, źródeł, poufności, PL/EN, testach/build, sprawdzonym Preview i kontroli produkcji. Upoważnienie obejmuje także istniejące szkice po ponownej weryfikacji. Dowód: docs/publication-authorization.json. Nie oznacza osobistego przeczytania przyszłych wersji; pola human review pozostają null bez rzeczywistego przeglądu. Zmiany merytoryczne wymagają ponownej kontroli, nie kolejnej osobistej akceptacji. Nie upoważnia to do wysyłki newslettera/e-maili ani ujawniania informacji poufnych.
 
 Każdy materiał musi wnosić konkretną wartość edukacyjną. Weryfikujemy źródła pierwotne, pochodzenie przykładu, fakty, daty, anonimizację, równoważność PL/EN, diagramy i działanie ćwiczeń. Nie wymyślamy doświadczeń autora, źródeł ani wyników testów. Etykieta „inspirowany praktyką” wymaga potwierdzonego źródła; bez niego stosujemy jawne oznaczenie scenariusza fikcyjnego albo modelowego. Poprawiamy istniejące materiały zamiast powielać treści. Brak minimalnej liczby publikacji; jakość ma pierwszeństwo przed kalendarzem.
 
@@ -213,10 +213,15 @@ Publiczny opis zasad: /jak-powstaja-materialy/ oraz /en/editorial-policy/. Oznac
 
 Aktualizacja generatora HLD z 2 października: limit funkcji 300 s, wywołania OpenAI 270 s, początkowy budżet pełnego HLD 12 000 tokenów (mini 8 000), licznik czasu i jawne błędy timeout/truncation. Test fikcyjnego pełnego HLD z Sol zakończył się HTTP 200 po 158,5 s, z dwoma diagramami. To dowód działania jednego wywołania, nie gwarancja poprawności architektonicznej każdego wyniku.
 
-Przegląd dla Wiesława: podsumowanie wydania zawiera czytelny podgląd Vercel Preview, draft PR, wersję/commit, pary PL/EN, źródła i krótką listę pytań do przeglądu. Wiesław czyta podgląd i akceptuje konkretną wersję w rozmowie lub PR; może zgłosić korekty albo zatwierdzić tylko nazwane materiały. Publikujemy wyłącznie zatwierdzony zakres. Niedostępny podgląd wymaga czytelnego szkicu jako zastępstwa, nie linku do starej produkcji.
+Raport publikacji dla Wiesława zawiera sprawdzony Preview, PR, dokładny commit, pary PL/EN, źródła, faktyczne kontrole i ograniczenia. Publikacja nie czeka już na osobisty przegląd, ale nie przechodzi przy nierozwiązanym błędzie jakości lub technicznym. Wiesław może zawęzić lub odwołać upoważnienie oraz zgłaszać korekty. Harmonogram pozostaje osobnym ustawieniem zadania.
+
 
 ## Wspólna strona główna PL/EN — 2 października 2026
 
 Obie edycje korzystają z src/components/Homepage.astro: jeden układ, style, kolejność sekcji i mechanizm linków. src/pages/pl/index.astro oraz src/pages/en/index.astro są jedynie wrapperami z locale. Teksty znajdują się w src/data/homepage-copy.json, a treści i adresy w src/data/homepage.ts. PolishHomepage.astro jest wrapperem zgodności, nie osobnym układem.
 
 Do PL przeniesiono kierunek UX z PR #37: główne działanie prowadzi do ćwiczenia, drugi link do wspólnej sekcji #start („Zacznij tutaj” / „Start here”), karta ćwiczeń jest wyróżniona. Lista najnowszych materiałów obu edycji wynika z editions.ts i latestEditionDate; EN korzysta z tłumaczeń artykułów, antywzorców i ćwiczeń. Brak tłumaczenia blokuje build, zamiast pomijać pozycję. Nie wpisujemy daty ani liczby materiałów na sztywno w stronach. Zachowujemy istniejące adresy PL/EN, przełącznik języka i biografię, bez scalania niezatwierdzonego PR #30. Zmiany układu wykonujemy wyłącznie we wspólnym komponencie; przy wydaniu aktualizujemy indeks i źródła treści, nie zastępujemy wrapperów osobnymi stronami.
+
+## Upoważnienie publikacyjne — 9 października 2026
+
+Zmiana obowiązuje dla ArchitectMentor; nie przenosi uprawnień między projektami. Zapis poprzedniej reguły stanowi historię decyzji, nie aktualną bramkę. Nie zmieniamy historycznych dowodów przeglądu ani nie przypisujemy Wiesławowi review nowych tekstów.
