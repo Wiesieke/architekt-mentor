@@ -1,6 +1,7 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'W RUCHU', published:'2026-10-05', eventDate:'2026-09-28', title:'Cloud Service Mesh: sprawdź wariant, zanim zaplanujesz migrację', summary:'28.09 · wariant · zgodność · migracja · dowody', href:'/architektura-w-ruchu/cloud-service-mesh-koniec-istiod/' },
   { kind:'W RUCHU', published:'2026-10-04', eventDate:'2026-10-02', title:'GitHub zmienił format tokenów: sprawdź całą ścieżkę poświadczenia', summary:'2.10 · magazyn · proxy · maskowanie · odnowienie', href:'/architektura-w-ruchu/github-tokeny-instalacyjne-format/' },
   { kind:'ĆWICZENIE', published:'2026-10-03', title:'Nowe opcjonalne pole w API. Czy aplikacja nadal odczyta odpowiedź?', summary:'Średni · szybka decyzja lub mentor', href:'/lamiglowki/2026-10-03-opcjonalne-pole-api/' },
   { kind:'ANTYWZORZEC', published:'2026-10-03', title:'Zgodne, bo generator nie zgłosił błędu', summary:'Schemat · ukryty kontrakt · test konsumenta', href:'/antywzorce/2026-10-03-zgodnosc-tylko-w-schemacie/' },
