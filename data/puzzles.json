@@ -1,5 +1,76 @@
 [
   {
+    "id": "2026-10-11-saas-granice-odpowiedzialnosci",
+    "week": "ArchitectMentor Weekly · 5–11.10.2026",
+    "date": "2026-10-11",
+    "title": "Dostawca daje SaaS. Czy musisz znać jego architekturę?",
+    "difficulty": "Średni",
+    "goal": "Odróżnić szczegóły implementacyjne dostawcy od informacji potrzebnych do oceny odpowiedzialności, ryzyka i integracji SaaS.",
+    "scenario": "Fikcyjny scenariusz edukacyjny\n\nOrganizacja rozważa zewnętrzną usługę SaaS do obsługi ważnego procesu transakcyjnego. Dostawca utrzymuje aplikację, bazę danych i infrastrukturę we własnym środowisku. Klient ma jednak zbudować własny kanał użytkownika, połączyć usługę z tożsamością organizacji, przekazywać część danych biznesowych i obsługiwać incydenty pierwszej linii.\n\nDostawca przekazał opis API, SLA oraz ogólną informację o bezpieczeństwie. Na pytanie o architekturę odpowiada: „To SaaS — szczegóły wewnętrznej implementacji są po naszej stronie”. Nie ma jeszcze jasnej informacji o granicach odpowiedzialności, lokalizacji i retencji danych, sposobie izolacji klientów, zależnościach krytycznych, procedurze awarii, RTO/RPO, telemetryce dostępnej klientowi ani mechanizmie zakończenia usługi i eksportu danych.\n\nBiznes chce szybko zatwierdzić kierunek. Zespół techniczny dzieli się na dwa obozy: „bez pełnego diagramu dostawcy niczego nie zatwierdzamy” oraz „to SaaS, więc architektura dostawcy nas nie interesuje”.",
+    "question": "Jaką decyzję podejmiesz na tym etapie? W 2–3 zdaniach wskaż potrzebne informacje, szczegóły pozostające po stronie dostawcy i dowód przed akceptacją.",
+    "hints": [
+      "Co kontroluje klient: kanał użytkownika, tożsamość, dane czy infrastrukturę dostawcy?",
+      "Jak sprawdzisz cały proces, gdy API odpowiada, lecz usługa biznesowa nie działa?",
+      "Które niewiadome można zamknąć kontraktem, testem odtwarzania lub eksportu?"
+    ],
+    "analysis": "### SaaS nie usuwa architektury — przesuwa granicę\nNajważniejsza decyzja nie dotyczy tego, czy dostawca używa kontenerów, maszyn wirtualnych czy konkretnej bazy danych. Jeżeli klient nie zarządza tymi elementami i ich zmiana nie narusza uzgodnionego kontraktu, szczegóły mogą pozostać wewnętrzne.\n\nArchitekt klienta musi jednak rozumieć **system, który powstaje na styku organizacji**. Granica rozwiązania obejmuje nie tylko API, lecz także przepływ tożsamości, dane, konfigurację, kanały użytkownika, zależności, procedurę awarii, telemetrykę i operacje day-2.\n\n### Minimalny zestaw informacji przed decyzją\n1. **Service boundary i odpowiedzialność.** Co dokładnie jest usługą? Kto odpowiada za endpoint klienta, IAM, konfigurację, dane, certyfikaty, integrację i pierwszą reakcję na incydent?\n2. **Dane.** Gdzie są przetwarzane i przechowywane, jak długo, jak są separowane pomiędzy klientami, jak wygląda backup, eksport i usunięcie?\n3. **Tożsamość i dostęp.** Jak działa federacja, role, uprzywilejowany dostęp dostawcy, audyt i odebranie dostępu?\n4. **NFR.** Dostępność, wydajność, limity, RTO, RPO, maintenance windows, skalowanie oraz sposób mierzenia zobowiązań.\n5. **Failure model.** Co obserwuje klient, kiedy usługa lub jej zależność zawodzi? Jakie są timeouty, retry, degradacja, komunikacja incydentowa i eskalacja?\n6. **Observability.** Jakie metryki, logi, identyfikatory korelacyjne i statusy dostaje klient? Co pozwala odróżnić błąd po swojej stronie od awarii SaaS?\n7. **Lifecycle i exit.** Jak zmieniają się API, jak wygląda wersjonowanie, eksport danych, okres przejściowy i zakończenie usługi?\n\n### Czego zwykle nie trzeba znać\nNie trzeba wymagać nazw każdego mikroserwisu, szczegółowej topologii klastra, konfiguracji każdego load balancera czy języka implementacji, jeśli nie wpływają na wymaganie, ryzyko, zgodność, kontrakt lub obowiązek klienta. Wyjątki powstają wtedy, gdy regulacja, bezpieczeństwo, customer-hosted data plane, dedykowany komponent w środowisku klienta albo wymaganie audytowe wprowadza dodatkową odpowiedzialność.\n\n### Jak zamknąć decyzję dowodami\nZamiast prosić tylko o „więcej dokumentacji”, zbuduj **macierz odpowiedzialność → wymaganie → dowód**. Przykładowo (wartość fikcyjna, wymagająca uzgodnienia): RTO 4 h → procedura odtworzenia + wynik regularnego testu; SSO → kontrakt federacji + test logowania/odebrania roli; izolacja danych → opis modelu izolacji + odpowiedni dowód bezpieczeństwa; exit → format eksportu + test próbnego eksportu.\n\n> Nie potrzebujesz pełnej mapy kuchni dostawcy. Musisz wiedzieć, co zamawiasz, gdzie kończy się jego odpowiedzialność, gdzie zaczyna Twoja i jak sprawdzisz, że granica działa.\n\n[Całe wydanie Weekly](/tygodnik/2026-10-11/) · [Antywzorzec](/antywzorce/2026-10-11-saas-nas-nie-interesuje/)",
+    "quick": {
+      "question": "Która odpowiedź jest najlepsza przy podanych założeniach?",
+      "hint": "Połącz zakres odpowiedzialności z wymaganiem i dowodem.",
+      "correctId": "c",
+      "options": [
+        {
+          "id": "a",
+          "text": "Żądać pełnego wewnętrznego HLD dostawcy i wszystkich technologii, zanim zacznie się ocena SaaS.",
+          "explanation": "Pełna mapa implementacji nie zastępuje sprawdzenia granic usługi. Dodatkowe szczegóły wymagają konkretnego uzasadnienia ryzykiem lub własnym komponentem."
+        },
+        {
+          "id": "b",
+          "text": "Zaakceptować API i SLA: SaaS przenosi całą odpowiedzialność techniczną na dostawcę.",
+          "explanation": "Klient nadal odpowiada za własny kanał, dane, tożsamość, konfigurację i integrację. Bez granic i dowodów SLA nie zamyka tej oceny."
+        },
+        {
+          "id": "c",
+          "text": "Ustalić granice odpowiedzialności oraz dowody dla danych, IAM, integracji, ciągłości, operacji i wyjścia; pozostawić nieistotne wnętrze dostawcy w jego gestii.",
+          "explanation": "Skupia przegląd na zachowaniu usługi, od którego klient zależy. Akceptacja wymaga zamknięcia istotnych luk lub jawnej decyzji właściciela ryzyka."
+        }
+      ]
+    },
+    "coach": {
+      "criteria": [
+        {
+          "id": "responsibility_boundary",
+          "label": "Granica odpowiedzialności",
+          "expected": "Rozróżnia obowiązki dostawcy i klienta oraz własny kanał, dane, IAM i integrację."
+        },
+        {
+          "id": "significant_information",
+          "label": "Informacje istotne dla decyzji",
+          "expected": "Wymaga kontraktów, danych, IAM, NFR, odtwarzania, operacji i wyjścia; nie żąda pełnego wewnętrznego HLD bez uzasadnienia."
+        },
+        {
+          "id": "acceptance_evidence",
+          "label": "Dowód przed akceptacją",
+          "expected": "Proponuje macierz odpowiedzialności i konkretne testy lub artefakty; nie uznaje API i SLA za wystarczający dowód."
+        }
+      ]
+    },
+    "related": [
+      {
+        "type": "PODSTAWY",
+        "title": "Przegląd architektoniczny SaaS przed zakupem",
+        "description": "Odróżnić szczegóły implementacyjne dostawcy od informacji potrzebnych do oceny odpowiedzialności, ryzyka i integracji SaaS.",
+        "href": "/podstawy-architektury/due-diligence-saas/"
+      },
+      {
+        "type": "ANTYWZORZEC",
+        "title": "To SaaS, więc architektura dostawcy nas nie interesuje",
+        "description": "Granice delegowania odpowiedzialności.",
+        "href": "/antywzorce/2026-10-11-saas-nas-nie-interesuje/"
+      }
+    ]
+  },
+  {
     "id": "2026-10-03-opcjonalne-pole-api",
     "week": "Publikacja codzienna / 2026",
     "date": "2026-10-03",

@@ -1,0 +1,65 @@
+<p>Buying SaaS reduces the technology the customer designs and operates. It still leaves a system spanning organisations: the user channel, identity, data, integration and business continuity.</p>
+<h3>1. Review behaviour and ownership</h3>
+<p>The useful question is which boundaries and risks the customer owns or depends on. A provider&#39;s implementation language and internal component names may be irrelevant when the customer neither operates them nor relies on a particular implementation. The service contract and its evidence matter whenever a change can affect the customer.</p>
+<h3>2. Connect a requirement to evidence</h3>
+<p>For each material requirement, name the responsible party, service scope, observable result and acceptance evidence. The customer and provider may share a task; explicitly divide it rather than writing “IT is responsible”. A declaration is an input to review, not a completed test.</p>
+<h3>3. Seven areas of SaaS review</h3>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Establish</th>
+<th>Example evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Responsibility</td>
+<td>Who operates each component and responds to failure</td>
+<td>Responsibility matrix with named owners</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Processing location, retention, isolation, backup and export</td>
+<td>Data flow, policy and export test</td>
+</tr>
+<tr>
+<td>IAM</td>
+<td>Federation, roles, privileged and support access</td>
+<td>Sign-in and access-revocation test</td>
+</tr>
+<tr>
+<td>Integration</td>
+<td>APIs, versioning, limits and errors</td>
+<td>Contract and failure/negative test</td>
+</tr>
+<tr>
+<td>Quality requirements</td>
+<td>Availability, latency, capacity, RTO/RPO</td>
+<td>SLA/SLO scope, measurement and recovery drill</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>Telemetry, status, incidents and changes</td>
+<td>Runbook, correlation and escalation path</td>
+</tr>
+<tr>
+<td>Exit</td>
+<td>Data portability and service termination</td>
+<td>Export format and exit rehearsal</td>
+</tr>
+</tbody></table>
+<h3>4. Availability and recovery need a boundary</h3>
+<p>An SLA has limited value when the measured function and perspective are unspecified. RTO and RPO need a defined scope of data and functions. A customer-owned channel can give the complete user journey a different recovery time from the provider service alone. Specify maintenance and exclusions as well as the target.</p>
+<h3>5. Observability belongs in the operating contract</h3>
+<p>The customer need not see every internal log. It needs enough information to understand service and integration health: status, relevant metrics, error codes, correlation identifiers, incident communication and escalation. A successful HTTP request alone does not demonstrate a completed business process.</p>
+<h3>6. Customer-hosted components change the review</h3>
+<p>An agent, terminal, connector, gateway or data plane in the customer environment adds architecture the customer must operate. Establish version compatibility, supported OS/runtime, upgrade ownership, network requirements, telemetry and rollback. Assess the actual deployment model rather than treating it as a remote website.</p>
+<h3>7. Exit is an architectural requirement</h3>
+<p>Managed services can remain a sound choice while some dependencies are hard to move. Establish export format, completeness, delivery time, deletion handling and integration/identity shutdown. Test an export before the process becomes dependent on the provider.</p>
+<h3>From a question to evidence</h3>
+<p>Fictional example: a business-agreed four-hour RTO covers the customer channel, IAM, SaaS and integration. A vendor database-recovery declaration alone does not prove that objective. Agree owners, drill conditions and measurement start/end points. Four hours is not a universal target.</p>
+<p>For data, test export and readability outside the service. For access, check role revocation, existing sessions and privileged support access. For integration, examine missing responses, limits and contract versions. Record the result, service version and unknowns. Scale evidence to process criticality and assign acceptance of remaining risk.</p>
+<p><strong>Decision rule:</strong> Do we know every boundary, risk and behaviour we own or depend on, and do we have evidence for it?</p>
+<h3>Sources and method</h3>
+<p>Primary sources checked 11 October 2026: <a href="https://learn.microsoft.com/en-us/azure/well-architected/saas/design-principles">Azure SaaS design principles</a> and <a href="https://learn.microsoft.com/en-us/azure/well-architected/saas/design-methodology">design methodology</a>. They explain responsibility and service-design principles; they do not prove any particular vendor&#39;s capabilities. The seven-area checklist and responsibility → requirement → evidence matrix are ArchitectMentor editorial synthesis. Prepared with AI assistance.</p>
+<p><a href="/en/practice/2026-10-11-saas-granice-odpowiedzialnosci/">Practise the decision</a> · <a href="/en/anti-patterns/2026-10-11-saas-nas-nie-interesuje/">Anti-pattern</a> · <a href="/en/weekly/2026-10-11/">Complete edition</a></p>

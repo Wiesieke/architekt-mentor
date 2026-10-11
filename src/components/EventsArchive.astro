@@ -7,22 +7,22 @@ const en = locale === 'en';
 const title = en ? 'Worth attending' : 'Warto wziąć udział';
 const statuses = en ? {upcoming:'Upcoming',in_progress:'In progress',ended:'Past event',review:'Date passed — awaiting review',cancelled:'Cancelled',postponed:'Postponed'} : {upcoming:'Nadchodzące',in_progress:'W trakcie',ended:'Zakończone',review:'Termin minął — wymaga sprawdzenia',cancelled:'Odwołane',postponed:'Przełożone'};
 ---
-<Studio locale={locale} title={title} description={en ? 'Selected educational events for IT architects, with independent recommendations and checked participation details.' : 'Wybrane wydarzenia edukacyjne dla architektów IT, z niezależnym komentarzem i sprawdzonymi warunkami udziału.'} translationUrl={en ? '/wydarzenia/' : '/en/events/'} modified="2026-10-02">
+<Studio locale={locale} title={title} description={en ? 'Selected educational events for IT architects, with independent recommendations and checked participation details.' : 'Wybrane wydarzenia edukacyjne dla architektów IT, z niezależnym komentarzem i sprawdzonymi warunkami udziału.'} translationUrl={en ? '/wydarzenia/' : '/en/events/'} modified="2026-10-11">
 <section class="container events-page" data-events-locale={locale}>
   <div class="eyebrow">{en ? 'ArchitectMentor · Events pilot' : 'ArchitectMentor · Pilotaż wydarzeń'}</div>
   <h1>{title}</h1>
   <p class="intro">{en ? 'Selected events for better architectural decisions. We check the programme and participation details, and explain why each topic matters in practice.' : 'Wybrane wydarzenia pomagające podejmować lepsze decyzje architektoniczne. Sprawdzamy program i warunki udziału oraz wyjaśniamy, dlaczego dany temat jest przydatny w praktyce.'}</p>
-  <p class="notice">{en ? 'First selection checked on 2 October 2026. Unknown details are marked explicitly. Confirm current conditions with the organizer before registering.' : 'Pierwsza selekcja sprawdzona 2 października 2026. Brakujące dane oznaczamy wprost. Przed zapisem potwierdź aktualne warunki u organizatora.'}</p>
+  <p class="notice">{en ? 'Selection updated on 11 October 2026. Unknown details are marked explicitly. Confirm current conditions with the organizer before registering.' : 'Selekcja zaktualizowana 11 października 2026. Brakujące dane oznaczamy wprost. Przed zapisem potwierdź aktualne warunki u organizatora.'}</p>
   <form class="filters" aria-label={en ? 'Event filters' : 'Filtry wydarzeń'}>
     <label>{en ? 'Format and place' : 'Format i miejsce'}<select name="format"><option value="all">{en ? 'All' : 'Wszystkie'}</option><option value="online">Online</option><option value="poland">{en ? 'Poland' : 'Polska'}</option><option value="europe">{en ? 'Europe, in person' : 'Europa stacjonarnie'}</option></select></label>
-    <label>{en ? 'Cost' : 'Koszt'}<select name="cost"><option value="all">{en ? 'All' : 'Wszystkie'}</option><option value="paid">{en ? 'Ticket price confirmed' : 'Cena biletu potwierdzona'}</option><option value="subscription">{en ? 'Subscription access' : 'Dostęp w abonamencie'}</option><option value="unknown">{en ? 'Unconfirmed' : 'Niepotwierdzony'}</option></select></label>
+    <label>{en ? 'Cost' : 'Koszt'}<select name="cost"><option value="all">{en ? 'All' : 'Wszystkie'}</option><option value="paid">{en ? 'Paid' : 'Płatne'}</option><option value="free">{en ? 'Free' : 'Bezpłatne'}</option><option value="subscription">{en ? 'Subscription access' : 'Dostęp w abonamencie'}</option><option value="unknown">{en ? 'Unconfirmed' : 'Niepotwierdzony'}</option></select></label>
     <label>{en ? 'Show' : 'Pokaż'}<select name="view"><option value="upcoming">{en ? 'Upcoming and ongoing' : 'Nadchodzące i w trakcie'}</option><option value="archive">{en ? 'Archive and notices' : 'Archiwum i komunikaty'}</option><option value="all">{en ? 'All' : 'Wszystkie'}</option></select></label>
   </form>
   <p class="result-count" aria-live="polite"></p>
   <noscript><p>{en ? 'All events are displayed. Check dates with the organizers; live filters require JavaScript.' : 'Wyświetlamy wszystkie wydarzenia. Sprawdź terminy u organizatorów; filtry na żywo wymagają JavaScript.'}</p></noscript>
   <div class="event-list">
   {[...events].sort((a,b)=>a.startDate.localeCompare(b.startDate)).map(event => {const copy=event[locale as 'pl'|'en']; return <article id={event.id} data-event-id={event.id} class="event-card">
-    <div class="card-top"><span class="badge">{event.format==='online' ? 'Online' : en ? 'Kraków · in person' : 'Kraków · stacjonarnie'}</span><span class="event-status">{statuses[eventStatus(event) as keyof typeof statuses]}</span></div>
+    <div class="card-top"><span class="badge">{event.format==='online' ? 'Online' : en ? 'In person' : 'Stacjonarnie'}</span><span class="event-status">{statuses[eventStatus(event) as keyof typeof statuses]}</span></div>
     <h2><a href={'#'+event.id}>{event.title}</a></h2>
     <p class="organizer">{en ? 'Organizer' : 'Organizator'}: {event.organizer}</p>
     {event.sponsor && <p class="sponsor-note">{en ? 'Event sponsor' : 'Sponsor wydarzenia'}: {event.sponsor}. {en ? 'This does not indicate sponsorship of ArchitectMentor.' : 'Nie oznacza to sponsorowania ArchitectMentor.'}</p>}

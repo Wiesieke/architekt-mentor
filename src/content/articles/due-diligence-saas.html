@@ -1,0 +1,67 @@
+<p>Kupno SaaS ogranicza zakres technologii, którą klient projektuje i utrzymuje. Nadal trzeba opisać system powstający na styku organizacji: kanał użytkownika, tożsamość, dane, integrację i ciągłość procesu.</p>
+<h3>1. Zacznij od modelu odpowiedzialności</h3>
+<p>Podział obowiązków nie wynika automatycznie z etykiety SaaS. Zależy od modelu wdrożenia i integracji. Czysty provider-hosted SaaS daje inną granicę niż rozwiązanie z agentem, terminalem, komponentem lub data plane działającym w środowisku klienta.</p>
+<p>Pierwszym artefaktem powinien być nie diagram technologii, lecz macierz odpowiedzialności obejmująca co najmniej: usługę SaaS, kanał klienta, IAM, dane, integracje, sieć, konfigurację, certyfikaty/sekrety, monitoring, incident management, continuity i exit.</p>
+<h3>2. Rozdziel „jak dostawca to zbudował” od „jak usługa zachowuje się na granicy”</h3>
+<p>Pytania o język, framework czy liczbę mikroserwisów są przydatne tylko wtedy, gdy prowadzą do ryzyka, które klient musi ocenić. Znacznie ważniejsze są: kontrakt API, ograniczenia, semantyka błędów, lifecycle, izolacja, sposób pracy administratorów dostawcy oraz zachowanie podczas awarii.</p>
+<h3>3. Siedem obszarów due diligence</h3>
+<table>
+<thead>
+<tr>
+<th>Obszar</th>
+<th>Co trzeba ustalić</th>
+<th>Przykład dowodu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Odpowiedzialność</td>
+<td>kto operuje czym i kto reaguje</td>
+<td>RACI / responsibility matrix</td>
+</tr>
+<tr>
+<td>Dane</td>
+<td>lokalizacja, retencja, izolacja, backup, eksport</td>
+<td>data flow + polityka + test eksportu</td>
+</tr>
+<tr>
+<td>IAM</td>
+<td>federacja, role, PIM/PAM, dostęp supportu</td>
+<td>test SSO i odebrania uprawnień</td>
+</tr>
+<tr>
+<td>Integracja</td>
+<td>API, wersjonowanie, limity, błędy</td>
+<td>kontrakt + test negatywny/failure test</td>
+</tr>
+<tr>
+<td>NFR</td>
+<td>dostępność, latency, capacity, RTO/RPO</td>
+<td>SLO/SLA + sposób pomiaru + drill</td>
+</tr>
+<tr>
+<td>Operacje</td>
+<td>monitoring, status, incydent, zmiana</td>
+<td>runbook + telemetry + escalation path</td>
+</tr>
+<tr>
+<td>Exit</td>
+<td>przenośność danych i zakończenie usługi</td>
+<td>format eksportu + exit rehearsal</td>
+</tr>
+</tbody></table>
+<h3>4. RTO/RPO i SLA nie mogą być dekoracją</h3>
+<p>SLA mówi niewiele, jeśli nie wiadomo, co dokładnie jest mierzone i z której perspektywy. RTO/RPO wymagają zdefiniowania granicy danych i funkcji. Jeżeli klient utrzymuje własny kanał, pełny user journey może mieć inne RTO niż sama usługa dostawcy.</p>
+<h3>5. Observability jest częścią kontraktu operacyjnego</h3>
+<p>Klient nie potrzebuje dostępu do każdego wewnętrznego logu dostawcy. Potrzebuje wystarczającej informacji, aby rozpoznać stan usługi i własnych integracji: health/status, korelacja, podstawowe metryki, kody błędów, incident communication i ścieżka eskalacji.</p>
+<h3>6. Im więcej elementów działa po stronie klienta, tym mniej „czysty” jest SaaS</h3>
+<p>Agent, terminal, konektor, gateway lub data plane po stronie klienta zwiększa customer-owned architecture. Wtedy potrzebna jest zgodność wersji, model upgrade’u, wsparcie OS/runtime, wymagania sieciowe, telemetria i rollback. Nie wolno nadal oceniać rozwiązania tak, jakby było wyłącznie zdalną stroną WWW.</p>
+<h3>7. Exit strategy jest wymaganiem architektonicznym</h3>
+<p>Vendor lock-in nie oznacza, że należy unikać usług zarządzanych. Oznacza, że trzeba wiedzieć, które elementy są trudno przenośne i co stanie się przy wyjściu. Dla krytycznej usługi potrzebne są format danych, kompletność eksportu, czas udostępnienia, sposób usunięcia kopii oraz wygaszenie integracji i tożsamości.</p>
+<h3>Decision rule</h3>
+<p><strong>Nie pytaj: „czy znamy architekturę dostawcy?”. Pytaj: „czy znamy wszystkie granice, ryzyka i zachowania, za które odpowiadamy albo od których zależymy — i czy mamy dla nich dowód?”.</strong></p>
+<h3>Od pytania do dowodu</h3>
+<p>Fikcyjny przykład: wymagany przez biznes RTO cztery godziny obejmuje kanał klienta, IAM, SaaS i integrację. Sama deklaracja odtworzenia bazy dostawcy nie potwierdza tego celu. Uzgodnij zakres, właścicieli, scenariusz próby, punkt rozpoczęcia pomiaru i warunek końca. Cztery godziny nie są uniwersalnym wymaganiem.</p>
+<p>Dla danych przetestuj eksport i możliwość odczytania go poza usługą. Dla dostępu sprawdź odebranie roli, aktywną sesję i uprzywilejowany dostęp wsparcia. Dla integracji przeanalizuj brak odpowiedzi, limity i wersję kontraktu. Zapisz wynik, wersję usługi oraz niewiadome. Dobierz zakres sprawdzenia do krytyczności procesu; lista dokumentów nie zastępuje decyzji właściciela ryzyka.</p>
+<h3>Źródła i metoda</h3>
+<p>Źródła pierwotne sprawdzone 11.10.2026: <a href="https://learn.microsoft.com/en-us/azure/well-architected/saas/design-principles">Azure: zasady projektowania SaaS</a> oraz <a href="https://learn.microsoft.com/en-us/azure/well-architected/saas/design-methodology">metodyka projektowania</a>. Wyjaśniają zasady odpowiedzialności i projektowania usługi; nie potwierdzają właściwości konkretnego dostawcy. Lista siedmiu obszarów i macierz odpowiedzialność → wymaganie → dowód są autorską syntezą ArchitectMentor. Materiał przygotowany z pomocą AI.</p>
+<p><a href="/lamiglowki/2026-10-11-saas-granice-odpowiedzialnosci/">Przećwicz decyzję</a> · <a href="/antywzorce/2026-10-11-saas-nas-nie-interesuje/">Antywzorzec</a> · <a href="/tygodnik/2026-10-11/">Całe wydanie</a></p>
