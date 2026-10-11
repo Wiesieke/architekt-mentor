@@ -23,7 +23,7 @@ test('the starter set has equivalent, anonymised choices, criteria and learning 
       assert.ok(p.quick.options.some(o=>o.id===p.quick.correctId));
       assert.ok(p.quick.options.every(o=>o.explanation.length>30));
       assert.ok(fs.existsSync(`src/content/articles/${locale==='en'?'en/':''}${p.learnSlug}.html`));
-      assert.match(p.scenario,locale==='pl'?/^Scenariusz edukacyjny inspirowany praktyką/:/^Practice-inspired educational scenario/);
+      assert.match(p.scenario,locale==='pl'?/^(Scenariusz edukacyjny inspirowany praktyką|Fikcyjny scenariusz edukacyjny|Złożony scenariusz edukacyjny)/:/^(Practice-inspired educational scenario|Fictional educational scenario|Composite educational scenario)/);
       assert.doesNotMatch(JSON.stringify(p),/brightstar|euronet|szczegóły zmieniono|TransactionLookup/i);
     }
   }

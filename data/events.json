@@ -5,21 +5,21 @@
     "organizer": "O’Reilly Media",
     "startDate": "2026-10-15",
     "lastDate": "2026-10-15",
-    "startAt": "2026-10-15T16:00:00Z",
-    "endAt": "2026-10-15T20:00:00Z",
-    "timeZone": "UTC",
+    "startAt": null,
+    "endAt": null,
+    "timeZone": null,
     "format": "online",
     "region": "global",
     "cost": "subscription",
     "url": "https://www.oreilly.com/live-events/generative-ai-for-software-architecture-diagrams/0642572001457/0642572445782/",
     "registrationUrl": "https://www.oreilly.com/live-events/generative-ai-for-software-architecture-diagrams/0642572001457/0642572445782/",
-    "checked": "2026-10-02",
-    "nextCheck": "2026-10-05",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
     "status": "scheduled",
     "sponsor": null,
     "pl": {
       "facts": [
-        "15.10.2026 · 18:00–22:00 Europe/Warsaw (CEST), 16:00–20:00 UTC",
+        "15.10.2026 · godziny i strefa czasowa wymagają ponownego potwierdzenia w koncie O’Reilly.",
         "Online · język angielski potwierdzony",
         "Średni · prowadząca Jacqui Read",
         "Dostęp w abonamencie O’Reilly; aktualna kwota niepotwierdzona. Brak potwierdzenia osobnego biletu.",
@@ -30,7 +30,7 @@
     },
     "en": {
       "facts": [
-        "15 Oct 2026 · 16:00–20:00 UTC; 18:00–22:00 Europe/Warsaw (CEST)",
+        "15 Oct 2026 · confirm session time and time zone in your O’Reilly account.",
         "Online · English confirmed",
         "Intermediate · Jacqui Read",
         "Included in O’Reilly subscription plans; current subscription price unconfirmed. Separate ticket not confirmed.",
@@ -41,7 +41,8 @@
     },
     "sources": [
       "https://www.oreilly.com/live-events/generative-ai-for-software-architecture-diagrams/0642572001457/0642572445782/",
-      "https://www.oreilly.com/online-learning/pricing"
+      "https://www.oreilly.com/online-learning/pricing",
+      "https://www.oreilly.com/products/software-architecture-live-events.html"
     ],
     "learningUrl": {
       "pl": "/architektura-it-ai/hld-ai-przeglad/",
@@ -62,34 +63,35 @@
     "cost": "paid",
     "url": "https://certification.qconferences.com/architecture",
     "registrationUrl": "https://certification.qconferences.com/architecture",
-    "checked": "2026-10-02",
-    "nextCheck": "2026-10-05",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
     "status": "scheduled",
     "sponsor": null,
     "pl": {
       "facts": [
-        "Start 09.10.2026 · 16:00–20:00 Europe/Warsaw; 10:00 ET (Nowy Jork)",
-        "Online, Zoom · język niepotwierdzony",
-        "Dla doświadczonych architektów · Luca Mezzalira",
-        "1470 USD; podatki i końcowe opłaty niepotwierdzone.",
-        "Sesje: 9, 23, 30.10 oraz 6, 13.11. Godziny po zmianie czasu wymagają potwierdzenia. Zapisy oznaczone jako otwarte."
+        "Kohorta z 9.10.2026 już rozpoczęta; wcześniejszy harmonogram obejmował sesje do 13.11.",
+        "Online · dla doświadczonych architektów",
+        "Strona programu wskazuje teraz kolejną kohortę: 22.01.2027.",
+        "Dostęp do rozpoczętej kohorty i aktualna cena niepotwierdzone; nie zakładamy możliwości dołączenia.",
+        "Lista InfoQ nadal pokazuje datę 9.10.2026. Przy wyborze terminu sprawdź bezpośrednią stronę programu."
       ],
       "programme": "Dla doświadczonych architektów i liderów technicznych. Program obejmuje odporność systemów rozproszonych, zdecentralizowane decyzje, platformy i AI, pracę w grupie oraz projekt końcowy.",
       "recommendation": "Wartość widzimy w ćwiczeniu uzasadniania decyzji na własnym problemie. To intensywny, kosztowny wariant rozwoju; dla początkujących lepszym startem będą krótsze warsztaty i ćwiczenia magazynu."
     },
     "en": {
       "facts": [
-        "Starts 9 Oct 2026 · 10:00 ET (New York); 16:00–20:00 Europe/Warsaw",
-        "Online, Zoom · language unconfirmed",
-        "Experienced architects · Luca Mezzalira",
-        "USD 1,470; taxes and final fees unconfirmed.",
-        "Sessions: Oct 9, 23, 30 and Nov 6, 13. Confirm later times across daylight-saving changes. Registration listed as open."
+        "The 9 Oct 2026 cohort has started; its earlier schedule ran to 13 Nov.",
+        "Online · for experienced architects",
+        "The programme page now lists the next cohort: 22 Jan 2027.",
+        "Access to the started cohort and current price are unconfirmed; do not assume late admission.",
+        "The InfoQ listing still shows 9 Oct 2026. Check the direct programme page when selecting a cohort."
       ],
       "programme": "For experienced architects and technical leaders. The cohort covers distributed-system resilience, decentralized decisions, platforms and AI, with peer discussion and a capstone.",
       "recommendation": "Its main appeal is practising the justification of decisions using a real work problem. This is an intensive, costly option; beginners should start with shorter workshops and magazine exercises."
     },
     "sources": [
-      "https://certification.qconferences.com/architecture"
+      "https://certification.qconferences.com/architecture",
+      "https://events.infoq.com/"
     ],
     "learningUrl": {
       "pl": "/podstawy-architektury/idempotencja-lookup-kompensacja/",
@@ -110,8 +112,8 @@
     "cost": "paid",
     "url": "https://jdd.org.pl/",
     "registrationUrl": "https://eventory.cc/event/jdd-2026/tickets",
-    "checked": "2026-10-02",
-    "nextCheck": "2026-10-05",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
     "status": "scheduled",
     "sponsor": null,
     "pl": {
@@ -159,8 +161,8 @@
     "cost": "unknown",
     "url": "https://events.infoq.com/",
     "registrationUrl": "https://events.infoq.com/",
-    "checked": "2026-10-02",
-    "nextCheck": "2026-10-05",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
     "status": "scheduled",
     "sponsor": "Harness",
     "pl": {
@@ -169,7 +171,7 @@
         "Online, webinar z Q&A · język niepotwierdzony",
         "Koszt AI i obserwowalność · dla architektów i liderów",
         "Koszt niepotwierdzony; nie oznaczamy jako bezpłatne.",
-        "InfoQ informuje o otwartych zapisach. Warunki formularza wymagają ponownego sprawdzenia."
+        "Lista InfoQ pokazuje otwarte zapisy; warunki formularza i godzina wymagają potwierdzenia."
       ],
       "programme": "Dla architektów i liderów oceniających ekonomię pracy z AI. Tematem jest przypisywanie użycia i kosztów modeli do pracy deweloperskiej oraz dostarczonych funkcji.",
       "recommendation": "Przydatny punkt wyjścia do pytania „ile kosztuje użyteczny rezultat?”, także przy generatorze HLD. Oddzielaj uniwersalne metody pomiaru od prezentacji produktu sponsora."
@@ -180,7 +182,7 @@
         "Online, live webinar with Q&A · language unconfirmed",
         "AI cost and observability · for architects and leads",
         "Cost unconfirmed; not labelled free.",
-        "InfoQ lists registration as open. Registration-form terms need to be checked again."
+        "The InfoQ listing shows open registration; confirm form terms and session time."
       ],
       "programme": "For architects and leads assessing AI economics. The webinar addresses attributing model usage and spending to engineering work and delivered features.",
       "recommendation": "Relevant to measuring the cost of a useful outcome, including HLD generation. Separate transferable measurement methods from the sponsor’s product presentation."
@@ -191,6 +193,183 @@
     "learningUrl": {
       "pl": "/architektura-it-ai/hld-ai-przeglad/",
       "en": "/en/architecture-with-ai/review-ai-generated-hld/"
+    }
+  },
+  {
+    "id": "ai-in-production",
+    "title": "AI in Production: What Breaks, What Works, and Who Approves It?",
+    "organizer": "InfoQ",
+    "startDate": "2026-10-14",
+    "lastDate": "2026-10-14",
+    "startAt": null,
+    "endAt": null,
+    "timeZone": null,
+    "format": "online",
+    "region": "global",
+    "cost": "free",
+    "url": "https://us02web.zoom.us/webinar/register/4717914657495/WN_ow6NX2woSvmfIlH7KE0RGQ",
+    "registrationUrl": "https://us02web.zoom.us/webinar/register/4717914657495/WN_ow6NX2woSvmfIlH7KE0RGQ",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
+    "status": "scheduled",
+    "sponsor": null,
+    "pl": {
+      "facts": [
+        "14.10.2026 · online · godzina i strefa niepotwierdzone",
+        "Bezpłatny według InfoQ; rejestracja przez Zoom",
+        "Język niepotwierdzony; nagranie zapowiedziane przez organizatora"
+      ],
+      "programme": "Uprawnienia agentów, weryfikacja wyników i dostęp do wrażliwych danych.",
+      "recommendation": "Dobry temat do porównania z tutorialem o dowodach w HLD: które działania agenta wymagają osobnej kontroli?"
+    },
+    "en": {
+      "facts": [
+        "14 Oct 2026 · online · time and zone unconfirmed",
+        "Free according to InfoQ; Zoom registration",
+        "Language unconfirmed; recording announced by the organiser"
+      ],
+      "programme": "Agent permissions, verification and sensitive-data access.",
+      "recommendation": "Compare the discussion with our HLD evidence tutorial: which agent actions need separate controls?"
+    },
+    "sources": [
+      "https://events.infoq.com/"
+    ],
+    "learningUrl": {
+      "pl": "/architektura-it-ai/hld-z-dokumentacji-dostawcy/",
+      "en": "/en/architecture-with-ai/hld-from-vendor-documentation/"
+    }
+  },
+  {
+    "id": "kubecon-na-2026",
+    "title": "KubeCon + CloudNativeCon North America 2026",
+    "organizer": "CNCF / Linux Foundation",
+    "startDate": "2026-11-09",
+    "lastDate": "2026-11-12",
+    "startAt": null,
+    "endAt": null,
+    "timeZone": "America/Denver",
+    "format": "in-person",
+    "region": "global",
+    "cost": "paid",
+    "url": "https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/",
+    "registrationUrl": "https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
+    "status": "scheduled",
+    "sponsor": null,
+    "pl": {
+      "facts": [
+        "9–12.11.2026 · Salt Lake City, USA",
+        "Stacjonarnie; szczegółowe godziny i język niepotwierdzone",
+        "Bilety płatne; aktualna cena i zakres wydarzeń towarzyszących do sprawdzenia"
+      ],
+      "programme": "Konferencja ekosystemu cloud native; 9 listopada obejmuje wydarzenia towarzyszące.",
+      "recommendation": "Dla zespołów Kubernetes: szukaj sesji o sieci, obserwowalności i cyklu życia platform. Zestaw je z planem migracji mesh."
+    },
+    "en": {
+      "facts": [
+        "9–12 Nov 2026 · Salt Lake City, USA",
+        "In person; detailed times and language unconfirmed",
+        "Paid tickets; verify price and co-located event access"
+      ],
+      "programme": "Cloud-native ecosystem conference; 9 November includes co-located events.",
+      "recommendation": "For Kubernetes teams: seek networking, observability and platform-lifecycle sessions to compare with the mesh migration plan."
+    },
+    "sources": [
+      "https://www.cncf.io/events/",
+      "https://events.linuxfoundation.org/kubecon-cloudnativecon-north-america/register/"
+    ],
+    "learningUrl": {
+      "pl": "/architektura-it-ai/hld-z-dokumentacji-dostawcy/",
+      "en": "/en/architecture-with-ai/hld-from-vendor-documentation/"
+    }
+  },
+  {
+    "id": "qcon-sf-2026",
+    "title": "QCon San Francisco 2026",
+    "organizer": "InfoQ / QCon",
+    "startDate": "2026-11-16",
+    "lastDate": "2026-11-20",
+    "startAt": null,
+    "endAt": null,
+    "timeZone": "America/Los_Angeles",
+    "format": "in-person",
+    "region": "global",
+    "cost": "paid",
+    "url": "https://qconsf.com/",
+    "registrationUrl": "https://qconsf.com/",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
+    "status": "scheduled",
+    "sponsor": null,
+    "pl": {
+      "facts": [
+        "Konferencja 16–18.11.2026; szkolenia 19–20.11",
+        "Hyatt Regency, San Francisco · stacjonarnie",
+        "2955 USD za konferencję według strony; early bird do 13.10. Szkolenia i opłaty końcowe sprawdź osobno."
+      ],
+      "programme": "Architektura agentów, ewaluacje, API, systemy rozproszone i platform engineering.",
+      "recommendation": "Dla doświadczonych architektów: wybierz sesje z mierzalnymi wynikami produkcyjnymi i porównaj kompromisy z własnym systemem."
+    },
+    "en": {
+      "facts": [
+        "Conference 16–18 Nov 2026; training 19–20 Nov",
+        "Hyatt Regency, San Francisco · in person",
+        "Conference price listed as USD 2,955; early bird ends 13 Oct. Check training and final fees separately."
+      ],
+      "programme": "Agent architecture, evaluations, APIs, distributed systems and platform engineering.",
+      "recommendation": "For experienced architects: choose sessions with measurable production outcomes and compare their trade-offs with your system."
+    },
+    "sources": [
+      "https://qconsf.com/"
+    ],
+    "learningUrl": {
+      "pl": "/architektura-it-ai/hld-z-dokumentacji-dostawcy/",
+      "en": "/en/architecture-with-ai/hld-from-vendor-documentation/"
+    }
+  },
+  {
+    "id": "aws-reinvent-2026",
+    "title": "AWS re:Invent 2026",
+    "organizer": "Amazon Web Services",
+    "startDate": "2026-11-30",
+    "lastDate": "2026-12-04",
+    "startAt": null,
+    "endAt": null,
+    "timeZone": "America/Los_Angeles",
+    "format": "in-person",
+    "region": "global",
+    "cost": "unknown",
+    "url": "https://aws.amazon.com/events/reinvent/",
+    "registrationUrl": "https://aws.amazon.com/events/reinvent/",
+    "checked": "2026-10-11",
+    "nextCheck": "2026-10-12",
+    "status": "scheduled",
+    "sponsor": null,
+    "pl": {
+      "facts": [
+        "30.11–4.12.2026 · Las Vegas, USA",
+        "Stacjonarnie; szczegółowe godziny i zakres dostępu online niepotwierdzone",
+        "Aktualna cena niepotwierdzona; sprawdź stronę rejestracji"
+      ],
+      "programme": "Konferencja usług chmurowych AWS i AI.",
+      "recommendation": "Dla zespołów AWS: wybierz warsztaty dotyczące własnych ograniczeń. Deklaracje i nowe funkcje wymagają później sprawdzenia zakresu, kosztów i dojrzałości."
+    },
+    "en": {
+      "facts": [
+        "30 Nov–4 Dec 2026 · Las Vegas, USA",
+        "In person; detailed times and online access unconfirmed",
+        "Current price unconfirmed; check registration details"
+      ],
+      "programme": "AWS cloud services and AI conference.",
+      "recommendation": "For AWS teams: select workshops around your constraints. New capabilities still need checks for scope, cost and maturity."
+    },
+    "sources": [
+      "https://aws.amazon.com/events/reinvent/"
+    ],
+    "learningUrl": {
+      "pl": "/architektura-it-ai/hld-z-dokumentacji-dostawcy/",
+      "en": "/en/architecture-with-ai/hld-from-vendor-documentation/"
     }
   }
 ]

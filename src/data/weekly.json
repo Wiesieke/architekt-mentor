@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-11",
+  "paths": {
+    "pl": {
+      "hub": "/tygodnik/2026-10-11/",
+      "practice": "/lamiglowki/2026-10-11-saas-granice-odpowiedzialnosci/",
+      "foundation": "/podstawy-architektury/due-diligence-saas/",
+      "anti": "/antywzorce/2026-10-11-saas-nas-nie-interesuje/",
+      "ai": "/architektura-it-ai/hld-z-dokumentacji-dostawcy/",
+      "mesh": "/architektura-w-ruchu/cloud-service-mesh-koniec-istiod/"
+    },
+    "en": {
+      "hub": "/en/weekly/2026-10-11/",
+      "practice": "/en/practice/2026-10-11-saas-granice-odpowiedzialnosci/",
+      "foundation": "/en/foundations/saas-architecture-due-diligence/",
+      "anti": "/en/anti-patterns/2026-10-11-saas-nas-nie-interesuje/",
+      "ai": "/en/architecture-with-ai/hld-from-vendor-documentation/",
+      "mesh": "/en/architecture-in-motion/cloud-service-mesh-istiod-retirement/"
+    }
+  },
+  "records": {
+    "pl": [
+      {
+        "section": "architektura-it-ai",
+        "slug": "hld-z-dokumentacji-dostawcy",
+        "title": "AI napisało HLD z dokumentów dostawcy. Co wiemy, a co dopowiedziało?",
+        "description": "Tutorial 02: rejestr źródeł, jawne niewiadome, pytania zmieniające projekt i weryfikacja stwierdzeń.",
+        "topic": "Tutorial 02 · źródła i HLD",
+        "body": "weeklyAI"
+      },
+      {
+        "section": "podstawy-architektury",
+        "slug": "due-diligence-saas",
+        "title": "Przegląd architektoniczny SaaS przed zakupem: co musi wiedzieć klient?",
+        "description": "Siedem obszarów oceny oraz macierz odpowiedzialność → wymaganie → dowód.",
+        "topic": "SaaS i odpowiedzialność",
+        "body": "weeklyFoundation"
+      },
+      {
+        "section": "architektura-w-ruchu",
+        "slug": "cloud-service-mesh-koniec-istiod",
+        "title": "Cloud Service Mesh kończy wsparcie ISTIOD: zaplanuj migrację granic",
+        "description": "Termin 1 marca 2028, dwa warianty migracji i dowody przed przeniesieniem ruchu.",
+        "topic": "Kubernetes i cykl życia",
+        "eventDate": "2026-09-28",
+        "body": "weeklyMesh"
+      }
+    ],
+    "en": [
+      {
+        "section": "architecture-with-ai",
+        "slug": "hld-from-vendor-documentation",
+        "plSlug": "hld-z-dokumentacji-dostawcy",
+        "title": "AI drafted an HLD from vendor documents. What do we know, and what did it invent?",
+        "description": "Tutorial 02: source register, visible unknowns, design-changing questions and statement verification.",
+        "topic": "Tutorial 02 · evidence and HLD",
+        "body": "weeklyAI"
+      },
+      {
+        "section": "foundations",
+        "slug": "saas-architecture-due-diligence",
+        "plSlug": "due-diligence-saas",
+        "title": "SaaS architecture due diligence: what the customer needs to know",
+        "description": "Seven review areas and a responsibility → requirement → evidence matrix.",
+        "topic": "SaaS and responsibility",
+        "body": "weeklyFoundation"
+      },
+      {
+        "section": "architecture-in-motion",
+        "slug": "cloud-service-mesh-istiod-retirement",
+        "plSlug": "cloud-service-mesh-koniec-istiod",
+        "title": "Cloud Service Mesh retires ISTIOD: plan a boundary migration",
+        "description": "The 1 March 2028 deadline, two migration paths and evidence before moving traffic.",
+        "topic": "Kubernetes and lifecycle",
+        "eventDate": "2026-09-28",
+        "body": "weeklyMesh"
+      }
+    ]
+  },
+  "practice": {
+    "pl": {
+      "title": "Dostawca daje SaaS. Czy musisz znać jego architekturę?",
+      "description": "Odróżnić szczegóły implementacyjne dostawcy od informacji potrzebnych do oceny odpowiedzialności, ryzyka i integracji SaaS."
+    },
+    "en": {
+      "title": "The provider delivers SaaS. Do you need to know its architecture?",
+      "description": "Distinguish vendor implementation details from information needed to assess responsibility, risk and SaaS integration."
+    }
+  },
+  "anti": {
+    "pl": {
+      "title": "To SaaS, więc architektura dostawcy nas nie interesuje",
+      "description": "API i SLA nie zamykają pytań o dane, IAM, ciągłość, operacje i wyjście z usługi."
+    },
+    "en": {
+      "title": "It is SaaS, so the provider architecture is none of our concern",
+      "description": "Service responsibilities cannot be reduced to an API and SLA."
+    }
+  }
+}

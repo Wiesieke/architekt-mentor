@@ -1,3 +1,6 @@
+import weeklyAI from '../content/articles/en/hld-from-vendor-documentation.html?raw';
+import weeklyFoundation from '../content/articles/en/saas-architecture-due-diligence.html?raw';
+import weeklyMesh from '../content/articles/en/cloud-service-mesh-istiod-retirement.html?raw';
 import installationTokens from '../content/articles/en/github-installation-token-format.html?raw';
 import apiEvolution from '../content/articles/en/evolving-api-contracts.html?raw';
 import asyncNotifications from '../content/articles/en/asynchronous-notifications.html?raw';
@@ -28,6 +31,9 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+{"section":"architecture-with-ai","slug":"hld-from-vendor-documentation","plSlug":"hld-z-dokumentacji-dostawcy","title":"AI drafted an HLD from vendor documents. What do we know, and what did it invent?","description":"Tutorial 02: source register, visible unknowns, design-changing questions and statement verification.","topic":"Tutorial 02 · evidence and HLD","body":weeklyAI,"published":"2026-10-11"},
+{"section":"foundations","slug":"saas-architecture-due-diligence","plSlug":"due-diligence-saas","title":"SaaS architecture due diligence: what the customer needs to know","description":"Seven review areas and a responsibility → requirement → evidence matrix.","topic":"SaaS and responsibility","body":weeklyFoundation,"published":"2026-10-11"},
+{"section":"architecture-in-motion","slug":"cloud-service-mesh-istiod-retirement","plSlug":"cloud-service-mesh-koniec-istiod","title":"Cloud Service Mesh retires ISTIOD: plan a boundary migration","description":"The 1 March 2028 deadline, two migration paths and evidence before moving traffic.","topic":"Kubernetes and lifecycle","eventDate":"2026-09-28","body":weeklyMesh,"published":"2026-10-11"},
   { section:'architecture-in-motion', slug:'github-installation-token-format', plSlug:'github-tokeny-instalacyjne-format', title:'GitHub changed its token format: check the complete credential path', description:'A longer installation token can expose storage, proxy and redaction limits. Verify integrations without exposing secrets.', topic:'Integration and security', published:'2026-10-04', eventDate:'2026-10-02', body:installationTokens },
   { section:'foundations', slug:'evolving-api-contracts', plSlug:'ewolucja-kontraktu-api', title:'Evolving an API contract: compatibility needs evidence', description:'Why an optional field can still break a client, and how to verify source, wire and semantic compatibility.', topic:'APIs and compatibility', published:'2026-10-03', body:apiEvolution },
   {section:'architecture-with-ai',slug:'review-ai-generated-hld',plSlug:'hld-ai-przeglad',title:'AI drafted an HLD — how do you check whether it is useful?',description:'Tutorial: from a brief and questions to a failure case, a diagram, verification and an ADR.',topic:'Tutorial 01 · HLD review',published:'2026-10-02',body:aiReview},

@@ -3,18 +3,42 @@
     "scenario": "Fictional educational scenario. An orders API adds an optional `deliveryWindow` response field. A still-supported mobile app uses strict deserialization and rejects unknown properties; it cannot be updated before the server rollout. The contract never stated whether clients must ignore unknown fields.",
     "question": "Would you expose the field to every client? In 2–3 sentences, state your decision, how you would limit risk and what evidence you need before broader rollout.",
     "criteria": [
-      {"id":"compatibility_scope","label":"Compatibility scope","expected":"Recognises that an optional field and a green schema check do not prove compatibility with a supported strict-deserialization client."},
-      {"id":"rollout_boundary","label":"Rollout boundary","expected":"Does not expose the field universally; proposes a client update, negotiated profile or separate contract version suited to the constraint."},
-      {"id":"consumer_evidence","label":"Consumer evidence","expected":"Requires a test with the oldest supported version and a controlled rollout that observes deserialization failures."}
+      {
+        "id": "compatibility_scope",
+        "label": "Compatibility scope",
+        "expected": "Recognises that an optional field and a green schema check do not prove compatibility with a supported strict-deserialization client."
+      },
+      {
+        "id": "rollout_boundary",
+        "label": "Rollout boundary",
+        "expected": "Does not expose the field universally; proposes a client update, negotiated profile or separate contract version suited to the constraint."
+      },
+      {
+        "id": "consumer_evidence",
+        "label": "Consumer evidence",
+        "expected": "Requires a test with the oldest supported version and a controlled rollout that observes deserialization failures."
+      }
     ]
   },
   "2026-10-02-email-po-zamowieniu": {
     "scenario": "Practice-inspired educational scenario. An order has committed and received an order number. A subsequent informational email failed. Email is not a condition of acceptance, and no durable notification task has yet been confirmed.",
     "question": "What result would you return to the user, and what would you retry? Explain how you would avoid both a second order and a lost notification.",
     "criteria": [
-      {"id": "order_outcome", "label": "Order outcome", "expected": "Recognises that the committed order exists and should be confirmed independently of email delivery."},
-      {"id": "duplicate_avoidance", "label": "Duplicate avoidance", "expected": "Does not retry order creation; separates the order's identity and outcome from its notification."},
-      {"id": "notification_retry", "label": "Durable notification retry", "expected": "Proposes a durable task or outbox and retries only delivery, with observability and duplicate protection."}
+      {
+        "id": "order_outcome",
+        "label": "Order outcome",
+        "expected": "Recognises that the committed order exists and should be confirmed independently of email delivery."
+      },
+      {
+        "id": "duplicate_avoidance",
+        "label": "Duplicate avoidance",
+        "expected": "Does not retry order creation; separates the order's identity and outcome from its notification."
+      },
+      {
+        "id": "notification_retry",
+        "label": "Durable notification retry",
+        "expected": "Proposes a durable task or outbox and retries only delivery, with observability and duplicate protection."
+      }
     ]
   },
   "2026-10-01-cache-bez-tenanta": {
@@ -232,6 +256,27 @@
         "id": "boundary",
         "label": "Applicability",
         "expected": "Distinguishes optional copy storage from mandatory durable recording."
+      }
+    ]
+  },
+  "2026-10-11-saas-granice-odpowiedzialnosci": {
+    "scenario": "Fictional educational scenario\n\nAn organisation is considering an external SaaS service for an important transactional process. The provider operates the application, database and infrastructure in its own environment. The customer must still build its own user channel, integrate enterprise identity, exchange business data and provide first-line incident handling.\n\nThe provider has supplied API documentation, an SLA and a high-level security statement. Asked for architecture details, it replies: “It is SaaS; internal implementation is our responsibility.” The customer still lacks a clear responsibility boundary, data location and retention model, tenant-isolation explanation, critical dependencies, failure procedure, RTO/RPO, customer-visible telemetry and exit/export process.\n\nBusiness stakeholders want a quick decision. The technical team splits into two camps: “No approval without the vendor’s full HLD” and “It is SaaS, so the vendor architecture is irrelevant to us.”",
+    "question": "What decision would you make now? In 2–3 sentences, identify the information you need, the internals you can leave with the provider and evidence required before acceptance.",
+    "criteria": [
+      {
+        "id": "responsibility_boundary",
+        "label": "Responsibility boundary",
+        "expected": "Separates provider and customer duties, including the customer channel, data, IAM and integration."
+      },
+      {
+        "id": "significant_information",
+        "label": "Decision-relevant information",
+        "expected": "Requires contracts, data, IAM, NFRs, recovery, operations and exit information without unjustified demands for a complete internal HLD."
+      },
+      {
+        "id": "acceptance_evidence",
+        "label": "Evidence before acceptance",
+        "expected": "Proposes a responsibility matrix and concrete tests or artefacts; does not treat an API and SLA as sufficient evidence."
       }
     ]
   }

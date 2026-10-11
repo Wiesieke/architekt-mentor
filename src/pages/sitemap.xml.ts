@@ -10,6 +10,8 @@ export const GET: APIRoute = () => {
   const pages = (process.env.VERCEL_ENV === 'production' || import.meta.env.PUBLIC_SITE_INDEXABLE === 'true')
     ? [
       {path:'/pl/', modified:latestEditionDate},
+      {path:'/tygodnik/2026-10-11/', modified:'2026-10-11'},
+      {path:'/en/weekly/2026-10-11/', modified:'2026-10-11'},
       {path:'/lamiglowka/'},
       {path:'/lamiglowki/'},
       ...puzzles.map(p => ({path:`/lamiglowki/${p.id}/`,modified:p.date})),
@@ -20,7 +22,7 @@ export const GET: APIRoute = () => {
       {path:'/informacja-o-danych/'},
       {path:'/newsletter/'},
       {path:'/jak-powstaja-materialy/',modified:'2026-10-02'},
-      {path:'/wydarzenia/',modified:'2026-10-02'},
+      {path:'/wydarzenia/',modified:'2026-10-11'},
       {path:'/architektura-w-ruchu/'},
       {path:'/podstawy-architektury/'},
       {path:'/architektura-it-ai/'},
@@ -36,7 +38,7 @@ export const GET: APIRoute = () => {
       {path:'/en/data-notice/'},
       {path:'/en/newsletter/'},
       {path:'/en/editorial-policy/',modified:'2026-10-02'},
-      {path:'/en/events/',modified:'2026-10-02'},
+      {path:'/en/events/',modified:'2026-10-11'},
       {path:'/en/anti-patterns/'},
       ...patterns.map(p => ({path:`/en/anti-patterns/${p.id}/`,modified:p.date})),
       {path:'/en/architecture-in-motion/'},

@@ -1,6 +1,11 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+{"kind":"ĆWICZENIE","title":"Dostawca daje SaaS. Czy musisz znać jego architekturę?","summary":"Średni · szybka decyzja, mentor i analiza","href":"/lamiglowki/2026-10-11-saas-granice-odpowiedzialnosci/","published":"2026-10-11"},
+{"kind":"PODSTAWY","title":"Przegląd architektoniczny SaaS przed zakupem: co musi wiedzieć klient?","summary":"Siedem obszarów oceny oraz macierz odpowiedzialność → wymaganie → dowód.","href":"/podstawy-architektury/due-diligence-saas/","published":"2026-10-11"},
+{"kind":"ANTYWZORZEC","title":"To SaaS, więc architektura dostawcy nas nie interesuje","summary":"API i SLA nie zamykają pytań o dane, IAM, ciągłość, operacje i wyjście z usługi.","href":"/antywzorce/2026-10-11-saas-nas-nie-interesuje/","published":"2026-10-11"},
+{"kind":"ARCHITEKT I AI","title":"AI napisało HLD z dokumentów dostawcy. Co wiemy, a co dopowiedziało?","summary":"Tutorial 02: rejestr źródeł, jawne niewiadome, pytania zmieniające projekt i weryfikacja stwierdzeń.","href":"/architektura-it-ai/hld-z-dokumentacji-dostawcy/","published":"2026-10-11"},
+{"kind":"W RUCHU","title":"Cloud Service Mesh kończy wsparcie ISTIOD: zaplanuj migrację granic","summary":"Termin 1 marca 2028, dwa warianty migracji i dowody przed przeniesieniem ruchu.","href":"/architektura-w-ruchu/cloud-service-mesh-koniec-istiod/","eventDate":"2026-09-28","published":"2026-10-11"},
   { kind:'W RUCHU', published:'2026-10-04', eventDate:'2026-10-02', title:'GitHub zmienił format tokenów: sprawdź całą ścieżkę poświadczenia', summary:'2.10 · magazyn · proxy · maskowanie · odnowienie', href:'/architektura-w-ruchu/github-tokeny-instalacyjne-format/' },
   { kind:'ĆWICZENIE', published:'2026-10-03', title:'Nowe opcjonalne pole w API. Czy aplikacja nadal odczyta odpowiedź?', summary:'Średni · szybka decyzja lub mentor', href:'/lamiglowki/2026-10-03-opcjonalne-pole-api/' },
   { kind:'ANTYWZORZEC', published:'2026-10-03', title:'Zgodne, bo generator nie zgłosił błędu', summary:'Schemat · ukryty kontrakt · test konsumenta', href:'/antywzorce/2026-10-03-zgodnosc-tylko-w-schemacie/' },
