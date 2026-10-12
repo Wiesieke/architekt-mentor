@@ -38,8 +38,9 @@ export function homepageData(locale: 'pl' | 'en') {
     dateLabel:new Intl.DateTimeFormat(en?'en-GB':'pl-PL',{dateStyle:'long',timeZone:'UTC'}).format(new Date(`${latestEditionDate}T12:00:00Z`)),
     featured:{title:featured.title,description:featured.description,href:url(featured),kind:copy.kinds[kind]},
     foundation:{title:foundation.title,description:foundation.description,href:url(foundation)},
+    // Hero starts the newest exercise; the navigation path exposes the whole Practice library.
     practiceUrl:en?'/en/practice/':'/lamiglowka/',
-    pathUrls:en?['/en/practice/','/en/foundations/','/en/architecture-in-motion/','/en/tools/']:['/lamiglowka/','/podstawy-architektury/','/architektura-w-ruchu/','/narzedzia/'],
+    pathUrls:en?['/en/practice/archive/','/en/foundations/','/en/architecture-in-motion/','/en/tools/']:['/lamiglowki/','/podstawy-architektury/','/architektura-w-ruchu/','/narzedzia/'],
     translationUrl:en?'/pl/':'/en/',newsletterUrl:en?'/en/newsletter/':'/newsletter/',
     businessUrl:en?'/en/for-business/':'/dlafirm/',tutorialUrl:en?'/en/architecture-with-ai/':'/architektura-it-ai/',eventsUrl:en?'/en/events/':'/wydarzenia/'
   };
