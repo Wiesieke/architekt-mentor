@@ -4,7 +4,7 @@ import { englishArticles, englishArticleUrl } from './articles-en';
 // Controlled editorial taxonomy: add a group deliberately, not from free-text topic labels.
 export const learningGroups = [
   { id: 'integration', pl: 'Integracja i API', en: 'Integration and APIs', slugs: ['ewolucja-kontraktu-api', 'komunikacja-asynchroniczna-powiadomienia', 'idempotencja-lookup-kompensacja', 'wzorce'] },
-  { id: 'analysis', pl: 'Analiza i decyzje', en: 'Analysis and decisions', slugs: ['due-diligence-saas', 'analiza-wplywu-zmiany', 'adr', 'checklista'] },
+  { id: 'analysis', pl: 'Analiza i decyzje', en: 'Analysis and decisions', slugs: ['warunkowa-decyzja-architektoniczna', 'due-diligence-saas', 'analiza-wplywu-zmiany', 'adr', 'checklista'] },
   { id: 'resilience', pl: 'Odporność i odtwarzanie', en: 'Resilience and recovery', slugs: ['graceful-degradation', 'rpo-rto-proba-odtworzenia', 'bulkhead'] },
   { id: 'security', pl: 'Bezpieczeństwo', en: 'Security', slugs: ['izolacja-tenantow-niezmiennik'] },
   { id: 'quality', pl: 'Jakość i pomiar', en: 'Quality and measurement', slugs: ['scenariusze-atrybutow-jakosciowych', 'slo-budzet-bledow'] },
