@@ -1,3 +1,4 @@
+import conditionalApproval from '../content/articles/en/conditional-architecture-approval.html?raw';
 import weeklyAI from '../content/articles/en/hld-from-vendor-documentation.html?raw';
 import weeklyFoundation from '../content/articles/en/saas-architecture-due-diligence.html?raw';
 import weeklyMesh from '../content/articles/en/cloud-service-mesh-istiod-retirement.html?raw';
@@ -31,6 +32,7 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'conditional-architecture-approval', plSlug:'warunkowa-decyzja-architektoniczna', title:'Conditional architecture approval is not a release sign-off', description:'Six fields for each condition: criterion, owner, evidence, verifier, gate and failure action.', topic:'Architecture governance and decisions', published:'2026-10-13', body:conditionalApproval },
 {"section":"architecture-with-ai","slug":"hld-from-vendor-documentation","plSlug":"hld-z-dokumentacji-dostawcy","title":"AI drafted an HLD from vendor documents. What do we know, and what did it invent?","description":"Tutorial 02: source register, visible unknowns, design-changing questions and statement verification.","topic":"Tutorial 02 · evidence and HLD","body":weeklyAI,"published":"2026-10-11"},
 {"section":"foundations","slug":"saas-architecture-due-diligence","plSlug":"due-diligence-saas","title":"SaaS architecture due diligence: what the customer needs to know","description":"Seven review areas and a responsibility → requirement → evidence matrix.","topic":"SaaS and responsibility","body":weeklyFoundation,"published":"2026-10-11"},
 {"section":"architecture-in-motion","slug":"cloud-service-mesh-istiod-retirement","plSlug":"cloud-service-mesh-koniec-istiod","title":"Cloud Service Mesh retires ISTIOD: plan a boundary migration","description":"The 1 March 2028 deadline, two migration paths and evidence before moving traffic.","topic":"Kubernetes and lifecycle","eventDate":"2026-09-28","body":weeklyMesh,"published":"2026-10-11"},
