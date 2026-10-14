@@ -1,3 +1,4 @@
+import replicaDecision from '../content/articles/czy-potrzebujemy-repliki-danych.html?raw';
 import conditionalApproval from '../content/articles/warunkowa-decyzja-architektoniczna.html?raw';
 import weeklyAI from '../content/articles/hld-z-dokumentacji-dostawcy.html?raw';
 import weeklyFoundation from '../content/articles/due-diligence-saas.html?raw';
@@ -39,6 +40,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'czy-potrzebujemy-repliki-danych', title:'Czy naprawdę potrzebujemy repliki danych?', description:'Od pomiarów i świeżości danych do decyzji: optymalizacja, replika odczytowa czy przełączenie awaryjne.', topic:'Dane, dostępność i spójność', published:'2026-10-14', body:replicaDecision },
   { section:'podstawy-architektury', slug:'warunkowa-decyzja-architektoniczna', title:'Decyzja warunkowa to nie zgoda na wdrożenie. Jak zamknąć warunki?', description:'Sześć pól warunku: kryterium, właściciel, dowód, weryfikator, bramka i działanie po niepowodzeniu.', topic:'Ład architektoniczny i decyzje', published:'2026-10-13', body:conditionalApproval },
 {"section":"architektura-it-ai","slug":"hld-z-dokumentacji-dostawcy","title":"AI napisało HLD z dokumentów dostawcy. Co wiemy, a co dopowiedziało?","description":"Tutorial 02: rejestr źródeł, jawne niewiadome, pytania zmieniające projekt i weryfikacja stwierdzeń.","topic":"Tutorial 02 · źródła i HLD","body":weeklyAI,"published":"2026-10-11"},
 {"section":"podstawy-architektury","slug":"due-diligence-saas","title":"Przegląd architektoniczny SaaS przed zakupem: co musi wiedzieć klient?","description":"Siedem obszarów oceny oraz macierz odpowiedzialność → wymaganie → dowód.","topic":"SaaS i odpowiedzialność","body":weeklyFoundation,"published":"2026-10-11"},
