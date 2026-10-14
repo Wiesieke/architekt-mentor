@@ -1,6 +1,7 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'PODSTAWY', title:'Czy naprawdę potrzebujemy repliki danych?', summary:'Obciążenie · świeżość · spójność · przełączenie', href:'/podstawy-architektury/czy-potrzebujemy-repliki-danych/', published:'2026-10-14' },
   { kind:'PODSTAWY', title:'Decyzja warunkowa to nie zgoda na wdrożenie. Jak zamknąć warunki?', summary:'Właściciel · dowód · weryfikator · bramka decyzji', href:'/podstawy-architektury/warunkowa-decyzja-architektoniczna/', published:'2026-10-13' },
 {"kind":"ĆWICZENIE","title":"Dostawca daje SaaS. Czy musisz znać jego architekturę?","summary":"Średni · szybka decyzja, mentor i analiza","href":"/lamiglowki/2026-10-11-saas-granice-odpowiedzialnosci/","published":"2026-10-11"},
 {"kind":"PODSTAWY","title":"Przegląd architektoniczny SaaS przed zakupem: co musi wiedzieć klient?","summary":"Siedem obszarów oceny oraz macierz odpowiedzialność → wymaganie → dowód.","href":"/podstawy-architektury/due-diligence-saas/","published":"2026-10-11"},
