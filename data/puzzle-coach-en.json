@@ -279,5 +279,26 @@
         "expected": "Proposes a responsibility matrix and concrete tests or artefacts; does not treat an API and SLA as sufficient evidence."
       }
     ]
+  },
+  "2026-10-15-zielony-healthcheck-przerwany-proces": {
+    "scenario": "Fictional educational scenario. A portal accepts an application and returns an identifier, while a stalled asynchronous consumer prevents the application reaching its final state. API, database, broker and /health are green. The service's agreed completion window has not yet been defined.",
+    "question": "Would you classify the service as available? In 2–3 sentences state its boundary, signals, controlled test and what would change your decision.",
+    "criteria": [
+      {
+        "id": "business_boundary",
+        "label": "Service boundary",
+        "expected": "Separates acceptance from completion and does not confuse infrastructure health with successful business outcomes."
+      },
+      {
+        "id": "progress_and_slo",
+        "label": "Progress and service objectives",
+        "expected": "Proposes age of pending work, throughput and user-facing completion within an agreed window, stating that the threshold remains unknown."
+      },
+      {
+        "id": "safe_negative_test",
+        "label": "Safe negative test",
+        "expected": "Proposes an isolated end-to-end probe and deliberately interrupted consumer followed by reconciliation without duplicate business results."
+      }
+    ]
   }
 }
