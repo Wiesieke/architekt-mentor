@@ -19,3 +19,11 @@ Technical checks: pending PR CI, fresh Astro build, Preview PL/EN and production
 Checked revision: pending final branch SHA and technical checks.
 Decision: draft, technically blocked until verifications pass.
 Deployed revision: pending.
+
+## CI outcome 2026-10-15
+- Checked branch revision: 28314ae3eed5720a8f8b3d2ab4c3bfe47817afcd
+- Workflow: ArchitectMentor publication gates, run 38698343978.
+- editorial-quality: SUCCESS (npm ci, npm run test:comments, PUBLIC_SITE_INDEXABLE=true npm run build, scripts/check-editorial-publishing.mjs).
+- protected-preview: FAILURE at credentials preflight. GitHub Actions secrets VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID are empty in that run; first specific reported failure is "Missing Actions secret VERCEL_TOKEN".
+- Authenticated Preview HTTP check was not performed. No human review or approval claimed.
+- Decision: BLOCKED. Do not merge until protected-preview succeeds for latest SHA. Production verification pending.
