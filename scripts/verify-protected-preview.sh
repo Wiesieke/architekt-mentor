@@ -29,7 +29,7 @@ paths=("/lamiglowki/$latest_id/" "/en/practice/$latest_id/" "/rss.xml" "/en/rss.
 for i in "${!paths[@]}"; do
   # vercel curl automatically uses the authenticated protection-bypass mechanism.
   # -f makes HTTP 4xx/5xx a hard failure, rather than a green check.
-  vercel curl "${paths[$i]}" --deployment "$deployment_url" --token "$VERCEL_TOKEN" -- -f -sS -o "/tmp/am-preview/$i"
+  vercel curl "${paths[$i]}" --deployment "$deployment_url" -- -f -sS -o "/tmp/am-preview/$i"
 done
 node --input-type=module <<'NODE'
 import fs from 'node:fs';
