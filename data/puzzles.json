@@ -1,5 +1,77 @@
 [
   {
+    "id": "2026-10-15-zielony-healthcheck-przerwany-proces",
+    "week": "ArchitectMentor Daily · 15.10.2026",
+    "date": "2026-10-15",
+    "title": "Wszystkie kontrolki świecą na zielono. Dlaczego klient nie może zakończyć operacji?",
+    "difficulty": "Średni",
+    "goal": "Rozróżnić zdrowie komponentu od dostępności ścieżki biznesowej oraz zdefiniować mierzalne dowody gotowości usługi.",
+    "scenario": "Fikcyjny scenariusz edukacyjny\n\nPortal pozwala użytkownikowi złożyć wniosek. Serwis WWW, API, baza danych i broker komunikatów mają zielone health-checki; dashboard infrastruktury pokazuje 99,99% dostępności. Endpoint /health zwraca 200, a API utworzenia wniosku przyjmuje żądanie i oddaje identyfikator.\n\nJednak od pewnego czasu potwierdzenie złożenia nie pojawia się w portalu: konsument zdarzeń zatrzymał się po błędzie deserializacji. Wnioski gromadzą się w kolejce, a status pozostaje „w realizacji”. Operator proponuje uznać usługę za dostępną, bo infrastruktura działa, i zwiększyć liczbę instancji API. Nie wiadomo jeszcze, jaki jest uzgodniony czas ukończenia procesu ani czy wszystkie zaległe komunikaty można bezpiecznie ponowić.",
+    "question": "Czy uznasz usługę za dostępną? Jaką granicę usługi, mierniki i kontrolowaną próbę zaproponujesz? W 2–3 zdaniach wyjaśnij decyzję i warunek jej zmiany.",
+    "hints": [
+      "Czy kod HTTP 200 na /health jest dowodem zakończenia procesu użytkownika?",
+      "Który etap jest asynchroniczny i jak wykryjesz zatrzymanie postępu?",
+      "Jak odróżnisz zaległość, błąd trwały i opóźnienie w dopuszczalnym oknie?",
+      "Jak przetestujesz wznowienie bez duplikowania skutków biznesowych?"
+    ],
+    "analysis": "### Zielony komponent to nie zielony proces\n\n**Nie uznawaj pełnej ścieżki biznesowej za zdrową na podstawie samych health-checków.** Kontrola /health mówi, że komponent odpowiada na wybrany test, a nie że wniosek został ukończony. API może poprawnie zaakceptować polecenie przy niedziałającej części asynchronicznej. Jeżeli kontrakt mówi tylko o przyjęciu wniosku, trzeba osobno odróżnić dostępność przyjmowania od terminowości przetwarzania — nie wymyślać obietnicy natychmiastowego zakończenia.\n\n### Trzy warianty\n\n1. **A — Sam uptime usług.** Prostota wdrożenia i szybkiej diagnostyki infrastruktury, ale brak informacji o zatrzymanym procesie; fałszywy obraz doświadczenia użytkownika.\n2. **B — Jeden syntetyczny test end-to-end na produkcji.** Wcześnie wykrywa problemy z integracją, ale może generować skutki biznesowe, dane testowe i fałszywe alarmy; potrzebuje izolacji, sprzątania i granic uprawnień.\n3. **C — Warstwowe sygnały oraz bezpieczna próba syntetyczna.** Zachowaj liveness/readiness komponentów, dołóż wiek najstarszego nieobsłużonego zdarzenia, tempo postępu, odsetek procesów zakończonych w uzgodnionym czasie i kontrolowany test całej ścieżki. W tym scenariuszu wybór C daje najlepszą obserwowalność pod warunkiem, że zespół uzgodni znaczenie „zakończony” i dopuszczalny czas.\n\n### Sygnały, których potrzebujesz\n\n- **Oddziel status przyjęcia od zakończenia.** Zdefiniuj stan wniosku, moment rozpoczęcia pomiaru i oczekiwane zachowanie UI przy opóźnieniu.\n- **Mierz postęp, a nie tylko rozmiar kolejki.** Śledź wiek najstarszej pracy, tempo konsumpcji i błędy trwałe / DLQ; sama liczba wiadomości bywa myląca przy zmianie ruchu.\n- **Wybierz SLI i SLO użytkownika.** Na przykład odsetek poprawnie przyjętych wniosków, które osiągnęły stan końcowy w *uzgodnionym* czasie — bez arbitralnego wpisywania czasu w publikacji.\n- **Sprawdź ścieżkę syntetycznie.** Użyj dedykowanego konta i nieszkodliwych danych testowych; nie twórz realnych zobowiązań. Potwierdź stan końcowy, obsługę duplikatów, możliwość sprzątania i limit częstotliwości.\n\n### Bramka decyzji\n\nPrzed dopuszczeniem usługi sprawdź kontrolowane zatrzymanie konsumenta. API nadal może być gotowe do przyjmowania, ale monitor powinien wykryć brak postępu we właściwym czasie. Po wznowieniu przetwórz zaległości i potwierdź, że ponowienie nie tworzy podwójnych rezultatów. W przypadku awarii stałej przyjmowanie nowych wniosków może wymagać ograniczenia albo komunikatu dla użytkownika zależnie od pojemności kolejki i uzgodnionego kontraktu.\n\n> Dostępność elementów jest niezbędną wskazówką operacyjną, ale nie zastępuje dowodu, że użytkownik otrzymuje obiecaną usługę.",
+    "quick": {
+      "question": "Jaka decyzja najlepiej odpowiada tym założeniom?",
+      "hint": "Oceń ścieżkę użytkownika, sygnały braku postępu i bezpieczeństwo próby.",
+      "correctId": "c",
+      "options": [
+        {
+          "id": "a",
+          "text": "Uznać usługę za dostępną; /health i dashboard potwierdzają zdrowie infrastruktury.",
+          "explanation": "Health-checki nie obejmują skutku asynchronicznego. Sygnał dostępności komponentu myli się tu z wynikiem procesu."
+        },
+        {
+          "id": "b",
+          "text": "Wyłączyć health-checki i co minutę tworzyć produkcyjny wniosek na zwykłym koncie.",
+          "explanation": "Sama próba E2E jest użyteczna, ale bez izolacji danych, uprawnień i ograniczenia skutków biznesowych może być ryzykowna; nie zastępuje diagnostyki warstw."
+        },
+        {
+          "id": "c",
+          "text": "Zachować kontrole komponentów, dodać miernik postępu i SLO procesu, a pełną ścieżkę sprawdzać bezpieczną próbą.",
+          "explanation": "Łączy wczesną diagnostykę z dowodem rezultatu widzianego przez użytkownika i kontroluje skutki testów."
+        }
+      ]
+    },
+    "coach": {
+      "criteria": [
+        {
+          "id": "business_boundary",
+          "label": "Granica usługi",
+          "expected": "Oddziela przyjęcie wniosku od jego ukończenia i nie nazywa zdrowia komponentu dostępnością procesu."
+        },
+        {
+          "id": "progress_and_slo",
+          "label": "Postęp i cele",
+          "expected": "Definiuje mierniki wieku zaległości, tempa zakończeń i wyniku ścieżki w uzgodnionym oknie; wskazuje nieznany próg jako decyzję do uzgodnienia."
+        },
+        {
+          "id": "safe_negative_test",
+          "label": "Bezpieczny test negatywny",
+          "expected": "Proponuje izolowaną próbę end-to-end z zatrzymaniem i wznowieniem konsumenta oraz weryfikacją braku duplikatów."
+        }
+      ]
+    },
+    "related": [
+      {
+        "type": "PODSTAWY",
+        "title": "SLO i budżet błędów",
+        "description": "Jak mierzyć usługę z perspektywy użytkownika.",
+        "href": "/podstawy-architektury/slo-budzet-bledow/"
+      },
+      {
+        "type": "PODSTAWY",
+        "title": "Komunikacja asynchroniczna",
+        "description": "Przyjęcie polecenia nie jest zakończeniem dalszej pracy.",
+        "href": "/podstawy-architektury/komunikacja-asynchroniczna-powiadomienia/"
+      }
+    ]
+  },
+  {
     "id": "2026-10-11-saas-granice-odpowiedzialnosci",
     "week": "ArchitectMentor Weekly · 5–11.10.2026",
     "date": "2026-10-11",
