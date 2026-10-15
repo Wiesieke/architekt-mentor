@@ -40,7 +40,10 @@ for (const i of [0,1]) {
  assert(bodies[i].includes(id),'Missing ID from '+(i===0?'PL':'EN')+' practice HTML');
  assert(!/Authentication Required|Log in to Vercel/i.test(bodies[i]),'Protection login was returned instead of HTML');
 }
-for(const i of [2,3,4]) assert(bodies[i].includes(id),'Missing latest exercise from '+['','','PL RSS','EN RSS','sitemap'][i]);
+for(const i of [2,3]) assert(bodies[i].includes(id),'Missing latest exercise from '+['','','PL RSS','EN RSS'][i]);
+// The protected Preview sitemap is intentionally empty: this is the site's anti-indexing policy.
+assert(bodies[4].includes('<urlset'),'Invalid sitemap XML in Preview');
+assert(!bodies[4].includes('<url><loc>'),'Preview unexpectedly exposes indexed routes');
 assert(bodies[0].includes('QuickDecision') || bodies[0].includes('quick-decision') || bodies[0].includes('quick-'),'Missing quick decision markup on PL page');
 console.log('Authenticated PL/EN Preview, RSS and sitemap passed.');
 NODE
