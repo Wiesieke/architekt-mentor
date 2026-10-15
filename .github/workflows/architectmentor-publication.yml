@@ -1,0 +1,62 @@
+name: ArchitectMentor publication gates
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: read
+
+concurrency:
+  group: architectmentor-gates-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  editorial-quality:
+    name: editorial-quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:comments
+      - name: Build public PL/EN pages
+        run: PUBLIC_SITE_INDEXABLE=true npm run build
+      - name: Verify latest bilingual practice, routes, RSS and sitemap
+        run: node scripts/check-editorial-publishing.mjs
+
+  protected-preview:
+    name: protected-preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: editorial-quality
+    if: github.event_name == 'pull_request'
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Vercel CI credentials exist
+        shell: bash
+        run: |
+          test -n "$VERCEL_TOKEN" || { echo 'Missing Actions secret VERCEL_TOKEN'; exit 1; }
+          test -n "$VERCEL_ORG_ID" || { echo 'Missing Actions secret VERCEL_ORG_ID'; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo 'Missing Actions secret VERCEL_PROJECT_ID'; exit 1; }
+      - name: Install Vercel CLI
+        run: npm install --global vercel@62
+      - name: Verify protected PL/EN Preview and RSS
+        shell: bash
+        run: bash scripts/verify-protected-preview.sh
