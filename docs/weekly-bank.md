@@ -20,3 +20,12 @@ Bank służy selekcji i pogłębieniu, nie kopiowaniu pełnych tekstów Daily. K
 - Teza: sama replika nie gwarantuje HA ani nie zastępuje backupu; kryterium decyzji są mierzalne SLO, świeżość i próba przełączenia.
 - Możliwe Practice: wybór wariantu dla trzech różnych RPO/RTO i tolerancji opóźnienia; test awarii, konfliktów oraz read-after-write.
 - Pochodzenie: fikcyjny scenariusz edukacyjny; bez powiązania z konkretnym projektem.
+
+## 2026-10-15 · Zielone health-checki, przerwany proces
+
+- Daily PL: /lamiglowki/2026-10-15-zielony-healthcheck-przerwany-proces/
+- Daily EN: /en/practice/2026-10-15-zielony-healthcheck-przerwany-proces/
+- Status: kandydat do pogłębienia, nie kopiować treści Daily.
+- Teza: komponenty mogą być dostępne, gdy obietnica złożona użytkownikowi nie jest realizowana. Rozdziel pomiary akceptacji i ukończenia.
+- Dalszy materiał: Anti-pattern „HTTP 200 jako definicja dostępności”; przykład projektu testu syntetycznego z bezpiecznym sprzątaniem i bramką SLO.
+- Pochodzenie: fikcyjny scenariusz edukacyjny; brak rzeczywistego klienta lub incydentu.
