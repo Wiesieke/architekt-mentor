@@ -2,6 +2,8 @@ import { articles, articleUrl } from './articles';
 import { englishArticles, englishArticleUrl } from './articles-en';
 import patterns from '../../data/antywzorce.json';
 import { englishAntipatterns } from './antipatterns-en';
+import puzzles from '../../data/puzzles.json';
+import { englishPuzzles } from './puzzles-en';
 
 type FeedItem = { title: string; description: string; url: string; published: string };
 const origin = 'https://ejsymont.com';
@@ -13,14 +15,16 @@ export function renderFeed(locale: 'pl' | 'en') {
     ? [
         ...articles.filter(article => article.published).map(article => ({title:article.title, description:article.description, url:articleUrl(article), published:article.published!})),
         ...patterns.map(pattern => ({title:pattern.title, description:pattern.summary, url:`/antywzorce/${pattern.id}/`, published:pattern.date})),
+        ...puzzles.filter(puzzle => puzzle.date && puzzle.coach).map(puzzle => ({title:puzzle.title, description:puzzle.goal || puzzle.question, url:`/lamiglowki/${puzzle.id}/`, published:puzzle.date})),
       ]
     : [
         ...englishArticles.filter(article => article.published).map(article => ({title:article.title, description:article.description, url:englishArticleUrl(article), published:article.published!})),
         ...englishAntipatterns.filter(pattern => pattern.title && pattern.summary).map(pattern => ({title:pattern.title, description:pattern.summary, url:`/en/anti-patterns/${pattern.id}/`, published:pattern.date})),
+        ...englishPuzzles.filter(puzzle => puzzle.date && puzzle.coach && puzzle.title).map(puzzle => ({title:puzzle.title, description:puzzle.question, url:`/en/practice/${puzzle.id}/`, published:puzzle.date})),
       ];
   items.sort((a,b) => b.published.localeCompare(a.published) || a.url.localeCompare(b.url));
   const feedUrl = `${origin}${locale === 'pl' ? '/rss.xml' : '/en/rss.xml'}`;
-  const title = locale === 'pl' ? 'ArchitectMentor — artykuły i antywzorce' : 'ArchitectMentor — articles and anti-patterns';
+  const title = locale === 'pl' ? 'ArchitectMentor — artykuły, łamigłówki i antywzorce' : 'ArchitectMentor — articles, puzzles and anti-patterns';
   const description = locale === 'pl' ? 'Nowe materiały o praktyce architektury IT' : 'New practical IT architecture articles';
   const entries = items.slice(0,40).map(item => {
     const link = `${origin}${item.url}`;
