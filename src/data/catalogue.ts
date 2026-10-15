@@ -15,6 +15,7 @@ const areas = [
  {id:'decisions',pl:'Analiza i decyzje',en:'Analysis and decisions'},
 ];
 const assignments: Record<string,string> = {
+ '2026-10-15-zielony-healthcheck-przerwany-proces':'resilience',
  '2026-10-11-saas-granice-odpowiedzialnosci':'decisions', '2026-10-11-saas-nas-nie-interesuje':'decisions',
  '2026-10-03-opcjonalne-pole-api':'integration','2026-10-02-email-po-zamowieniu':'integration',
  '2026-10-01-wymiana-urzadzen':'decisions','2026-10-01-nieznany-wynik-transakcji':'integration',
