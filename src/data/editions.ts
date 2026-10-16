@@ -1,6 +1,7 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'PODSTAWY', title:'Czy retry pogłębia przeciążenie? Jeden właściciel ponowień', summary:'3 × 3 próby · deadline · jitter · test 429/503', href:'/podstawy-architektury/retry-budget-jeden-wlasciciel/', published:'2026-10-16' },
   { kind:'ĆWICZENIE', title:'Wszystkie kontrolki świecą na zielono. Dlaczego klient nie może zakończyć operacji?', summary:'Średni · zdrowie komponentów vs. wynik procesu · test negatywny', href:'/lamiglowki/2026-10-15-zielony-healthcheck-przerwany-proces/', published:'2026-10-15' },
   { kind:'PODSTAWY', title:'Czy naprawdę potrzebujemy repliki danych?', summary:'Obciążenie · świeżość · spójność · przełączenie', href:'/podstawy-architektury/czy-potrzebujemy-repliki-danych/', published:'2026-10-14' },
   { kind:'PODSTAWY', title:'Decyzja warunkowa to nie zgoda na wdrożenie. Jak zamknąć warunki?', summary:'Właściciel · dowód · weryfikator · bramka decyzji', href:'/podstawy-architektury/warunkowa-decyzja-architektoniczna/', published:'2026-10-13' },
