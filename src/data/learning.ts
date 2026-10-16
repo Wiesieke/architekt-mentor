@@ -5,7 +5,7 @@ import { englishArticles, englishArticleUrl } from './articles-en';
 export const learningGroups = [
   { id: 'integration', pl: 'Integracja i API', en: 'Integration and APIs', slugs: ['ewolucja-kontraktu-api', 'komunikacja-asynchroniczna-powiadomienia', 'idempotencja-lookup-kompensacja', 'wzorce'] },
   { id: 'analysis', pl: 'Analiza i decyzje', en: 'Analysis and decisions', slugs: ['czy-potrzebujemy-repliki-danych', 'warunkowa-decyzja-architektoniczna', 'due-diligence-saas', 'analiza-wplywu-zmiany', 'adr', 'checklista'] },
-  { id: 'resilience', pl: 'Odporność i odtwarzanie', en: 'Resilience and recovery', slugs: ['graceful-degradation', 'rpo-rto-proba-odtworzenia', 'bulkhead'] },
+  { id: 'resilience', pl: 'Odporność i odtwarzanie', en: 'Resilience and recovery', slugs: ['retry-budget-jeden-wlasciciel', 'graceful-degradation', 'rpo-rto-proba-odtworzenia', 'bulkhead'] },
   { id: 'security', pl: 'Bezpieczeństwo', en: 'Security', slugs: ['izolacja-tenantow-niezmiennik'] },
   { id: 'quality', pl: 'Jakość i pomiar', en: 'Quality and measurement', slugs: ['scenariusze-atrybutow-jakosciowych', 'slo-budzet-bledow'] },
   { id: 'description', pl: 'Opis i modele architektury', en: 'Architecture descriptions and models', slugs: ['opis', 'c4', 'ramy'] },
