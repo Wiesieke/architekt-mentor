@@ -4,18 +4,20 @@ import Comments from '../../components/Comments.astro';
 import { articles, articleUrl, type Article } from '../../data/articles';
 import { englishUrlForPolishArticle } from '../../data/articles-en';
 import { editionLearningLinks } from '../../data/edition-links';
+import { resolveAuthor, authorUrl, authorSchema } from '../../data/authors';
 
 export function getStaticPaths() {
   return articles.map(article => ({ params: { section: article.section, slug: article.slug }, props: { article } }));
 }
 const { article } = Astro.props as { article: Article };
+const author = resolveAuthor(article.authorId);
 const sectionTitle = article.section === 'architektura-it-ai' ? 'Architektura IT w dobie AI' : article.section === 'architektura-w-ruchu' ? 'Architektura w ruchu' : 'Podstawy architektury';
 const schema = {
   '@context':'https://schema.org', '@type':'Article',
   headline:article.title, description:article.description,
   inLanguage:'pl', articleSection:sectionTitle,
   mainEntityOfPage:new URL(articleUrl(article), 'https://ejsymont.com').href,
-  author:{'@type':'Person',name:'Wiesław Ejsymont'},
+  author:authorSchema(article.authorId,'pl'),
   ...(article.published ? {datePublished:article.published} : {}),
 };
 const editionRelated = editionLearningLinks('pl', article.published, articleUrl(article));
@@ -25,7 +27,7 @@ const format = (value: string) => new Intl.DateTimeFormat('pl-PL', {dateStyle:'l
   <div class="article-page"><div class="container article-wrap">
     <a class="back" href={`/${article.section}/`}>← {sectionTitle}</a>
     <header><div class="eyebrow">{sectionTitle} · {article.topic}</div><h1>{article.title}</h1><p>{article.description}</p>
-      <div class="meta">Wiesław Ejsymont {article.published && <> · Opublikowano <time datetime={article.published}>{format(article.published)}</time></>}{article.eventDate && <> · Data wydarzenia <time datetime={article.eventDate}>{format(article.eventDate)}</time></>}</div>
+      <div class="meta"><a href={authorUrl(article.authorId,'pl')}>{author.name}</a> {article.published && <> · Opublikowano <time datetime={article.published}>{format(article.published)}</time></>}{article.eventDate && <> · Data wydarzenia <time datetime={article.eventDate}>{format(article.eventDate)}</time></>}</div>
     </header>
     <article class="article-body" set:html={article.body} />
     <Comments articlePath={articleUrl(article)} />
