@@ -1,0 +1,1 @@
+Cel nauki: kto ponawia wywołanie i ile razy. Fikcyjny scenariusz edukacyjny. Przy trzech próbach w dwóch warstwach może powstać dziewięć wywołań zależności. Rozwiązanie: jeden właściciel retry, budżet prób, deadline i test przeciążenia. Nie publikować bez weryfikacji źródeł.
