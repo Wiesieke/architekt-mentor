@@ -163,6 +163,6 @@ Do not promise a global exactly-once guarantee. If the provider supports neither
   },
 };
 
-export const englishPuzzles = puzzles.map(puzzle => ({ id:puzzle.id, week:puzzle.week.replace(/TYDZIEŃ/i, 'WEEK'), date:puzzle.date, coach:Boolean(puzzle.coach), ...(starters.find(item=>item.id===puzzle.id)?.en || translations[puzzle.id]) }));
+export const englishPuzzles = puzzles.map(puzzle => ({ id:puzzle.id, week:puzzle.week.replace(/TYDZIEŃ/i, 'WEEK'), date:puzzle.date, authorId:(puzzle as typeof puzzle & {authorId?:string}).authorId ?? 'architectmentor', coach:Boolean(puzzle.coach), ...(starters.find(item=>item.id===puzzle.id)?.en || translations[puzzle.id]) }));
 export const latestEnglishPuzzle = [...englishPuzzles].filter(p => p.coach).sort((a,b) => b.date.localeCompare(a.date))[0];
 export const englishPuzzleUrl = (id:string) => id === latestEnglishPuzzle.id ? '/en/practice/' : `/en/practice/${id}/`;

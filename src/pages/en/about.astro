@@ -1,0 +1,22 @@
+---
+import Studio from '../../layouts/Studio.astro';
+import { authors, authorUrl } from '../../data/authors';
+const founder = authors['wieslaw-ejsymont'];
+---
+<Studio locale="en" title="About" description="ArchitectMentor: an independent educational platform on enterprise and solution architecture in practice." translationUrl="/o-nas/">
+  <section class="container about">
+    <div class="eyebrow">ArchitectMentor / About</div>
+    <h1>Architecture knowledge you can put into practice.</h1>
+    <p class="lead">ArchitectMentor is an independent educational initiative devoted to enterprise and solution architecture. We help readers practise reasoning, recognise risks and verify decisions — rather than stopping at diagrams and buzzwords.</p>
+    <div class="principles">
+      <article><span>01 / Education</span><h2>From situation to decision</h2><p>Exercises, anti-patterns, analysis and tools encourage useful questions, trade-offs and evidence.</p></article>
+      <article><span>02 / Accountability</span><h2>Knowledge with context</h2><p>We distinguish facts, fictional teaching scenarios and judgement. Our policy explains the use of AI and editorial checks.</p></article>
+      <article><span>03 / Growth</span><h2>Open to more experts</h2><p>The publication can accommodate additional practitioners over time. We do not present future contributors as an existing team.</p></article>
+    </div>
+    <section class="founder"><div class="eyebrow">Founder</div><h2>{founder.name}</h2><p>{founder.summary.en}</p><p>The founder's experience is the starting point, not the limit of the brand. ArchitectMentor is being designed as a multi-author platform.</p><a href={authorUrl(founder.id,'en')}>Meet the founder →</a></section>
+    <div class="links"><a href="/en/editorial-policy/">Editorial policy →</a><a href="/en/for-business/">Work with ArchitectMentor →</a></div>
+  </section>
+</Studio>
+<style>
+.about{padding:68px 0 100px}.about h1{font-size:clamp(35px,5vw,58px);max-width:18ch;margin:18px 0}.lead{max-width:75ch;color:var(--muted);font-size:19px}.principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:52px 0 68px}.principles article,.founder{background:white;border:1px solid var(--line);border-radius:13px;padding:30px}.principles span{font-size:12px;font-weight:700;color:var(--teal)}.principles h2,.founder h2{font-size:24px}.principles p,.founder p{color:var(--muted)}.founder{max-width:790px}.founder h2{margin-top:15px}.founder a,.links a{color:var(--teal);font-weight:700}.links{display:flex;flex-wrap:wrap;gap:28px;margin-top:35px}@media(max-width:760px){.principles{grid-template-columns:1fr;margin:35px 0}.about{padding:45px 0}.principles article,.founder{padding:24px}}
+</style>

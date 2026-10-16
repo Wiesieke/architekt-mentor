@@ -1,0 +1,22 @@
+---
+import Studio from '../layouts/Studio.astro';
+import { authors, authorUrl } from '../data/authors';
+const founder = authors['wieslaw-ejsymont'];
+---
+<Studio title="O nas" description="ArchitectMentor: niezależna platforma edukacyjna o praktyce architektury korporacyjnej i rozwiązań IT." translationUrl="/en/about/">
+  <section class="container about">
+    <div class="eyebrow">ArchitectMentor / O nas</div>
+    <h1>Wiedza o architekturze, którą można wykorzystać w praktyce.</h1>
+    <p class="lead">ArchitectMentor to niezależna inicjatywa edukacyjna poświęcona architekturze korporacyjnej i architekturze rozwiązań IT. Pomagamy ćwiczyć rozumowanie, nazywać ryzyka i sprawdzać decyzje — zamiast poprzestawać na diagramach i modnych hasłach.</p>
+    <div class="principles">
+      <article><span>01 / Edukacja</span><h2>Od sytuacji do decyzji</h2><p>Łamigłówki, antywzorce, analizy i narzędzia uczą stawiać pytania, ważyć kompromisy i szukać dowodów.</p></article>
+      <article><span>02 / Odpowiedzialność</span><h2>Wiedza z kontekstem</h2><p>Rozróżniamy fakty, scenariusze dydaktyczne i oceny. Publikujemy zasady korzystania z AI i kontroli redakcyjnej.</p></article>
+      <article><span>03 / Rozwój</span><h2>Otwarta formuła ekspercka</h2><p>Marka została zaprojektowana tak, by z czasem publikowali pod nią także inni praktycy. Nie przedstawiamy planowanego zespołu jako już istniejącego.</p></article>
+    </div>
+    <section class="founder"><div class="eyebrow">Założyciel</div><h2>{founder.name}</h2><p>{founder.summary.pl}</p><p>Doświadczenie założyciela jest punktem wyjścia, ale celem ArchitectMentor jest budowanie niezależnej, wieloautorskiej platformy.</p><a href={authorUrl(founder.id,'pl')}>Poznaj założyciela →</a></section>
+    <div class="links"><a href="/jak-powstaja-materialy/">Zasady redakcyjne →</a><a href="/dlafirm/">Współpraca z ArchitectMentor →</a></div>
+  </section>
+</Studio>
+<style>
+.about{padding:68px 0 100px}.about h1{font-size:clamp(35px,5vw,58px);max-width:18ch;margin:18px 0}.lead{max-width:75ch;color:var(--muted);font-size:19px}.principles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:52px 0 68px}.principles article,.founder{background:white;border:1px solid var(--line);border-radius:13px;padding:30px}.principles span{font-size:12px;font-weight:700;color:var(--teal)}.principles h2,.founder h2{font-size:24px}.principles p,.founder p{color:var(--muted)}.founder{max-width:790px}.founder h2{margin-top:15px}.founder a,.links a{color:var(--teal);font-weight:700}.links{display:flex;flex-wrap:wrap;gap:28px;margin-top:35px}@media(max-width:760px){.principles{grid-template-columns:1fr;margin:35px 0}.about{padding:45px 0}.principles article,.founder{padding:24px}}
+</style>

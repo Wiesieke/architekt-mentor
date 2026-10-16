@@ -4,6 +4,7 @@ import { latestEditionDate } from '../data/editions';
 import patterns from '../../data/antywzorce.json';
 import puzzles from '../../data/puzzles.json';
 import { englishArticles, englishArticleUrl } from '../data/articles-en';
+import { authors, authorUrl } from '../data/authors';
 
 export const GET: APIRoute = () => {
   // Preview sites remain out of the index; production gets the full map.
@@ -19,6 +20,8 @@ export const GET: APIRoute = () => {
       {path:'/narzedzia/adr/'},
       {path:'/narzedzia/hld/'},
       {path:'/dlafirm/'},
+      {path:'/o-nas/'},
+      ...Object.values(authors).map(a => ({path:authorUrl(a.id,'pl')})),
       {path:'/informacja-o-danych/'},
       {path:'/newsletter/'},
       {path:'/jak-powstaja-materialy/',modified:'2026-10-02'},
@@ -35,6 +38,8 @@ export const GET: APIRoute = () => {
       {path:'/en/tools/adr/'},
       {path:'/en/tools/hld/'},
       {path:'/en/for-business/'},
+      {path:'/en/about/'},
+      ...Object.values(authors).map(a => ({path:authorUrl(a.id,'en')})),
       {path:'/en/data-notice/'},
       {path:'/en/newsletter/'},
       {path:'/en/editorial-policy/',modified:'2026-10-02'},
