@@ -1,0 +1,12 @@
+---
+import Studio from '../../layouts/Studio.astro';
+import { authors, authorUrl, type AuthorId } from '../../data/authors';
+export function getStaticPaths() { return Object.values(authors).map(author => ({params:{slug:author.id},props:{authorId:author.id as AuthorId}})); }
+const { authorId } = Astro.props as {authorId:AuthorId};
+const author = authors[authorId];
+---
+<Studio title={author.name} description={author.summary.pl} translationUrl={authorUrl(authorId,'en')}>
+  <section class="container profile"><a class="back" href="/o-nas/">← O ArchitectMentor</a><div class="eyebrow">{author.role.pl}</div><h1>{author.name}</h1><p class="lead">{author.summary.pl}</p><div class="bio">{author.bio.pl}</div><nav><a href="/o-nas/">O inicjatywie →</a><a href="/jak-powstaja-materialy/">Zasady redakcyjne →</a></nav></section>
+</Studio>
+<script type="application/ld+json" is:inline set:html={JSON.stringify({'@context':'https://schema.org','@type':author.kind,name:author.name,url:new URL(authorUrl(authorId,'pl'),'https://ejsymont.com').href})} />
+<style>.profile{max-width:900px;padding:60px 0 110px}.back,.profile nav a{color:var(--teal);font-weight:700}.eyebrow{margin:38px 0 8px}.profile h1{font-size:clamp(36px,5vw,58px);margin:15px 0}.lead{color:var(--muted);font-size:19px}.bio{background:#fff;border:1px solid var(--line);border-radius:13px;padding:30px;white-space:pre-line;line-height:1.9}.profile nav{display:flex;gap:24px;flex-wrap:wrap;margin-top:35px}@media(max-width:600px){.profile{padding:35px 0 65px}.bio{padding:22px}}</style>
