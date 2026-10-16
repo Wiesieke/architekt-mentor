@@ -4,7 +4,9 @@ import QuickDecision from './QuickDecision.astro';
 import { marked } from 'marked';
 import { englishPuzzleUrl, englishPuzzles } from '../data/puzzles-en';
 import { editionLearningLinks } from '../data/edition-links';
+import { resolveAuthor, authorUrl } from '../data/authors';
 const { puzzle, permanent = false } = Astro.props as { puzzle:(typeof englishPuzzles)[number]; permanent?: boolean };
+const author = resolveAuthor(puzzle.authorId);
 const scenario = marked.parse(puzzle.scenario);
 const analysis = marked.parse(puzzle.analysis);
 const isLatest = englishPuzzleUrl(puzzle.id) === '/en/practice/';
@@ -13,7 +15,7 @@ const decisionRecord = puzzle.decisionRecord;
 const editionRelated = permanent ? editionLearningLinks('en', puzzle.date, `/en/practice/${puzzle.id}/`) : [];
 ---
 <Studio locale="en" translationUrl={polishUrl} title={puzzle.title} description={`Architecture exercise: ${puzzle.question}`} published={puzzle.date} active="practice">
- <div class="exercise-head"><div class="container"><a class="back" href="/en/practice/archive/">← All exercises</a><div class="eyebrow">Decision workshop · {puzzle.week}</div><h1>{puzzle.title}</h1><p>Identify the risk, make a decision and compare your reasoning with a senior architect’s analysis.</p></div></div>
+ <div class="exercise-head"><div class="container"><a class="back" href="/en/practice/archive/">← All exercises</a><div class="eyebrow">Decision workshop · {puzzle.week}</div><h1>{puzzle.title}</h1><p class="byline">Published by <a href={authorUrl(author.id,'en')}>{author.name}</a></p><p>Identify the risk, make a decision and compare your reasoning with a senior architect’s analysis.</p></div></div>
  <div class="container exercise" data-puzzle-id={puzzle.id}>
   <article class="panel"><div class="label">01 · SCENARIO · {puzzle.difficulty}</div><div class="body"><div class="markdown" set:html={scenario} /><div class="question"><strong>Your question</strong><p>{puzzle.question}</p></div><details><summary>Guiding questions</summary><ul>{puzzle.hints.map(h => <li>{h}</li>)}</ul></details></div></article>
   {puzzle.quick && <QuickDecision quick={puzzle.quick} locale="en" />}

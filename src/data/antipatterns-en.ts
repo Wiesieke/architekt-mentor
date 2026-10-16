@@ -199,5 +199,6 @@ Who can change the data? How current must the portal view be? How do both system
 export const englishAntipatterns = patterns.map(pattern => ({
   id: pattern.id,
   date: pattern.date,
+  authorId: (pattern as typeof pattern & {authorId?:string}).authorId ?? 'architectmentor',
   ...translations[pattern.id],
 }));
