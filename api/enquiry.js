@@ -3,7 +3,8 @@ const nodemailer = require("nodemailer");
 
 const MAILBOX = "architektura@sensinte.com";
 const SERVICES = new Set([
-  "HLD w 5 dni", "Przegląd architektury", "Konsultacja", "Nie wiem jeszcze — doradźcie"
+  "HLD w 5 dni", "Przegląd architektury", "Konsultacja", "Nie wiem jeszcze — doradźcie",
+  "Architecture Advisory", "Architecture Governance", "Solution Architecture", "Academy & Mentoring"
 ]);
 const WINDOW_MS = 15 * 60 * 1000, LIMIT = 3;
 const attempts = new Map();
