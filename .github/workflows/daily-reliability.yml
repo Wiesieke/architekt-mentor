@@ -1,0 +1,49 @@
+name: ArchitectMentor Daily reliability
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '20 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-reliability-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Comment tests
+        run: npm run test:comments
+      - name: Production build
+        run: npm run build
+      - name: Publication integrity
+        run: node scripts/check-daily-integrity.mjs
+
+  daily-health:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check today's publication and expose a diagnostic
+        run: node scripts/check-daily-integrity.mjs --daily-health
+      - name: Report status without bypassing publication gates
+        if: always()
+        run: |
+          echo "Scheduled health is monitoring only: it never merges, publishes, or disables any external ChatGPT schedule." >> "$GITHUB_STEP_SUMMARY"
