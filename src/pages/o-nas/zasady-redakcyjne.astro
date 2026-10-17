@@ -1,0 +1,14 @@
+---
+import Studio from '../../layouts/Studio.astro';
+const structured = { '@context':'https://schema.org', '@type':'AboutPage', name:'Zasady redakcyjne ArchitectMentor', url:'https://ejsymont.com/o-nas/zasady-redakcyjne/', inLanguage:'pl', about:{'@type':'Organization',name:'ArchitectMentor',url:'https://ejsymont.com/',founder:{'@type':'Person',name:'Wiesław Ejsymont'}}, publisher:{'@type':'Organization',name:'ArchitectMentor'} };
+---
+<Studio locale="pl" title="Zasady redakcyjne i odpowiedzialność" description="Jak ArchitectMentor wykorzystuje AI, weryfikuje materiały i podejmuje decyzje o publikacji." translationUrl="/en/about/editorial-policy/">
+  <script type="application/ld+json" set:html={JSON.stringify(structured)} />
+  <article class="container editorial"><p class="eyebrow">O nas · Transparentność</p><h1>Zasady redakcyjne i odpowiedzialność</h1><p>ArchitectMentor jest niezależnym magazynem ekspercko-edukacyjnym poświęconym architekturze IT, podejmowaniu decyzji technologicznych i praktyce projektowania systemów.</p>
+  <h2>Jak powstają materiały</h2><p>W przygotowywaniu publikacji możemy korzystać z narzędzi sztucznej inteligencji. AI może wspierać analizę, wyszukiwanie źródeł, tworzenie wersji roboczych, tłumaczenie, redakcję oraz opracowywanie przykładów i diagramów. Narzędzia te nie pełnią funkcji wydawcy ani nie podejmują ostatecznych decyzji redakcyjnych.</p>
+  <h2>Redakcja i odpowiedzialność</h2><p>W przyjętym od 17 października 2026 r. procesie wszystkie nowe publikacje wymagają weryfikacji merytorycznej i redakcyjnej oraz zatwierdzenia końcowej wersji. Ostateczna decyzja o publikacji należy do Wiesława Ejsymonta, założyciela i redaktora odpowiedzialnego ArchitectMentor, który bierze odpowiedzialność redakcyjną za zatwierdzony materiał. Opis ten nie oznacza, że wszystkie archiwalne publikacje przeszły identyczny proces.</p>
+  <h2>Weryfikacja i korekty</h2><p>Sprawdzamy źródła, odróżniamy fakty od interpretacji i przykładów modelowych, oceniamy wartość edukacyjną oraz dbamy o poufność. W razie nowych ustaleń lub błędów poprawiamy materiały i wskazujemy istotne aktualizacje.</p>
+  <h2>Autorzy</h2><p>ArchitectMentor jest marką ekspercko-edukacyjną otwartą na przyszłych współpracowników. Autorstwo materiałów i odpowiedzialność redakcyjna pozostają odrębnymi rolami i są oznaczane zgodnie z rzeczywistym wkładem.</p>
+  </article>
+</Studio>
+<style>.editorial{max-width:850px;padding-top:70px;padding-bottom:110px}.editorial h1{font-size:clamp(32px,5vw,52px)}.editorial h2{margin-top:38px}.editorial p{font-size:18px;line-height:1.75}</style>

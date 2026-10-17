@@ -10,13 +10,17 @@ Publish to help a reader make a concrete architectural decision. Each item must 
 
 Check technical claims in primary sources. Link to relevant documentation, incidents or organizer pages; record dates and distinguish fact, interpretation and assumption. Never invent references, benchmark results, model calls, client projects, outcomes or first-hand experience. Use “Practice-inspired educational scenario” only when a confirmed source supports the scenario. Otherwise explicitly use “Fictional educational scenario” or “Composite educational scenario”. Remove confidential and identifying details; anonymization alone does not prove a source is safe to publish.
 
-## Publication authorization and quality gate
+## Human editorial approval and publication gate (effective 17 October 2026)
 
-Effective 9 October 2026, Wiesław authorizes ArchitectMentor publication without his separate review of each final revision. This supersedes the mandatory personal-review gate adopted on 2 October. It covers articles, exercises, anti-patterns, tutorials and event recommendations in PL/EN, including existing draft candidates after fresh checks. The authorization evidence is recorded in `docs/publication-authorization.json`.
+ArchitectMentor is an independent expert-education publication. AI tools may support research, drafting, translation, illustrations, editing and technical checks. AI is not the publisher and may not certify that a human reviewed any text.
 
-AI may research, draft, translate, check and publish through a branch/PR, verified Preview, passing applicable tests/build and production verification. Every material must pass the checklist below; unresolved factual, confidentiality, educational or technical issues still block publication. Recheck substantive edits and the final revision. Authorization does not itself certify any candidate as ready.
+The publisher and editor responsible, Wiesław Ejsymont, reviews, corrects and makes the final decision on each new publication, in both PL and EN. Explicit approval must identify the exact final commit SHA and cover both language versions and associated assets. A new content revision invalidates that approval and requires a new decision. A general standing authorization is not approval of a specific issue.
 
-Record cycle authorization separately from human review. Never fill a human reviewer, reviewed revision or personal approval without actual evidence, and never add a “Reviewed by” label merely because publication was authorized. Previous publications and review records remain unchanged. Newsletter/email sends, commercial commitments and publication of confidential source material require separate authorization. Generated HLDs still require the user's architectural review.
+Until approval, ChatGPT may create a branch, draft PR and Vercel Preview; GitHub Actions may run tests. It must not merge, promote a deployment to production or mark a draft as published. Approval must be recorded as genuine evidence (e.g. a publisher-authored PR approval or an explicit approval in a conversation referencing the exact SHA); never invent a human reviewer or infer approval from successful CI.
+
+On production, publish a public PL/EN editorial manifesto that accurately explains AI assistance and the publisher's responsibility. Do not retroactively assert personal review of historic articles without evidence. Public structured data should identify genuine authors and publisher, not claim human authorship for unreviewed drafts.
+
+The intended enforced control is a GitHub branch ruleset on main requiring pull requests, successful checks and a review by an authorized human other than the automation actor; stale approvals must be dismissed on new commits, bypass restricted, and direct pushes disabled. Repository text and CI alone are not an adequate substitute for an enforced branch rule. Configure in GitHub Settings and verify the rule is active before relying on it.
 
 ## Publication checklist
 
