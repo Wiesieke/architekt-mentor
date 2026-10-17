@@ -1,4 +1,5 @@
 import retryBudget from '../content/articles/retry-budget-jeden-wlasciciel.html?raw';
+import businessAudit from '../content/articles/audyt-zdarzen-biznesowych.html?raw';
 import replicaDecision from '../content/articles/czy-potrzebujemy-repliki-danych.html?raw';
 import conditionalApproval from '../content/articles/warunkowa-decyzja-architektoniczna.html?raw';
 import weeklyAI from '../content/articles/hld-z-dokumentacji-dostawcy.html?raw';
@@ -43,6 +44,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'audyt-zdarzen-biznesowych', title:'Log nie jest audytem. Jak zaprojektować wiarygodny ślad operacji?', description:'Log HTTP 200 nie dowodzi zmiany stanu. Trzy warianty, transactional outbox i pięć testów wiarygodności audytu.', topic:'Audyt, integralność i architektura danych', published:'2026-10-17', body:businessAudit },
   { section:'podstawy-architektury', slug:'retry-budget-jeden-wlasciciel', title:'Czy retry pogłębia przeciążenie? Jeden właściciel ponowień', description:'Dlaczego 3 × 3 próby mogą przeciążyć katalog i jak ustalić wspólny budżet prób, deadline i testy 429/503.', topic:'Odporność, integracje i retry', published:'2026-10-16', authorId:'wieslaw-ejsymont', body:retryBudget },
   { section:'podstawy-architektury', slug:'czy-potrzebujemy-repliki-danych', title:'Czy naprawdę potrzebujemy repliki danych?', description:'Od pomiarów i świeżości danych do decyzji: optymalizacja, replika odczytowa czy przełączenie awaryjne.', topic:'Dane, dostępność i spójność', published:'2026-10-14', authorId:'wieslaw-ejsymont', body:replicaDecision },
   { section:'podstawy-architektury', slug:'warunkowa-decyzja-architektoniczna', title:'Decyzja warunkowa to nie zgoda na wdrożenie. Jak zamknąć warunki?', description:'Sześć pól warunku: kryterium, właściciel, dowód, weryfikator, bramka i działanie po niepowodzeniu.', topic:'Ład architektoniczny i decyzje', published:'2026-10-13', authorId:'wieslaw-ejsymont', body:conditionalApproval },
