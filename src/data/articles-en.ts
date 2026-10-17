@@ -1,4 +1,5 @@
 import retryBudget from '../content/articles/en/retry-budget-single-owner.html?raw';
+import businessAudit from '../content/articles/en/business-audit-events.html?raw';
 import replicaDecision from '../content/articles/en/do-we-need-data-replication.html?raw';
 import conditionalApproval from '../content/articles/en/conditional-architecture-approval.html?raw';
 import weeklyAI from '../content/articles/en/hld-from-vendor-documentation.html?raw';
@@ -34,6 +35,7 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'business-audit-events', plSlug:'audyt-zdarzen-biznesowych', title:'A log is not an audit trail. How do you prove a business operation?', description:'HTTP 200 is not evidence of a state change. Three options, transactional outbox and five audit acceptance tests.', topic:'Audit, integrity and data architecture', published:'2026-10-17', body:businessAudit },
   { section:'foundations', slug:'retry-budget-single-owner', plSlug:'retry-budget-jeden-wlasciciel', title:'Can retries make an overloaded dependency worse?', description:'How 3 × 3 attempts amplify load and how to establish one retry owner, a shared deadline and 429/503 tests.', topic:'Resilience, integration and retries', published:'2026-10-16', authorId:'wieslaw-ejsymont', body:retryBudget },
   { section:'foundations', slug:'do-we-need-data-replication', plSlug:'czy-potrzebujemy-repliki-danych', title:'Do we actually need a data replica?', description:'From measurable demand and data freshness to a choice: optimise, read replica or failover.', topic:'Data, availability and consistency', published:'2026-10-14', authorId:'wieslaw-ejsymont', body:replicaDecision },
   { section:'foundations', slug:'conditional-architecture-approval', plSlug:'warunkowa-decyzja-architektoniczna', title:'Conditional architecture approval is not a release sign-off', description:'Six fields for each condition: criterion, owner, evidence, verifier, gate and failure action.', topic:'Architecture governance and decisions', published:'2026-10-13', authorId:'wieslaw-ejsymont', body:conditionalApproval },
