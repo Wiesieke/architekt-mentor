@@ -1,7 +1,7 @@
 ---
 import Studio from '../../layouts/Studio.astro';
+import body from '../../content/articles/agent-ai-bramka-decyzji.html?raw';
 ---
-<Studio locale="pl" title="Agent AI: bramka decyzji" description="Kontrola działań agenta AI">
-<h1>Agent AI może zaproponować zmianę. Kto pozwoli ją wykonać?</h1>
-<article class="article-body"><p>Model proponuje zmianę, a zaufana aplikacja ją zatwierdza.</p></article>
+<Studio locale="pl" title="Agent AI: kto zatwierdza zmianę?" description="Bramka decyzji, autoryzacja i audyt działań agentów AI." translationUrl="/en/architecture-with-ai/agent-action-gateway/" published="2026-10-18">
+  <article class="container" style="max-width:850px;padding-top:60px;padding-bottom:100px"><h1>Agent AI może zaproponować zmianę. Kto pozwoli ją wykonać?</h1><div class="article-body" set:html={body} /></article>
 </Studio>
