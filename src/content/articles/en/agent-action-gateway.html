@@ -1,2 +1,17 @@
-<p>Learning goal: explain how an independent service validates business changes proposed by an assistant.</p>
-<h2>Review</h2><p>Human approval is required for high-impact changes.</p>
+<p><strong>Learning goal:</strong> design a boundary between an AI assistant's proposal and an authorised business change.</p>
+<h2>Fictional scenario</h2>
+<p>An assistant reviews purchase orders and suggests moving a delivery date. A supporting document contains an unrelated instruction about the approval process. The document is data, not a source of authority. Which component decides whether the proposed change is allowed?</p>
+<h2>Architecture options</h2>
+<ol><li><strong>A: direct writes.</strong> Simple, but too much autonomy for consequential actions.</li><li><strong>B: action gateway.</strong> An independent application checks the proposal against user permissions, business rules and required human review. Recommended.</li><li><strong>C: read-only assistant.</strong> Prepare a draft for the existing business workflow where approval infrastructure is not ready.</li></ol>
+<h2>Six responsibilities</h2>
+<ol><li><strong>Read:</strong> restrict access to the necessary data.</li><li><strong>Propose:</strong> describe the target, original value, requested value and rationale.</li><li><strong>Authorise:</strong> verify identity and business policy in application code.</li><li><strong>Approve:</strong> show the precise parameters to the reviewer and bind the decision to one revision and expiry.</li><li><strong>Execute:</strong> revalidate current permissions and state, and track the operation identifier.</li><li><strong>Audit:</strong> retain the initiator, reviewer, policy version, decision and outcome without secrets.</li></ol>
+<p>A review decision does not replace target-system authorisation. A later change in parameters or permissions requires re-evaluation.</p>
+<h2>OWASP Agent Control Standard</h2>
+<p>OWASP announced the Agent Control Standard (ACS) on 1 September 2026. Its three areas are Instrument, Trace and Inspect. The published specification is v0.1.0 and should be treated as an early reference for architecture pilots, not as a certification. The core gateway pattern can be implemented independently.</p>
+<h2>Acceptance tests</h2>
+<ol><li>Instructions inside documents cannot grant authority.</li><li>A changed request requires a new review.</li><li>Expired permissions prevent the action.</li><li>An unclear outcome is checked before another attempt.</li><li>A policy-service outage holds high-impact changes.</li></ol>
+<p><strong>ADR:</strong> choose B for controlled write operations and C for the rest. Extra infrastructure and review latency are the trade-offs. The acceptance condition is a verified single path for changes.</p>
+<p><strong>Architect's question:</strong> which independent component can reject the proposal?</p>
+<h2>Sources</h2>
+<ul><li><a href="https://genai.owasp.org/resource/agent-control-standard-acs/">OWASP Agent Control Standard</a></li><li><a href="https://genai-security-project.github.io/agent-control-standard/">ACS specification</a></li><li><a href="https://genai.owasp.org/llmrisk/llm062025-excessive-agency/">OWASP Excessive Agency</a></li></ul>
+<p><small>Sources verified 18 October 2026. Fictional scenario; no production claims.</small></p>
