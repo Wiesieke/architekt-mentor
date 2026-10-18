@@ -1,3 +1,4 @@
+import agentAction from '../content/articles/en/agent-action-gateway.html?raw';
 import retryBudget from '../content/articles/en/retry-budget-single-owner.html?raw';
 import replicaDecision from '../content/articles/en/do-we-need-data-replication.html?raw';
 import conditionalApproval from '../content/articles/en/conditional-architecture-approval.html?raw';
@@ -34,6 +35,8 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'architecture-with-ai', slug:'agent-action-gateway', plSlug:'agent-ai-bramka-decyzji', title:'An AI agent can propose a change. Who authorises execution?', description:'Action gateway, independent authorisation, human approval and audit for AI agents.', topic:'AI agent security', published:'2026-10-18', authorId:'wieslaw-ejsymont', body:agentAction },
+
   { section:'foundations', slug:'retry-budget-single-owner', plSlug:'retry-budget-jeden-wlasciciel', title:'Can retries make an overloaded dependency worse?', description:'How 3 × 3 attempts amplify load and how to establish one retry owner, a shared deadline and 429/503 tests.', topic:'Resilience, integration and retries', published:'2026-10-16', authorId:'wieslaw-ejsymont', body:retryBudget },
   { section:'foundations', slug:'do-we-need-data-replication', plSlug:'czy-potrzebujemy-repliki-danych', title:'Do we actually need a data replica?', description:'From measurable demand and data freshness to a choice: optimise, read replica or failover.', topic:'Data, availability and consistency', published:'2026-10-14', authorId:'wieslaw-ejsymont', body:replicaDecision },
   { section:'foundations', slug:'conditional-architecture-approval', plSlug:'warunkowa-decyzja-architektoniczna', title:'Conditional architecture approval is not a release sign-off', description:'Six fields for each condition: criterion, owner, evidence, verifier, gate and failure action.', topic:'Architecture governance and decisions', published:'2026-10-13', authorId:'wieslaw-ejsymont', body:conditionalApproval },
