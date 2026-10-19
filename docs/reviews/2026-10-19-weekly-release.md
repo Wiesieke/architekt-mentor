@@ -55,7 +55,7 @@ Original contribution: the evidence ladder, negative-test plan, operational inte
 ## Revision and approval state
 
 - Publication instruction for this cycle requires Wiesław's explicit approval of the final version/SHA.
-- Checked content revision: pending first commit.
+- Checked content revision: `efc0d100a9dbf22eec9da8af651746ffab14867a`.
 - Final candidate SHA: pending.
 - Human reviewer: null.
 - Human-reviewed revision: null.
