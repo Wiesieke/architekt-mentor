@@ -1,0 +1,29 @@
+<p><strong>Data wydarzenia: 14.10.2026.</strong> GitHub udostępnił w publicznym podglądzie pliki blokady zależności workflow dla GitHub Actions. Funkcja jest dostępna w planach Free, Team oraz GitHub Enterprise Cloud. Pozwala pozostawić czytelne odwołanie do taga lub gałęzi w workflow, ale uruchamiać dokładny commit zapisany w <code>.github/workflows/actions.lock</code>.</p>
+
+<h2>Co rzeczywiście jest blokowane?</h2>
+<p>Narzędzie <code>gh actions-lock</code> zapisuje commit oraz numery identyfikujące repozytorium akcji. Obejmuje akcje bezpośrednie, ich zależności przechodnie oraz odwołania do workflow wielokrotnego użytku. Jest jednak ważna granica: zależności wewnątrz wywołanego reusable workflow kontroluje plik blokady w repozytorium, w którym ten workflow jest zdefiniowany.</p>
+
+<h2>Dlaczego to jest decyzja architektoniczna?</h2>
+<p>Workflow CI/CD jest częścią łańcucha dostawy. Odwołanie <code>uses: vendor/action@v3</code> może wskazywać inny kod po przesunięciu taga — bez zmiany w repozytorium korzystającym z akcji. Lockfile przenosi taką zmianę do jawnego diffu. Daje trzy rzeczy: powtarzalność wykonania, spis zależności pipeline’u i punkt kontroli aktualizacji.</p>
+
+<h2>Czego lockfile nie gwarantuje?</h2>
+<ul>
+  <li>Nie dowodzi, że zablokowany kod jest bezpieczny.</li>
+  <li>Nie zastępuje minimalnych uprawnień <code>GITHUB_TOKEN</code>, ochrony sekretów ani izolacji runnera.</li>
+  <li>Nie blokuje automatycznie obrazów kontenerów, pakietów i skryptów pobieranych przez samą akcję.</li>
+  <li>Nie usuwa obowiązku aktualizacji. Stary, znany commit może zawierać znaną podatność.</li>
+</ul>
+
+<h2>Plan pilotażu</h2>
+<ol>
+  <li>Wybierz repozytorium bez krytycznego procesu wydawniczego i zinwentaryzuj <code>uses:</code>, reusable workflows oraz akcje lokalne.</li>
+  <li>Sprawdź bieżące referencje, wygeneruj lockfile i przejrzyj cały diff. Generator może doprecyzować wersje w samych workflow.</li>
+  <li>Dodaj w PR kontrolę <code>gh actions-lock --verify</code>. Zmiany pliku blokady skieruj do właściciela bezpieczeństwa pipeline’u.</li>
+  <li>Skonfiguruj Dependabot dla GitHub Actions i przetestuj aktualizację, cofnięcie oraz przypadek przesuniętego taga.</li>
+  <li>Dopiero po pilotażu rozważ wymaganie lockfile. Dokumentacja GitHuba ostrzega, że tryb Evaluate polityki jest dostępny tylko w Enterprise.</li>
+</ol>
+
+<h2>Interpretacja ArchitectMentor</h2>
+<p>Największą wartością nie jest kolejny plik YAML. Wartością jest przeniesienie niewidocznej zmiany zależności do miejsca, w którym można ją zobaczyć, ocenić i zatwierdzić. Bez przeglądu diffu lockfile staje się eleganckim sposobem na trwałe uruchamianie czegoś, czego nikt nie przeczytał.</p>
+
+<div class="source"><strong>Źródła pierwotne sprawdzone 19.10.2026:</strong> <a href="https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/">GitHub Changelog, 14.10.2026</a>; <a href="https://docs.github.com/en/actions/concepts/security/workflow-dependency-lockfiles">koncepcja i zakres lockfile</a>; <a href="https://docs.github.com/en/actions/how-tos/secure-your-work/lock-workflow-dependencies">generowanie i przegląd</a>; <a href="https://docs.github.com/en/actions/how-tos/administer/enforce-workflow-lockfiles">pilotaż i egzekwowanie polityki</a>. Opis produktu jest faktem; plan pilotażu i interpretacja są autorskim wnioskiem.</div>

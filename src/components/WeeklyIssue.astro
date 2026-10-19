@@ -1,28 +1,38 @@
 ---
 import Studio from '../layouts/Studio.astro';
-import issue from '../data/weekly.json';
-interface Props {locale:'pl'|'en'}
-const {locale}=Astro.props;const en=locale==='en';const p=issue.paths[locale];
-const title=en?'Evidence before architecture acceptance':'Dowód przed akceptacją architektury';
-const labels=en?['Practice','Foundations','Anti-pattern','Architect + AI','Architecture in motion']:['Łamigłówka','Podstawy architektury','Antywzorzec','Architekt i AI','Architektura w ruchu'];
-const items=[{...issue.practice[locale],href:p.practice},{...issue.records[locale][1],href:p.foundation},{...issue.anti[locale],href:p.anti},{...issue.records[locale][0],href:p.ai},{...issue.records[locale][2],href:p.mesh}];
-const questions=en?[
- ['A conditional decision: who verifies completion?','Name an owner for each condition, evidence, an acceptance criterion and a launch decision. Keep review coordination separate from operating the control.'],
- ['Three places show different standards. Which one applies?','Establish an authoritative source, version and owner. A portal should lead readers to the current standard rather than preserve conflicting copies.'],
- ['An agent checks publication hourly. Who completes it?','Separate monitoring from an executable process with states, an owner and recovery. A recurring green status is not a delivered edition.']
-]:[
- ['Decyzja jest warunkowa. Kto sprawdzi jej wykonanie?','Przypisz właściciela do każdego warunku, dowód, kryterium przyjęcia i decyzję o uruchomieniu. Oddziel koordynację przeglądu od wykonywania kontroli.'],
- ['Trzy miejsca pokazują inny standard. Który obowiązuje?','Ustal źródło nadrzędne, wersję i właściciela. Portal powinien prowadzić do aktualnego standardu, zamiast utrwalać sprzeczne kopie.'],
- ['Agent co godzinę sprawdza publikację. Kto ją kończy?','Oddziel obserwację od procesu ze stanami, właścicielem i odtwarzaniem po błędzie. Powtarzający się zielony status nie oznacza dostarczonego wydania.']
-];
+
+interface WeeklyPage {
+  title:string; description:string; lead:string; meta:string; cta:string;
+  editorialTitle:string; editorialParagraphs:string[];
+  items:{label:string;title:string;description:string;href:string}[];
+  discussionTitle:string; discussionIntro:string; questions:string[][];
+  eventsText:string; eventsCta:string;
+}
+interface WeeklyData {
+  date:string; period:string; paths:{pl:string;en:string};
+  pages:{pl:WeeklyPage;en:WeeklyPage};
+}
+interface Props { locale:'pl'|'en'; issue:WeeklyData }
+const {locale,issue}=Astro.props;
+const en=locale==='en';
+const page=issue.pages[locale];
+const other=en?'pl':'en';
 ---
-<Studio locale={locale} title={`ArchitectMentor Weekly · ${title}`} description={en?'Five linked lessons on SaaS, AI-generated HLDs and service-mesh migration, with conferences and discussion prompts.':'Pięć powiązanych materiałów o SaaS, HLD z AI i migracji service mesh, konferencje oraz pytania do dyskusji.'} translationUrl={issue.paths[en?'pl':'en'].hub} published={issue.date} modified={issue.date}>
-<section class="opening"><div class="container"><div class="eyebrow">ArchitectMentor Weekly · 5–11.10.2026</div><h1>{title}</h1><p class="lead">{en?'A convincing diagram is a starting point. This edition asks what the customer actually owns, which HLD claims have a source and what evidence allows a migration to proceed.':'Przekonujący diagram jest początkiem rozmowy. W tym wydaniu pytamy, za co rzeczywiście odpowiada klient, które stwierdzenia w HLD mają źródło i jaki dowód pozwala rozpocząć migrację.'}</p><p class="meta">{en?'Published 11 October 2026 · 5 materials · PL / EN':'Publikacja 11 października 2026 · 5 materiałów · PL / EN'}</p><a class="button" href={p.practice}>{en?'Start with the decision':'Zacznij od decyzji'}</a></div></section>
-<div class="container issue"><section class="editorial"><div class="eyebrow">{en?'From the editor':'Od redakcji'}</div><h2>{en?'One question across three boundaries':'Jedno pytanie na trzech granicach'}</h2><p>{en?'SaaS delegates much of the implementation, while the customer still owns its channel, identity, data and integrations. We begin with a dilemma: demand every internal diagram, or accept an API and SLA? The exercise leads to a third path: establish boundaries and evidence for behaviour the customer depends on.':'SaaS deleguje dużą część implementacji, ale klient nadal odpowiada za kanał użytkownika, tożsamość, dane i integrację. Zaczynamy od dylematu: żądać wszystkich diagramów wewnętrznych czy zaakceptować API i SLA? Ćwiczenie prowadzi do trzeciej drogi: ustalić granice i dowody zachowania, od którego zależy klient.'}</p><p>{en?'AI can organise vendor documents and produce an HLD. It can also turn an unknown into a plausible statement. Tutorial 02 shows how to build a source register, retain gaps and select questions that change the design. Its fictional examples demonstrate a method, not an actual vendor capability or model evaluation.':'AI może uporządkować dokumenty dostawcy i przygotować HLD. Może też zamienić niewiadomą w wiarygodnie brzmiące stwierdzenie. Tutorial 02 pokazuje rejestr źródeł, jawne luki i wybór pytań zmieniających projekt. Fikcyjne przykłady demonstrują metodę, a nie możliwości rzeczywistego dostawcy ani wynik testu modelu.'}</p><p>{en?'Google’s ISTIOD retirement announcement gives a concrete lifecycle decision. Migration requires compatibility checks, allowed and denied traffic tests, and an explicit rollback boundary. Across all three topics, ask: who owns the result, what has been agreed and how will we demonstrate it?':'Komunikat Google o wycofaniu ISTIOD daje konkretną decyzję dotyczącą cyklu życia. Migracja wymaga sprawdzenia zgodności, prób ruchu dozwolonego i zabronionego oraz jawnej granicy wycofania zmiany. W każdym temacie pytamy: kto odpowiada za wynik, co uzgodniono i jak to potwierdzimy?'}</p></section>
-<section aria-labelledby="contents"><div class="eyebrow">{en?'Reading order':'Kolejność lektury'}</div><h2 id="contents">{en?'In this edition':'W tym wydaniu'}</h2><ol class="contents">{items.map((item,i)=><li><a href={item.href}><small>{String(i+1).padStart(2,'0')} · {labels[i]}</small><h3>{item.title}</h3><p>{item.description}</p><span>{en?'Read the material →':'Otwórz materiał →'}</span></a></li>)}</ol></section>
-<section class="discussion"><div class="eyebrow">{en?'Team discussion':'Dyskusja zespołu'}</div><h2>{en?'Three more dilemmas from our editorial work':'Trzy kolejne dylematy z pracy redakcyjnej'}</h2><p>{en?'These are proposed topics to practise, not accounts of confirmed incidents. Choose one and explain your decision in three sentences.':'To propozycje tematów do przećwiczenia, a nie relacje z potwierdzonych incydentów. Wybierz jeden i uzasadnij decyzję w trzech zdaniach.'}</p>{questions.map(([q,a])=><details><summary>{q}</summary><p>{a}</p></details>)}</section>
-<section class="events"><div class="eyebrow">{en?'Conferences and workshops':'Konferencje i warsztaty'}</div><h2>{en?'Continue the discussion with practitioners':'Kontynuuj rozmowę z praktykami'}</h2><p>{en?'Look for sessions about verification, responsibility and operating systems in production. The catalogue includes current dates, confirmation limits and organiser links.':'Szukaj sesji o weryfikacji, odpowiedzialności i utrzymaniu systemów produkcyjnych. Katalog zawiera aktualne terminy, granice potwierdzenia informacji i odnośniki do organizatorów.'}</p><a class="button" href={en?'/en/events/':'/wydarzenia/'}>{en?'Browse events checked 11 October':'Wydarzenia sprawdzone 11 października'}</a></section></div>
+<Studio locale={locale} title={`ArchitectMentor Weekly · ${page.title}`} description={page.description} translationUrl={issue.paths[other]} published={issue.date} modified={issue.date}>
+  <section class="opening"><div class="container">
+    <div class="eyebrow">ArchitectMentor Weekly · {issue.period}</div>
+    <h1>{page.title}</h1><p class="lead">{page.lead}</p><p class="meta">{page.meta}</p>
+    <a class="button" href={page.items[0].href}>{page.cta}</a>
+  </div></section>
+  <div class="container issue">
+    <section class="editorial"><div class="eyebrow">{en?'From the editor':'Od redakcji'}</div><h2>{page.editorialTitle}</h2>{page.editorialParagraphs.map(text=><p>{text}</p>)}</section>
+    <section aria-labelledby="contents"><div class="eyebrow">{en?'Reading order':'Kolejność lektury'}</div><h2 id="contents">{en?'In this edition':'W tym wydaniu'}</h2>
+      <ol class="contents">{page.items.map((item,i)=><li><a href={item.href}><small>{String(i+1).padStart(2,'0')} · {item.label}</small><h3>{item.title}</h3><p>{item.description}</p><span>{en?'Read the material →':'Otwórz materiał →'}</span></a></li>)}</ol>
+    </section>
+    <section class="discussion"><div class="eyebrow">{en?'Team discussion':'Dyskusja zespołu'}</div><h2>{page.discussionTitle}</h2><p>{page.discussionIntro}</p>{page.questions.map(([q,a])=><details><summary>{q}</summary><p>{a}</p></details>)}</section>
+    <section class="events"><div class="eyebrow">{en?'Conferences and workshops':'Konferencje i warsztaty'}</div><h2>{en?'Continue the discussion with practitioners':'Kontynuuj rozmowę z praktykami'}</h2><p>{page.eventsText}</p><a class="button" href={en?'/en/events/':'/wydarzenia/'}>{page.eventsCta}</a></section>
+  </div>
 </Studio>
 <style>
-.opening{background:#142b3b;color:#f8f7f2;padding:64px 0}.opening .eyebrow{color:#bce4d2}.opening h1{font-size:clamp(36px,5vw,60px);line-height:1.12;max-width:18ch}.lead{font-size:20px;max-width:65ch;color:#d9e7e3}.meta{color:#bce4d2;font-size:14px;margin-block:24px}.issue{padding-block:48px}.issue section{margin-bottom:64px}.editorial{max-width:78ch}.issue h2{font-size:clamp(26px,3.5vw,38px)}.contents{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.contents li:last-child{grid-column:1/-1}.contents a{display:block;height:100%;box-sizing:border-box;background:white;border:1px solid #dce4df;border-radius:12px;padding:28px;text-decoration:none}.contents small{color:#136d73;font-weight:800}.contents h3{font-size:23px;line-height:1.35}.contents p{color:#536577}.contents span{color:#136d73;font-weight:700}.discussion,.events{background:#e8f4ef;border-radius:12px;padding:32px}.discussion details{border-top:1px solid #b6d4c9;padding:18px 0}.discussion summary{cursor:pointer;font-weight:700}.discussion details p{max-width:75ch}.events p{max-width:75ch}@media(max-width:720px){.opening{padding:40px 0}.contents{grid-template-columns:1fr}.contents li:last-child{grid-column:auto}.contents a,.discussion,.events{padding:22px}.lead{font-size:18px}}
+.opening{background:#142b3b;color:#f8f7f2;padding:64px 0}.opening .eyebrow{color:#bce4d2}.opening h1{font-size:clamp(36px,5vw,60px);line-height:1.12;max-width:18ch}.lead{font-size:20px;max-width:65ch;color:#d9e7e3}.meta{color:#bce4d2;font-size:14px;margin-block:24px}.issue{padding-block:48px}.issue section{margin-bottom:64px}.editorial{max-width:78ch}.issue h2{font-size:clamp(26px,3.5vw,38px)}.contents{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.contents li:last-child{grid-column:1/-1}.contents a{display:block;height:100%;box-sizing:border-box;background:white;border:1px solid #dce4df;border-radius:12px;padding:28px;text-decoration:none}.contents small{color:#136d73;font-weight:800}.contents h3{font-size:23px;line-height:1.35}.contents p{color:#536577}.contents span{color:#136d73;font-weight:700}.discussion,.events{background:#e8f4ef;border-radius:12px;padding:32px}.discussion details{border-top:1px solid #b6d4c9;padding:18px 0}.discussion summary{cursor:pointer;font-weight:700}.discussion details p,.events p{max-width:75ch}@media(max-width:720px){.opening{padding:40px 0}.contents{grid-template-columns:1fr}.contents li:last-child{grid-column:auto}.contents a,.discussion,.events{padding:22px}.lead{font-size:18px}}
 </style>

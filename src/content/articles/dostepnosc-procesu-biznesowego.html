@@ -1,0 +1,51 @@
+<p><strong>Cel nauki:</strong> zdefiniować dostępność usługi przez wynik obiecany użytkownikowi, a nie przez liczbę zielonych komponentów.</p>
+
+<div class="note"><strong>Fikcyjny scenariusz edukacyjny.</strong> Portal przyjmuje wniosek i zwraca identyfikator. API, baza i broker odpowiadają, ale zatrzymany konsument nie doprowadza procesu do stanu końcowego. Nie jest to opis konkretnej organizacji ani incydentu.</div>
+
+<h2>Dwie prawdziwe odpowiedzi mogą sobie przeczyć</h2>
+<p>Serwis przyjmujący polecenia może być dostępny, a proces biznesowy — nie. To nie błąd logiki. To dwa różne zobowiązania:</p>
+<ul>
+  <li><strong>akceptacja</strong> — system trwale przyjął pracę i potrafi wskazać jej identyfikator;</li>
+  <li><strong>ukończenie</strong> — praca osiągnęła uzgodniony stan końcowy w określonym czasie.</li>
+</ul>
+<p>Jeżeli dashboard miesza te odpowiedzi, zielony kolor nie jest kłamstwem. Jest odpowiedzią na zbyt małe pytanie.</p>
+
+<h2>Drabina dowodów</h2>
+<table>
+  <thead><tr><th>Warstwa</th><th>Pytanie</th><th>Przykładowy dowód</th><th>Czego nie dowodzi</th></tr></thead>
+  <tbody>
+    <tr><td>Proces</td><td>Czy komponent żyje?</td><td>Liveness, restart, wykorzystanie zasobów</td><td>Gotowości do obsługi ruchu</td></tr>
+    <tr><td>Zależność</td><td>Czy komponent może wykonać swój krok?</td><td>Readiness, połączenie, uprawnienia</td><td>Ukończenia całego procesu</td></tr>
+    <tr><td>Postęp</td><td>Czy przyjęta praca przesuwa się do przodu?</td><td>Wiek najstarszego zadania, tempo zakończeń, błędy trwałe</td><td>Poprawności skutku dla użytkownika</td></tr>
+    <tr><td>Wynik</td><td>Czy użytkownik otrzymuje obiecaną usługę?</td><td>SLI stanu końcowego, kontrolowana próba syntetyczna</td><td>Przyczyny ewentualnej awarii</td></tr>
+  </tbody>
+</table>
+<p>Potrzebne są wszystkie warstwy. Sygnał wyniku wykrywa problem, a sygnały komponentów pomagają go zlokalizować. Jeden wykres nie musi udawać całej architektury.</p>
+
+<h2>Zacznij od kontraktu procesu</h2>
+<ol>
+  <li>Nazwij stan przyjęcia i stany końcowe: sukces, odrzucenie, anulowanie albo wymaganie interwencji.</li>
+  <li>Ustal początek pomiaru, dopuszczalne okno i populację. Nie wpisuj arbitralnego czasu tylko po to, żeby wykres miał próg.</li>
+  <li>Przenieś identyfikator korelacji przez kolejkę, konsumentów i magazyny stanu. Nie umieszczaj poufnej treści w etykietach metryk.</li>
+  <li>Mierz opóźnienie i brak postępu. Sama długość kolejki rośnie także podczas zdrowego skoku ruchu.</li>
+  <li>Uzgodnij zachowanie po przekroczeniu progu: ograniczenie przyjmowania, komunikat o opóźnieniu, ręczna obsługa albo zatrzymanie procesu.</li>
+</ol>
+
+<h2>Bezpieczna próba całej ścieżki</h2>
+<p>Test syntetyczny powinien mieć osobną tożsamość, nieszkodliwe dane, ograniczoną częstotliwość i kontrolowane sprzątanie. Musi potwierdzić stan końcowy, a nie tylko odpowiedź HTTP. Przy operacjach tworzących zobowiązania lepiej użyć izolowanego wariantu testowego niż produkować „fałszywe zamówienia dla monitoringu”. Monitoring też potrafi zostać klientem, tylko zwykle nie płaci faktur.</p>
+
+<h2>Test negatywny</h2>
+<p>Zatrzymaj konsumenta w kontrolowanym środowisku. Oczekuj, że:</p>
+<ul>
+  <li>kontrole komponentów precyzyjnie pokażą, co nadal działa;</li>
+  <li>miernik postępu wykryje starzenie się pracy;</li>
+  <li>SLO wyniku zacznie zużywać budżet zgodnie z kontraktem;</li>
+  <li>po wznowieniu nie powstaną podwójne skutki;</li>
+  <li>operator potrafi wskazać stan każdej przyjętej pracy.</li>
+</ul>
+
+<h2>Granica tej techniki</h2>
+<p>Pełna próba end-to-end nie zastępuje diagnostyki, testów bezpieczeństwa ani uzgodnienia pojemności kolejki. SLO nie naprawia procesu; mówi, kiedy rzeczywisty wynik odbiega od zaakceptowanej obietnicy. Najpierw trzeba tę obietnicę ustalić.</p>
+
+<p><a href="/lamiglowki/2026-10-15-zielony-healthcheck-przerwany-proces/">Przećwicz decyzję na zatrzymanym procesie →</a></p>
+<div class="source"><strong>Źródła i podstawa metody:</strong> <a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Monitoring Distributed Systems</a>; <a href="https://sre.google/workbook/implementing-slos/">Google SRE Workbook — Implementing SLOs</a>; <a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry — traces</a>. Drabina dowodów i scenariusz są autorskim opracowaniem ArchitectMentor. Źródła sprawdzono 19.10.2026.</div>

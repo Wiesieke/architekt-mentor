@@ -1,0 +1,29 @@
+<p><strong>Event date: 14 October 2026.</strong> GitHub released workflow dependency lockfiles for GitHub Actions in public preview. The feature is available on Free, Team and GitHub Enterprise Cloud plans. A workflow may retain a readable tag or branch reference while GitHub runs the exact commit recorded in <code>.github/workflows/actions.lock</code>.</p>
+
+<h2>What is actually locked?</h2>
+<p><code>gh actions-lock</code> records the commit and numeric repository identity for an action. It covers direct actions, their transitive action dependencies and references to reusable workflows. There is an important boundary: dependencies inside a called reusable workflow are governed by the lockfile in the repository that defines that workflow.</p>
+
+<h2>Why is this an architecture decision?</h2>
+<p>A CI/CD workflow is part of the delivery supply chain. A reference such as <code>uses: vendor/action@v3</code> may resolve to different code after the tag moves, with no change in the consuming repository. A lockfile moves that invisible change into a reviewable diff. It provides repeatable execution, an inventory of pipeline dependencies and a control point for updates.</p>
+
+<h2>What does a lockfile not guarantee?</h2>
+<ul>
+  <li>It does not prove that the locked code is safe.</li>
+  <li>It does not replace least-privilege <code>GITHUB_TOKEN</code> permissions, secret protection or runner isolation.</li>
+  <li>It does not automatically lock container images, packages and scripts downloaded by the action itself.</li>
+  <li>It does not remove the need to update. An old, known commit may contain a known vulnerability.</li>
+</ul>
+
+<h2>A pilot plan</h2>
+<ol>
+  <li>Select a repository without a critical release path and inventory <code>uses:</code>, reusable workflows and local actions.</li>
+  <li>Review current references, generate the lockfile and inspect the complete diff. The generator may make workflow version references more specific.</li>
+  <li>Add <code>gh actions-lock --verify</code> as a pull-request check. Route lockfile changes to the owner of pipeline security.</li>
+  <li>Configure Dependabot for GitHub Actions and test an update, rollback and moved-tag case.</li>
+  <li>Only then consider requiring a lockfile. GitHub documentation notes that policy Evaluate mode is available only on Enterprise.</li>
+</ol>
+
+<h2>ArchitectMentor interpretation</h2>
+<p>The main value is not another YAML file. It is moving an invisible dependency change to a place where it can be seen, assessed and approved. Without review of the diff, a lockfile is merely an elegant way to keep running code nobody examined.</p>
+
+<div class="source"><strong>Primary sources checked 19 October 2026:</strong> <a href="https://github.blog/changelog/2026-10-14-github-actions-workflow-lockfiles-in-public-preview/">GitHub Changelog, 14 October 2026</a>; <a href="https://docs.github.com/en/actions/concepts/security/workflow-dependency-lockfiles">lockfile concept and coverage</a>; <a href="https://docs.github.com/en/actions/how-tos/secure-your-work/lock-workflow-dependencies">generation and review</a>; <a href="https://docs.github.com/en/actions/how-tos/administer/enforce-workflow-lockfiles">policy pilot and enforcement</a>. Product facts come from GitHub; the pilot plan and interpretation are original analysis.</div>

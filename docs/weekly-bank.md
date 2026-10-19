@@ -25,7 +25,7 @@ Bank służy selekcji i pogłębieniu, nie kopiowaniu pełnych tekstów Daily. K
 
 - Daily PL: /lamiglowki/2026-10-15-zielony-healthcheck-przerwany-proces/
 - Daily EN: /en/practice/2026-10-15-zielony-healthcheck-przerwany-proces/
-- Status: kandydat do pogłębienia, nie kopiować treści Daily.
+- Status: wybrany jako punkt wejścia do szkicu Weekly 19.10; ćwiczenie pozostaje bez zmian, a nowe Foundation i antywzorzec pogłębiają temat zamiast kopiować Daily. Publikacja oczekuje na akceptację końcowego SHA przez Wiesława.
 - Teza: komponenty mogą być dostępne, gdy obietnica złożona użytkownikowi nie jest realizowana. Rozdziel pomiary akceptacji i ukończenia.
 - Dalszy materiał: Anti-pattern „HTTP 200 jako definicja dostępności”; przykład projektu testu syntetycznego z bezpiecznym sprzątaniem i bramką SLO.
 - Pochodzenie: fikcyjny scenariusz edukacyjny; brak rzeczywistego klienta lub incydentu.
