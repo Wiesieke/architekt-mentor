@@ -1,4 +1,6 @@
 import agentAction from '../content/articles/en/agent-action-gateway.html?raw';
+import processAvailability from '../content/articles/en/business-process-availability.html?raw';
+import actionsLockfiles from '../content/articles/en/github-actions-lockfiles.html?raw';
 import retryBudget from '../content/articles/en/retry-budget-single-owner.html?raw';
 import replicaDecision from '../content/articles/en/do-we-need-data-replication.html?raw';
 import conditionalApproval from '../content/articles/en/conditional-architecture-approval.html?raw';
@@ -35,6 +37,8 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'business-process-availability', plSlug:'dostepnosc-procesu-biznesowego', title:'Business-process availability: from green components to a user outcome', description:'An evidence ladder from liveness and readiness through work progress to a measurable end-to-end outcome.', topic:'Observability and SLOs', published:'2026-10-19', authorId:'wieslaw-ejsymont', body:processAvailability },
+  { section:'architecture-in-motion', slug:'github-actions-lockfiles', plSlug:'github-actions-lockfiles', title:'GitHub Actions lockfiles move invisible changes into review', description:'The 14 October public preview pins actions and their dependencies to commits, but still needs an update process and review of the diff.', topic:'CI/CD and software supply-chain security', published:'2026-10-19', eventDate:'2026-10-14', authorId:'wieslaw-ejsymont', body:actionsLockfiles },
   { section:'architecture-with-ai', slug:'agent-action-gateway', plSlug:'agent-ai-bramka-decyzji', title:'An AI agent can propose a change. Who authorises execution?', description:'Action gateway, independent authorisation, human approval and audit for AI agents.', topic:'AI agent security', published:'2026-10-18', authorId:'wieslaw-ejsymont', body:agentAction },
 
   { section:'foundations', slug:'retry-budget-single-owner', plSlug:'retry-budget-jeden-wlasciciel', title:'Can retries make an overloaded dependency worse?', description:'How 3 × 3 attempts amplify load and how to establish one retry owner, a shared deadline and 429/503 tests.', topic:'Resilience, integration and retries', published:'2026-10-16', authorId:'wieslaw-ejsymont', body:retryBudget },

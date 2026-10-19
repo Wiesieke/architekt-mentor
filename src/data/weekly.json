@@ -1,100 +1,65 @@
 {
-  "date": "2026-10-11",
-  "paths": {
+  "date": "2026-10-19",
+  "period": "12–18.10.2026",
+  "paths": {"pl": "/tygodnik/2026-10-19/", "en": "/en/weekly/2026-10-19/"},
+  "pages": {
     "pl": {
-      "hub": "/tygodnik/2026-10-11/",
-      "practice": "/lamiglowki/2026-10-11-saas-granice-odpowiedzialnosci/",
-      "foundation": "/podstawy-architektury/due-diligence-saas/",
-      "anti": "/antywzorce/2026-10-11-saas-nas-nie-interesuje/",
-      "ai": "/architektura-it-ai/hld-z-dokumentacji-dostawcy/",
-      "mesh": "/architektura-w-ruchu/cloud-service-mesh-koniec-istiod/"
+      "title": "Zielony nie znaczy zakończony",
+      "description": "Pięć powiązanych materiałów o wyniku procesu, sygnałach operacyjnych, kontroli działań AI i zależnościach pipeline’u.",
+      "lead": "Komponent może odpowiadać, pipeline może być zielony, a agent może zwrócić poprawny JSON. Żaden z tych faktów nie dowodzi jeszcze, że użytkownik otrzymał wynik albo że zmianę wolno wykonać.",
+      "meta": "Wydanie do przeglądu · 5 materiałów · PL / EN",
+      "cta": "Zacznij od decyzji",
+      "editorialTitle": "Najpierw nazwij wynik, potem patrz na kontrolki",
+      "editorialParagraphs": [
+        "Ćwiczenie zaczyna się od systemu, w którym każdy element wygląda zdrowo, ale praca zatrzymała się pomiędzy przyjęciem a ukończeniem. To częsty błąd perspektywy: architektura jest mierzona od środka, podczas gdy użytkownik stoi na jej końcu.",
+        "Foundation porządkuje dowody w czterech warstwach: życie procesu, gotowość zależności, postęp pracy i wynik użytkownika. Antywzorzec pokazuje, jak łatwo zsumować zielone komponenty i otrzymać fałszywą pewność.",
+        "Ten sam motyw wraca przy agentach AI oraz w łańcuchu dostawy. Bramka działania ma zatrzymać operację, której model nie powinien autoryzować. Lockfile GitHub Actions przenosi niewidoczną zmianę zależności do przeglądu — ale sam przegląd nadal musi się wydarzyć. Automatyzacja bez właściciela decyzji jest tylko szybszym sposobem zgubienia odpowiedzialności."
+      ],
+      "items": [
+        {"label":"Ćwiczenie","title":"Wszystkie kontrolki świecą na zielono. Dlaczego klient nie może zakończyć operacji?","description":"Rozdziel zdrowie komponentów, postęp asynchroniczny i wynik obiecany użytkownikowi.","href":"/lamiglowki/2026-10-15-zielony-healthcheck-przerwany-proces/"},
+        {"label":"Podstawy architektury","title":"Dostępność procesu: od zielonych komponentów do wyniku użytkownika","description":"Drabina dowodów: liveness, readiness, postęp i bezpieczna próba całej ścieżki.","href":"/podstawy-architektury/dostepnosc-procesu-biznesowego/"},
+        {"label":"Antywzorzec","title":"Wszystkie komponenty są zielone, więc usługa działa","description":"Dlaczego średnia z health-checków nie jest miarą ukończenia procesu.","href":"/antywzorce/2026-10-19-zielone-komponenty-zdrowa-usluga/"},
+        {"label":"Architekt i AI","title":"Agent AI może zaproponować zmianę. Kto pozwoli ją wykonać?","description":"Bramka decyzji, niezależna autoryzacja i audyt skutków działania agenta.","href":"/architektura-it-ai/agent-ai-bramka-decyzji/"},
+        {"label":"Architektura w ruchu","title":"GitHub Actions: lockfile przenosi niewidoczną zmianę do przeglądu","description":"Public Preview z 14 października: przypięte commity, zależności przechodnie i proces aktualizacji.","href":"/architektura-w-ruchu/github-actions-lockfiles/"}
+      ],
+      "discussionTitle": "Trzy pytania na przegląd architektury",
+      "discussionIntro": "To pytania do pracy zespołowej, nie relacje z konkretnych incydentów.",
+      "questions": [
+        ["Decyzja ma warunek. Kto potwierdza jego spełnienie?","Oddziel wykonawcę kontroli, osobę oceniającą dowód i rolę zwalniającą bramkę uruchomienia."],
+        ["Replika istnieje. Którą obietnicę poprawia?","Wskaż mierzalny cel: wydajność odczytu, świeżość danych albo przełączenie. Sama kopia danych nie wybiera celu za architekta."],
+        ["Każda warstwa ponawia trzy razy. Kto posiada budżet prób?","Wyznacz jeden deadline i właściciela ponowień całej ścieżki; lokalne retry nie mogą mnożyć obciążenia bez kontroli."]
+      ],
+      "eventsText": "Katalog wydarzeń zawiera nadchodzące konferencje i warsztaty oraz jawnie oznacza dane wymagające ponownego sprawdzenia.",
+      "eventsCta": "Sprawdź wydarzenia"
     },
     "en": {
-      "hub": "/en/weekly/2026-10-11/",
-      "practice": "/en/practice/2026-10-11-saas-granice-odpowiedzialnosci/",
-      "foundation": "/en/foundations/saas-architecture-due-diligence/",
-      "anti": "/en/anti-patterns/2026-10-11-saas-nas-nie-interesuje/",
-      "ai": "/en/architecture-with-ai/hld-from-vendor-documentation/",
-      "mesh": "/en/architecture-in-motion/cloud-service-mesh-istiod-retirement/"
-    }
-  },
-  "records": {
-    "pl": [
-      {
-        "section": "architektura-it-ai",
-        "slug": "hld-z-dokumentacji-dostawcy",
-        "title": "AI napisało HLD z dokumentów dostawcy. Co wiemy, a co dopowiedziało?",
-        "description": "Tutorial 02: rejestr źródeł, jawne niewiadome, pytania zmieniające projekt i weryfikacja stwierdzeń.",
-        "topic": "Tutorial 02 · źródła i HLD",
-        "body": "weeklyAI"
-      },
-      {
-        "section": "podstawy-architektury",
-        "slug": "due-diligence-saas",
-        "title": "Przegląd architektoniczny SaaS przed zakupem: co musi wiedzieć klient?",
-        "description": "Siedem obszarów oceny oraz macierz odpowiedzialność → wymaganie → dowód.",
-        "topic": "SaaS i odpowiedzialność",
-        "body": "weeklyFoundation"
-      },
-      {
-        "section": "architektura-w-ruchu",
-        "slug": "cloud-service-mesh-koniec-istiod",
-        "title": "Cloud Service Mesh kończy wsparcie ISTIOD: zaplanuj migrację granic",
-        "description": "Termin 1 marca 2028, dwa warianty migracji i dowody przed przeniesieniem ruchu.",
-        "topic": "Kubernetes i cykl życia",
-        "eventDate": "2026-09-28",
-        "body": "weeklyMesh"
-      }
-    ],
-    "en": [
-      {
-        "section": "architecture-with-ai",
-        "slug": "hld-from-vendor-documentation",
-        "plSlug": "hld-z-dokumentacji-dostawcy",
-        "title": "AI drafted an HLD from vendor documents. What do we know, and what did it invent?",
-        "description": "Tutorial 02: source register, visible unknowns, design-changing questions and statement verification.",
-        "topic": "Tutorial 02 · evidence and HLD",
-        "body": "weeklyAI"
-      },
-      {
-        "section": "foundations",
-        "slug": "saas-architecture-due-diligence",
-        "plSlug": "due-diligence-saas",
-        "title": "SaaS architecture due diligence: what the customer needs to know",
-        "description": "Seven review areas and a responsibility → requirement → evidence matrix.",
-        "topic": "SaaS and responsibility",
-        "body": "weeklyFoundation"
-      },
-      {
-        "section": "architecture-in-motion",
-        "slug": "cloud-service-mesh-istiod-retirement",
-        "plSlug": "cloud-service-mesh-koniec-istiod",
-        "title": "Cloud Service Mesh retires ISTIOD: plan a boundary migration",
-        "description": "The 1 March 2028 deadline, two migration paths and evidence before moving traffic.",
-        "topic": "Kubernetes and lifecycle",
-        "eventDate": "2026-09-28",
-        "body": "weeklyMesh"
-      }
-    ]
-  },
-  "practice": {
-    "pl": {
-      "title": "Dostawca daje SaaS. Czy musisz znać jego architekturę?",
-      "description": "Odróżnić szczegóły implementacyjne dostawcy od informacji potrzebnych do oceny odpowiedzialności, ryzyka i integracji SaaS."
-    },
-    "en": {
-      "title": "The provider delivers SaaS. Do you need to know its architecture?",
-      "description": "Distinguish vendor implementation details from information needed to assess responsibility, risk and SaaS integration."
-    }
-  },
-  "anti": {
-    "pl": {
-      "title": "To SaaS, więc architektura dostawcy nas nie interesuje",
-      "description": "API i SLA nie zamykają pytań o dane, IAM, ciągłość, operacje i wyjście z usługi."
-    },
-    "en": {
-      "title": "It is SaaS, so the provider architecture is none of our concern",
-      "description": "Service responsibilities cannot be reduced to an API and SLA."
+      "title": "Green does not mean complete",
+      "description": "Five linked lessons on process outcomes, operational signals, control of AI actions and pipeline dependencies.",
+      "lead": "A component may respond, a pipeline may be green and an agent may return valid JSON. None of those facts yet proves that the user received an outcome or that the proposed change was authorised.",
+      "meta": "Edition for review · 5 materials · PL / EN",
+      "cta": "Start with the decision",
+      "editorialTitle": "Name the outcome before reading the lights",
+      "editorialParagraphs": [
+        "The exercise begins with a system whose components look healthy while work has stopped between acceptance and completion. This is a common perspective error: architecture is measured from the inside while the user stands at its end.",
+        "The Foundation arranges evidence in four layers: process life, dependency readiness, work progress and the user outcome. The anti-pattern shows how easy it is to aggregate green components into false confidence.",
+        "The same idea returns in AI agents and the delivery supply chain. An action gateway stops an operation the model cannot authorise. A GitHub Actions lockfile moves an invisible dependency change into review — but the review still has to happen. Automation without a decision owner merely loses accountability faster."
+      ],
+      "items": [
+        {"label":"Practice","title":"Every light is green. Why can the customer not complete the operation?","description":"Separate component health, asynchronous progress and the outcome promised to the user.","href":"/en/practice/2026-10-15-zielony-healthcheck-przerwany-proces/"},
+        {"label":"Foundations","title":"Business-process availability: from green components to a user outcome","description":"An evidence ladder: liveness, readiness, progress and a safe end-to-end probe.","href":"/en/foundations/business-process-availability/"},
+        {"label":"Anti-pattern","title":"Every component is green, therefore the service works","description":"Why an average of health checks is not evidence that a process completed.","href":"/en/anti-patterns/2026-10-19-zielone-komponenty-zdrowa-usluga/"},
+        {"label":"Architect + AI","title":"An AI agent can propose a change. Who authorises execution?","description":"An action gateway, independent authorisation and an audit trail for agent effects.","href":"/en/architecture-with-ai/agent-action-gateway/"},
+        {"label":"Architecture in motion","title":"GitHub Actions lockfiles move invisible changes into review","description":"The 14 October public preview: pinned commits, transitive dependencies and an update process.","href":"/en/architecture-in-motion/github-actions-lockfiles/"}
+      ],
+      "discussionTitle": "Three questions for an architecture review",
+      "discussionIntro": "These are prompts for team practice, not reports of particular incidents.",
+      "questions": [
+        ["A decision has a condition. Who confirms completion?","Separate the person operating the control, the reviewer of evidence and the role that releases the launch gate."],
+        ["A replica exists. Which promise does it improve?","Name a measurable goal: read performance, data freshness or failover. A copy of data does not select the objective for the architect."],
+        ["Every layer retries three times. Who owns the attempt budget?","Set one end-to-end deadline and retry owner; local retries must not amplify load without control."]
+      ],
+      "eventsText": "The events catalogue lists upcoming conferences and workshops and marks details that require another check.",
+      "eventsCta": "Browse events"
     }
   }
 }

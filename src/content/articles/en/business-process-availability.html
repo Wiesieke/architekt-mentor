@@ -1,0 +1,51 @@
+<p><strong>Learning goal:</strong> define service availability through the outcome promised to the user, rather than the number of green components.</p>
+
+<div class="note"><strong>Fictional educational scenario.</strong> A portal accepts a request and returns an identifier. The API, database and broker respond, but a stopped consumer never takes the process to a terminal state. This is not an account of a particular organisation or incident.</div>
+
+<h2>Two truthful answers can contradict each other</h2>
+<p>The command-acceptance service may be available while the business process is not. These are two different commitments:</p>
+<ul>
+  <li><strong>acceptance</strong> — the system durably accepted the work and can identify it;</li>
+  <li><strong>completion</strong> — the work reached an agreed terminal state within the agreed time.</li>
+</ul>
+<p>If a dashboard combines those answers, green is not necessarily a lie. It is an answer to a question that is too small.</p>
+
+<h2>An evidence ladder</h2>
+<table>
+  <thead><tr><th>Layer</th><th>Question</th><th>Example evidence</th><th>What it does not prove</th></tr></thead>
+  <tbody>
+    <tr><td>Process</td><td>Is the component alive?</td><td>Liveness, restart and resource use</td><td>Readiness to serve traffic</td></tr>
+    <tr><td>Dependency</td><td>Can the component perform its step?</td><td>Readiness, connectivity and permissions</td><td>Completion of the whole process</td></tr>
+    <tr><td>Progress</td><td>Is accepted work moving?</td><td>Oldest-work age, completion rate and permanent failures</td><td>Correctness of the user outcome</td></tr>
+    <tr><td>Outcome</td><td>Does the user receive the promised service?</td><td>Terminal-state SLI and a controlled synthetic journey</td><td>The root cause of a failure</td></tr>
+  </tbody>
+</table>
+<p>All layers are useful. Outcome signals expose the failure; component signals help locate it. One chart need not pretend to be the whole architecture.</p>
+
+<h2>Start with the process contract</h2>
+<ol>
+  <li>Name the accepted state and terminal states: success, rejection, cancellation or human intervention.</li>
+  <li>Agree the measurement start, window and population. Do not invent a duration merely to give a dashboard a threshold.</li>
+  <li>Carry a correlation identifier through queues, consumers and state stores. Keep confidential content out of metric labels.</li>
+  <li>Measure latency and lack of progress. Queue depth alone can also rise during healthy traffic bursts.</li>
+  <li>Define what happens after the threshold: limit intake, disclose delay, route to manual handling or stop the process.</li>
+</ol>
+
+<h2>A safe end-to-end probe</h2>
+<p>A synthetic journey needs a separate identity, harmless data, bounded frequency and controlled cleanup. It must verify the terminal state, not merely an HTTP response. For operations that create obligations, use an isolated test path instead of generating “monitoring orders” in production. Monitoring can become a customer too; it merely tends not to pay the invoices.</p>
+
+<h2>The negative test</h2>
+<p>Stop a consumer in a controlled environment and expect:</p>
+<ul>
+  <li>component checks to state precisely what still works;</li>
+  <li>progress measures to detect ageing work;</li>
+  <li>the outcome SLO to consume budget according to the contract;</li>
+  <li>recovery not to create duplicate effects;</li>
+  <li>operators to account for every accepted item.</li>
+</ul>
+
+<h2>Boundary of the technique</h2>
+<p>An end-to-end probe does not replace diagnostics, security tests or queue-capacity decisions. An SLO does not repair a process; it tells you when the observed outcome departs from the accepted promise. That promise has to exist first.</p>
+
+<p><a href="/en/practice/2026-10-15-zielony-healthcheck-przerwany-proces/">Practise the decision on a stalled process →</a></p>
+<div class="source"><strong>Sources and method basis:</strong> <a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Monitoring Distributed Systems</a>; <a href="https://sre.google/workbook/implementing-slos/">Google SRE Workbook — Implementing SLOs</a>; <a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry — traces</a>. The evidence ladder and scenario are original ArchitectMentor work. Sources checked 19 October 2026.</div>

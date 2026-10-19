@@ -1,5 +1,18 @@
 [
   {
+    "id": "2026-10-19-zielone-komponenty-zdrowa-usluga",
+    "date": "2026-10-19",
+    "title": "Wszystkie komponenty są zielone, więc usługa działa",
+    "summary": "Zespół sumuje health-checki komponentów i nazywa wynik dostępnością, choć przyjęta praca nie osiąga stanu końcowego.",
+    "tags": [
+      "obserwowalność",
+      "dostępność",
+      "proces biznesowy",
+      "SLO"
+    ],
+    "content": "**Fikcyjny scenariusz edukacyjny.** Nie opisuje konkretnej organizacji ani incydentu.\n\n## Sytuacja\n\nDashboard pokazuje zielone API, bazę i broker. Endpoint zdrowia odpowiada 200, więc raport dostępności usługi ma 99,99%. Tymczasem zatrzymany konsument nie kończy przyjętej pracy, a użytkownicy widzą stan „w realizacji” bez dalszego postępu.\n\n## Gdzie powstaje antywzorzec\n\nWyniki diagnostyki elementów zostają zsumowane i nazwane miarą usługi. Nikt nie zdefiniował, czy obietnicą jest samo przyjęcie polecenia, czy również osiągnięcie stanu końcowego w określonym czasie. Zielony raport odpowiada więc poprawnie na techniczne pytanie i błędnie na pytanie biznesowe.\n\n## Sygnały ostrzegawcze\n\n- dostępność procesu jest średnią dostępności jego komponentów;\n- odpowiedź HTTP 200 kończy pomiar, chociaż dalsza praca jest asynchroniczna;\n- monitorowana jest długość kolejki, ale nie wiek najstarszej pracy ani tempo kończenia;\n- alarm nie rozróżnia przyjęcia, ukończenia i trwałego błędu;\n- nie istnieje bezpieczna próba całej ścieżki ani test zatrzymania konsumenta.\n\n## Konsekwencje\n\nOperatorzy widzą zdrową infrastrukturę podczas realnego przerwania usługi. Skalują niewłaściwy komponent, a czas wykrycia rośnie. Raport SLA może wyglądać dobrze, choć użytkownik nie otrzymuje wyniku. Po wznowieniu niekontrolowane ponowienia mogą utworzyć podwójne skutki. To możliwe skutki modelowego układu, nie relacja z awarii.\n\n## Lepsza decyzja\n\n1. Oddziel trwałe przyjęcie pracy od jej ukończenia i nazwij stany końcowe.\n2. Zachowaj liveness i readiness do diagnostyki, ale dodaj mierniki postępu: wiek pracy, tempo zakończeń i błędy trwałe.\n3. Zdefiniuj SLI wyniku na granicy użytkownika oraz uzgodnione okno czasowe.\n4. Wykonuj kontrolowaną próbę syntetyczną z nieszkodliwymi danymi i sprawdzaniem stanu końcowego.\n5. Przetestuj zatrzymanie i wznowienie konsumenta, w tym brak duplikatów oraz możliwość rozliczenia każdej przyjętej pracy.\n\n## Granica\n\nTest end-to-end nie zastępuje monitoringu komponentów. Informuje, że obietnica nie jest spełniana; sygnały warstwowe pomagają znaleźć przyczynę. Potrzebne są oba poziomy.\n\n> Zielony komponent jest wskazówką. Zielony wynik procesu wymaga dowodu.\n\n[Podstawy: dostępność procesu](/podstawy-architektury/dostepnosc-procesu-biznesowego/) · [Ćwiczenie](/lamiglowki/2026-10-15-zielony-healthcheck-przerwany-proces/)"
+  },
+  {
     "id": "2026-10-11-saas-nas-nie-interesuje",
     "date": "2026-10-11",
     "title": "To SaaS, więc architektura dostawcy nas nie interesuje",

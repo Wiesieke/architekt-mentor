@@ -13,6 +13,8 @@ export const GET: APIRoute = () => {
       {path:'/pl/', modified:latestEditionDate},
       {path:'/tygodnik/2026-10-11/', modified:'2026-10-11'},
       {path:'/en/weekly/2026-10-11/', modified:'2026-10-11'},
+      {path:'/tygodnik/2026-10-19/', modified:'2026-10-19'},
+      {path:'/en/weekly/2026-10-19/', modified:'2026-10-19'},
       {path:'/lamiglowka/'},
       {path:'/lamiglowki/'},
       ...puzzles.map(p => ({path:`/lamiglowki/${p.id}/`,modified:p.date})),
