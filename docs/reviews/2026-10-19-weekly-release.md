@@ -50,17 +50,21 @@ Original contribution: the evidence ladder, negative-test plan, operational inte
 - `node --test tests/*.test.cjs`: 54 passed, 0 failed.
 - `VERCEL_ENV=preview npm run build`: passed; 159 pages and moderation context for 90 articles.
 - New PL/EN content routes, both Weekly routes and the preserved 11 October Weekly routes were generated.
-- JSON parsing, internal links, sitemap/RSS generation, canonical/hreflang and rendered Preview still require final-revision verification after the branch is pushed.
+- GitHub Actions `ArchitectMentor publication gates` and `ArchitectMentor Daily reliability`: passed for verification candidate `a9d6374202885b4d444d79f2497aad2f7c250aa3`.
+- Vercel Preview: READY for the verification candidate. Both Weekly hubs, all four new article routes and both preserved 11 October Weekly routes returned HTTP 200.
+- The rendered PL and EN Weekly pages were opened in a browser; the language switch and all five material links point to the expected language-specific routes.
+- Both home pages expose the new Weekly title. Both RSS feeds contain the new Foundation. The production-mode build contains both new Weekly routes in the sitemap; the Preview sitemap is intentionally empty because Preview carries `noindex,nofollow`.
 
 ## Revision and approval state
 
 - Publication instruction for this cycle requires Wiesław's explicit approval of the final version/SHA.
 - Checked content revision: `efc0d100a9dbf22eec9da8af651746ffab14867a`.
-- Final candidate SHA: pending.
+- Verification candidate: `a9d6374202885b4d444d79f2497aad2f7c250aa3`.
+- Final candidate SHA: the current head of draft PR #60 after this verification-only record update; the exact SHA is recorded in the PR description.
 - Human reviewer: null.
 - Human-reviewed revision: null.
 - Personal approval evidence: null.
-- Vercel Preview: pending branch push and READY verification.
+- Vercel Preview: READY and checked at https://project-ead46-git-editorial-weekly-2026-10-19-outco-b9dc6c-my-c.vercel.app
 - Production revision: none.
 
 Changes after approval invalidate that approval unless they are separately reviewed and accepted.
