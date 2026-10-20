@@ -8,8 +8,8 @@ const date = new Intl.DateTimeFormat('en-CA', {timeZone: 'Europe/Warsaw', year:'
 const health = process.argv.includes('--daily-health');
 const issues = [];
 const auth = JSON.parse(read('docs/publication-authorization.json'));
-if (auth.mode !== 'publish-after-quality-and-technical-checks' || auth.personalReviewRequired !== false) {
-  issues.push('Publication authorization changed: re-evaluate gates before release');
+if (auth.mode !== 'human-approved-final-revision-only' || auth.personalReviewRequired !== true) {
+  issues.push('Publisher approval policy is missing or weakened');
 }
 const today = [...editions.matchAll(/published:\s*['"]([^'"]+)['"]/g)].filter(m => m[1] === date);
 const paths = [...editions.matchAll(/href:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
@@ -19,7 +19,7 @@ if (health) {
   const line = `Daily health for ${date}: ${today.length} indexed entries. This does not prove successful production deployment.\n`;
   if (summary) fs.appendFileSync(summary, line);
   console.log(line.trim());
-  if (!today.length) issues.push('No edition indexed for today. Investigate draft, PR, CI and Vercel; do not bypass gates');
+  if (!today.length) console.warn('No approved edition indexed today; draft may be awaiting publisher review. This is not a reason to bypass approval.');
 }
 if (issues.length) {
   for (const issue of issues) console.error('BLOCKER:', issue);

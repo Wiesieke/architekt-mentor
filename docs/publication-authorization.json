@@ -2,7 +2,7 @@
   "project": "ArchitectMentor",
   "authorizedBy": "Wiesław Ejsymont",
   "recordedAt": "2026-10-09T15:47:23+02:00",
-  "evidence": "odblokuj ta blokadę Publikację blokuje obowiązująca w tym repo zasada Twojego przeglądu konkretnej wersji.",
+  "evidence": "Publisher instruction on 2026-10-17: editorial review and final publication approval belong to Wiesław Ejsymont; AI may assist but cannot approve.",
   "scope": [
     "articles",
     "exercises",
@@ -12,14 +12,23 @@
     "PL/EN",
     "existing drafts after fresh checks"
   ],
-  "mode": "publish-after-quality-and-technical-checks",
-  "personalReviewRequired": false,
+  "mode": "human-approved-final-revision-only",
+  "personalReviewRequired": true,
   "personalApproval": null,
-  "supersedes": "Mandatory review of each final revision adopted on 2026-10-02",
+  "supersedes": "General autonomous publication authorization recorded on 2026-10-09",
   "excludes": [
     "newsletter/email sends",
     "commercial commitments",
     "confidential material"
   ],
-  "scheduleChanged": false
+  "scheduleChanged": false,
+  "policyUpdatedAt": "2026-10-17",
+  "approvalRequirements": {
+    "approver": "Wiesław Ejsymont",
+    "scope": "each exact final content revision including PL and EN",
+    "evidence": "explicit recorded approval of final commit SHA",
+    "onContentChange": "approval expires; review and approve new SHA",
+    "beforeApproval": "draft PR and Vercel Preview only; no merge to main or production release",
+    "technicalChecks": "GitHub Actions checks and Vercel Preview must pass for approved SHA"
+  }
 }

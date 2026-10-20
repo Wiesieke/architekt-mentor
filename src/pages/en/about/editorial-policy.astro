@@ -1,0 +1,14 @@
+---
+import Studio from '../../../layouts/Studio.astro';
+const structured = { '@context':'https://schema.org', '@type':'AboutPage', name:'ArchitectMentor editorial policy', url:'https://ejsymont.com/en/about/editorial-policy/', inLanguage:'en', about:{'@type':'Organization',name:'ArchitectMentor',url:'https://ejsymont.com/',founder:{'@type':'Person',name:'Wiesław Ejsymont'}}, publisher:{'@type':'Organization',name:'ArchitectMentor'} };
+---
+<Studio locale="en" title="Editorial policy and accountability" description="How ArchitectMentor uses AI assistance, checks content and approves publication." translationUrl="/o-nas/zasady-redakcyjne/">
+  <script type="application/ld+json" set:html={JSON.stringify(structured)} />
+  <article class="container editorial"><p class="eyebrow">About · Transparency</p><h1>Editorial policy and accountability</h1><p>ArchitectMentor is an independent expert-led educational publication about IT architecture, technology decisions and the practice of designing systems.</p>
+  <h2>How our material is created</h2><p>We may use artificial intelligence tools to assist with analysis, finding sources, preparing drafts, translation, editing, examples and diagrams. AI is neither the publisher nor the final editorial decision-maker.</p>
+  <h2>Human review and responsibility</h2><p>Under the editorial process adopted on 17 October 2026, every new publication requires substantive and editorial review and approval of its final revision. Wiesław Ejsymont, the founder and editor responsible for ArchitectMentor, makes the final publication decision and assumes editorial responsibility for approved material. This does not imply that every archived article underwent the same process.</p>
+  <h2>Verification and corrections</h2><p>We check sources, distinguish facts from interpretation and fictional educational scenarios, assess educational value and protect confidential information. We correct published material when new evidence or errors warrant an update and identify material changes.</p>
+  <h2>Contributors</h2><p>ArchitectMentor is an expert-education brand designed to accommodate additional contributors. Authorship and editorial accountability are distinct roles and should reflect each person's actual contribution.</p>
+  </article>
+</Studio>
+<style>.editorial{max-width:850px;padding-top:70px;padding-bottom:110px}.editorial h1{font-size:clamp(32px,5vw,52px)}.editorial h2{margin-top:38px}.editorial p{font-size:18px;line-height:1.75}</style>
