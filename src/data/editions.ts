@@ -1,6 +1,7 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'PODSTAWY', title:'Log nie jest audytem. Jak zaprojektować wiarygodny ślad operacji?', summary:'Ślad biznesowy · integralność · transactional outbox · pięć testów', href:'/podstawy-architektury/audyt-zdarzen-biznesowych/', published:'2026-10-21' },
   { kind:'PODSTAWY', title:'Dostępność procesu: od zielonych komponentów do wyniku użytkownika', summary:'Liveness · readiness · postęp · wynik · test negatywny', href:'/podstawy-architektury/dostepnosc-procesu-biznesowego/', published:'2026-10-19' },
   { kind:'ANTYWZORZEC', title:'Wszystkie komponenty są zielone, więc usługa działa', summary:'Zdrowie elementów · przerwany proces · fałszywa dostępność', href:'/antywzorce/2026-10-19-zielone-komponenty-zdrowa-usluga/', published:'2026-10-19' },
   { kind:'W RUCHU', title:'GitHub Actions: lockfile przenosi niewidoczną zmianę do przeglądu', summary:'Public Preview · przypięte commity · transitive dependencies · kontrola diffu', href:'/architektura-w-ruchu/github-actions-lockfiles/', eventDate:'2026-10-14', published:'2026-10-19' },
