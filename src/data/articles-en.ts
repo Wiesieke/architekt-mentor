@@ -1,3 +1,4 @@
+import businessAudit from '../content/articles/en/business-audit-events.html?raw';
 import agentAction from '../content/articles/en/agent-action-gateway.html?raw';
 import processAvailability from '../content/articles/en/business-process-availability.html?raw';
 import actionsLockfiles from '../content/articles/en/github-actions-lockfiles.html?raw';
@@ -37,6 +38,7 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'business-audit-events', plSlug:'audyt-zdarzen-biznesowych', title:'A log is not an audit trail. How do you prove a business operation?', description:'HTTP 200 is not evidence of a state change. Three options, transactional outbox and five audit acceptance tests.', topic:'Audit, integrity and data architecture', published:'2026-10-21', body:businessAudit },
   { section:'foundations', slug:'business-process-availability', plSlug:'dostepnosc-procesu-biznesowego', title:'Business-process availability: from green components to a user outcome', description:'An evidence ladder from liveness and readiness through work progress to a measurable end-to-end outcome.', topic:'Observability and SLOs', published:'2026-10-19', authorId:'wieslaw-ejsymont', body:processAvailability },
   { section:'architecture-in-motion', slug:'github-actions-lockfiles', plSlug:'github-actions-lockfiles', title:'GitHub Actions lockfiles move invisible changes into review', description:'The 14 October public preview pins actions and their dependencies to commits, but still needs an update process and review of the diff.', topic:'CI/CD and software supply-chain security', published:'2026-10-19', eventDate:'2026-10-14', authorId:'wieslaw-ejsymont', body:actionsLockfiles },
   { section:'architecture-with-ai', slug:'agent-action-gateway', plSlug:'agent-ai-bramka-decyzji', title:'An AI agent can propose a change. Who authorises execution?', description:'Action gateway, independent authorisation, human approval and audit for AI agents.', topic:'AI agent security', published:'2026-10-18', authorId:'wieslaw-ejsymont', body:agentAction },
