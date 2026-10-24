@@ -1,26 +1,26 @@
-<p><strong>Cel:</strong> zaprojektować flagę funkcjonalną tak, aby jej wyłączenie było przewidywalnym działaniem operacyjnym, a nie kolejnym źródłem awarii.</p>
+<p><strong>Cel:</strong> zaprojektować feature flag (flagę funkcjonalności) tak, aby jej wyłączenie było przewidywalnym działaniem operacyjnym, a nie kolejnym źródłem awarii.</p>
 <h2>Scenariusz: przycisk „Wyłącz” nie wystarcza</h2>
-<p><em>Fikcyjny scenariusz edukacyjny.</em> Portal obsługuje wnioski. Nowy mechanizm automatycznego uzupełniania danych działa dla 10% użytkowników. Zespół ma flagę <code>new-prefill</code> i plan zwiększenia udziału do 50%. Po godzinie rośnie liczba błędnych wniosków. Operator wyłącza flagę, ale część procesów nadal korzysta z zapamiętanej decyzji, a kolejka zawiera już zadania uruchomione według nowej logiki.</p>
-<p>Flaga steruje wyborem ścieżki kodu, lecz nie cofa skutków wcześniej wykonanych operacji. Dlatego sama możliwość zmiany wartości flagi nie jest jeszcze planem wycofania zmiany.</p>
+<p><em>Fikcyjny scenariusz edukacyjny.</em> Portal obsługuje wnioski. Nowy mechanizm automatycznego uzupełniania danych działa dla 10% użytkowników. Zespół korzysta z feature flag <code>new-prefill</code> i plan zwiększenia udziału do 50%. Po godzinie rośnie liczba błędnych wniosków. Operator wyłącza feature flag, ale część procesów nadal korzysta z zapamiętanej decyzji, a kolejka zawiera już zadania uruchomione według nowej logiki.</p>
+<p>Feature flag steruje wyborem ścieżki kodu, lecz nie cofa skutków wcześniej wykonanych operacji. Dlatego sama możliwość zmiany wartości flagi nie jest jeszcze planem wycofania zmiany.</p>
 <h2>Trzy decyzje przed wdrożeniem</h2>
 <ol>
-<li><strong>Co dokładnie przełączamy?</strong> Określ punkt oceny flagi: wejście do procesu, każde żądanie czy konkretne działanie. Dla jednego wniosku wynik powinien być spójny. Jeżeli wariant zostaje przypisany na początku procesu, zapisz identyfikator wariantu przy instancji procesu; nie zakładaj, że zmiana flagi przepisze jego historię.</li>
-<li><strong>Co oznacza brak dostawcy flag?</strong> Ustal zachowanie domyślne dla każdej operacji. W tym przykładzie brak pewnej konfiguracji może wyłączyć automatyczne uzupełnianie, ale nie powinien uniemożliwić ręcznego złożenia wniosku. Nie stosuj zasady „zawsze false” bez analizy skutków dla bezpieczeństwa i dostępności.</li>
+<li><strong>Co dokładnie przełączamy?</strong> Określ punkt oceny feature flag: wejście do procesu, każde żądanie czy konkretne działanie. Dla jednego wniosku wynik powinien być spójny. Jeżeli wariant zostaje przypisany na początku procesu, zapisz identyfikator wariantu przy instancji procesu; nie zakładaj, że zmiana feature flag przepisze jego historię.</li>
+<li><strong>Co oznacza brak dostawcy feature flags?</strong> Ustal zachowanie domyślne dla każdej operacji. W tym przykładzie brak pewnej konfiguracji może wyłączyć automatyczne uzupełnianie, ale nie powinien uniemożliwić ręcznego złożenia wniosku. Nie stosuj zasady „zawsze false” bez analizy skutków dla bezpieczeństwa i dostępności.</li>
 <li><strong>Kto i na jakiej podstawie może wyłączyć funkcję?</strong> Wskaż właściciela, uprawnienia, próg alarmowy, sposób propagacji zmiany, maksymalny akceptowalny czas reakcji i sposób potwierdzenia, że system faktycznie przeszedł na starą ścieżkę.</li>
 </ol>
-<h2>Kontrakt operacyjny flagi</h2>
-<p>Do opisu flagi dołącz sześć pól: <strong>właściciel</strong>, <strong>zakres oddziaływania</strong> (usługi, użytkownicy, procesy), <strong>wartość awaryjna</strong>, <strong>sygnał wyłączenia</strong> (metryka i próg), <strong>czas propagacji</strong> oraz <strong>termin usunięcia flagi</strong>. To propozycja praktyki projektowej, nie wymaganie specyfikacji OpenFeature.</p>
-<p>Rozdziel flagę wydania nowej funkcji od trwałego ustawienia biznesowego. Pierwsza powinna mieć plan usunięcia wraz z martwą gałęzią kodu. Drugie jest elementem modelu produktu i wymaga innego procesu zarządzania. Każda dodatkowa kombinacja flag zwiększa liczbę możliwych stanów, które trzeba rozumieć i testować.</p>
+<h2>Kontrakt operacyjny feature flag</h2>
+<p>Do opisu feature flag dołącz sześć pól: <strong>właściciel</strong>, <strong>zakres oddziaływania</strong> (usługi, użytkownicy, procesy), <strong>wartość awaryjna</strong>, <strong>sygnał wyłączenia</strong> (metryka i próg), <strong>czas propagacji</strong> oraz <strong>termin usunięcia feature flag</strong>. To propozycja praktyki projektowej, nie wymaganie specyfikacji OpenFeature.</p>
+<p>Rozdziel feature flag sterującą udostępnieniem nowej funkcjonalności od trwałego ustawienia biznesowego. Pierwsza powinna mieć plan usunięcia wraz z martwą gałęzią kodu. Drugie jest elementem modelu produktu i wymaga innego procesu zarządzania. Każda dodatkowa kombinacja feature flags zwiększa liczbę możliwych stanów, które trzeba rozumieć i testować.</p>
 <h2>Pięć prób, które ujawnią fałszywe poczucie kontroli</h2>
 <ol>
-<li>Wyłącz flagę podczas aktywnego procesu: sprawdź, czy istniejące i nowe wnioski zachowują się zgodnie z opisanym kontraktem.</li>
-<li>Odłącz dostawcę flag: zweryfikuj zachowanie przy błędzie, braku konfiguracji i danych nieaktualnych.</li>
+<li>Wyłącz feature flag podczas aktywnego procesu: sprawdź, czy istniejące i nowe wnioski zachowują się zgodnie z opisanym kontraktem.</li>
+<li>Odłącz dostawcę feature flags: zweryfikuj zachowanie przy błędzie, braku konfiguracji i danych nieaktualnych.</li>
 <li>Sprawdź opóźnienie propagacji na wszystkich instancjach i w zadaniach asynchronicznych; nie utożsamiaj kliknięcia w panelu ze zmianą zachowania całej usługi.</li>
 <li>Zweryfikuj, że uprawniony operator potrafi wykonać zmianę, a nieuprawniony nie może; zapisz kto, kiedy i dlaczego zmienił konfigurację.</li>
-<li>Po zakończeniu wdrożenia usuń flagę i nieużywaną gałąź kodu, a następnie uruchom testy regresji.</li>
+<li>Po zakończeniu wdrożenia usuń feature flag i nieużywaną gałąź kodu, a następnie uruchom testy regresji.</li>
 </ol>
 <h2>Co wynika ze źródeł, a co jest decyzją zespołu?</h2>
-<p>Specyfikacja OpenFeature opisuje m.in. wartości domyślne przy ocenie flag, kontekst oceny oraz zdarzenia dostawcy takie jak <code>PROVIDER_READY</code>, <code>PROVIDER_ERROR</code> i <code>PROVIDER_STALE</code>. Nie definiuje natomiast uniwersalnego czasu propagacji ani biznesowego progu wyłączenia funkcji. Te wartości trzeba ustalić i zmierzyć dla konkretnej implementacji. Pete Hodgson opisuje różne kategorie flag oraz koszt ich długiego utrzymywania; przedstawiony wyżej sześciopolowy kontrakt jest naszą propozycją ich operacyjnego uporządkowania.</p>
+<p>Specyfikacja OpenFeature opisuje m.in. wartości domyślne przy ocenie feature flags, kontekst oceny oraz zdarzenia dostawcy takie jak <code>PROVIDER_READY</code>, <code>PROVIDER_ERROR</code> i <code>PROVIDER_STALE</code>. Nie definiuje natomiast uniwersalnego czasu propagacji ani biznesowego progu wyłączenia funkcji. Te wartości trzeba ustalić i zmierzyć dla konkretnej implementacji. Pete Hodgson opisuje różne kategorie flag oraz koszt ich długiego utrzymywania; przedstawiony wyżej sześciopolowy kontrakt jest naszą propozycją ich operacyjnego uporządkowania.</p>
 <p><strong>Pytanie do architekta:</strong> jeżeli o 14:00 trzeba wyłączyć nową funkcję, jaki dowód o 14:05 pozwoli stwierdzić, że nie wpływa już na nowe operacje — i co z tymi rozpoczętymi wcześniej?</p>
 <h2>Źródła</h2>
 <ul>
