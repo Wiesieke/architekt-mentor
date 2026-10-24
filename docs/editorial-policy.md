@@ -51,7 +51,7 @@ Personal approval evidence: null unless actually provided
 Quality/technical checks: actual outcomes, failures and limitations
 Deployed revision and production verification: pending until deployed
 
-An unresolved quality or technical check is a blocking state. Absent personal review is not a blocker under the current authorization. AI checks remain AI checks; record their outcomes honestly. Publish only the checked scope, verify production and record the deployed revision.
+An unresolved quality or technical check is a blocking state. **Absent personal review and explicit publisher approval of the exact final SHA are also blocking states.** AI checks remain AI checks; record their outcomes honestly. Do not merge or publish until Wiesław Ejsymont personally approves the final SHA covering PL, EN and assets. Any later content change invalidates that approval. Publish only the approved and checked scope, verify production and record the deployed revision.
 
 ## Corrections, transparency and commercial relationships
 
@@ -59,15 +59,15 @@ Explain AI assistance and responsibility on /jak-powstaja-materialy/ and /en/edi
 
 ## Existing catalogue and recurring work
 
-Maintain a review backlog for existing materials, starting with factual claims, first-hand narratives, external news and diagram accuracy. Do not claim the backlog is completed. The existing task schedule controls preparation; this policy does not create a new schedule. Publish after the quality and technical gate, even when this reduces frequency. Check organizer facts again before publishing event recommendations. The event pilot plan and technical measurement details belong in internal documentation, with appropriate data notices on the dedicated public page.
+Maintain a review backlog for existing materials, starting with factual claims, first-hand narratives, external news and diagram accuracy. Do not claim the backlog is completed. The existing task schedule controls preparation; this policy does not create a new schedule. Publish only after quality and technical checks and the publisher's explicit approval of the exact final SHA, even when this reduces frequency. Check organizer facts again before publishing event recommendations. The event pilot plan and technical measurement details belong in internal documentation, with appropriate data notices on the dedicated public page.
 
 Reference guidance checked 2 October 2026:
 - https://developers.google.com/search/docs/fundamentals/using-gen-ai-content
 - https://developers.google.com/search/docs/essentials/spam-policies
 - https://developers.google.com/search/docs/fundamentals/creating-helpful-content
 
-## Publication report and optional personal review
+## Publication report and mandatory personal review
 
 The run summary includes titles and permanent PL/EN pairs, a verified readable Preview URL, GitHub PR, exact checked/deployed commit, primary sources, checks and remaining limitations. Never present production as a preview of unpublished content. If Preview is unavailable, record that technical block and keep the candidate unpublished.
 
-Wiesław may request edits, review a specific revision or narrow/revoke authorization at any time. Record an actual personal review only when it happens. Under the current authorization, a missing personal review does not prevent publishing a candidate that passes all other gates. Preserve the evidence of checks and corrections for each release.
+Wiesław may request edits, review a specific revision or narrow/revoke authorization at any time. Record an actual personal review only when it happens. Under the current authorization, a missing personal review or exact-SHA approval always prevents merging and publishing, regardless of other checks. Preserve the evidence of checks and corrections for each release.

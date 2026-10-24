@@ -1,3 +1,4 @@
+import featureFlags from '../content/articles/flagi-funkcji-kontrakt-operacyjny.html?raw';
 import businessAudit from '../content/articles/audyt-zdarzen-biznesowych.html?raw';
 import agentAction from '../content/articles/agent-ai-bramka-decyzji.html?raw';
 import processAvailability from '../content/articles/dostepnosc-procesu-biznesowego.html?raw';
@@ -47,6 +48,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'flagi-funkcji-kontrakt-operacyjny', title:'Feature flag to nie strategia wycofania zmiany', description:'Sześciopolowy kontrakt operacyjny feature flag: właściciel, zasięg, wartość awaryjna, próg wyłączenia, propagacja i termin usunięcia.', topic:'Wdrożenia i odporność operacyjna', published:'2026-10-24', authorId:'architectmentor', body:featureFlags },
   { section:'podstawy-architektury', slug:'audyt-zdarzen-biznesowych', title:'Log nie jest audytem. Jak zaprojektować wiarygodny ślad operacji?', description:'Log HTTP 200 nie dowodzi zmiany stanu. Trzy warianty, transactional outbox i pięć testów wiarygodności audytu.', topic:'Audyt, integralność i architektura danych', published:'2026-10-21', body:businessAudit },
   { section:'podstawy-architektury', slug:'dostepnosc-procesu-biznesowego', title:'Dostępność procesu: od zielonych komponentów do wyniku użytkownika', description:'Drabina dowodów od liveness i readiness przez postęp pracy do mierzalnego wyniku całej ścieżki.', topic:'Obserwowalność i SLO', published:'2026-10-19', authorId:'wieslaw-ejsymont', body:processAvailability },
   { section:'architektura-w-ruchu', slug:'github-actions-lockfiles', title:'GitHub Actions: lockfile przenosi niewidoczną zmianę do przeglądu', description:'Public Preview z 14 października przypina akcje i ich zależności do commitów, ale wymaga procesu aktualizacji oraz kontroli diffu.', topic:'CI/CD i bezpieczeństwo łańcucha dostaw', published:'2026-10-19', eventDate:'2026-10-14', authorId:'wieslaw-ejsymont', body:actionsLockfiles },
