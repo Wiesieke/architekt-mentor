@@ -1,0 +1,32 @@
+name: ArchitectMentor quality (drafts only)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build PL/EN and test comments
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out candidate revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Node 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build both language editions
+        run: npm run build
+      - name: Run comment tests
+        run: npm run test:comments
+
+# Quality checks do NOT authorize merging or publishing.
+# Only explicit publisher approval of the exact final SHA can authorize release.
