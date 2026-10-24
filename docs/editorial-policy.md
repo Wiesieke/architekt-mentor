@@ -22,6 +22,22 @@ On production, publish a public PL/EN editorial manifesto that accurately explai
 
 The intended enforced control is a GitHub branch ruleset on main requiring pull requests, successful checks and a review by an authorized human other than the automation actor; stale approvals must be dismissed on new commits, bypass restricted, and direct pushes disabled. Repository text and CI alone are not an adequate substitute for an enforced branch rule. Configure in GitHub Settings and verify the rule is active before relying on it.
 
+## Language and terminology standard (PL/EN, effective 25 October 2026)
+
+Write for practicing architects, engineers and technical decision-makers in natural, idiomatic Polish and English. The two editions must convey equivalent facts, assumptions, architectural consequences and cautions; they do not have to be literal translations. Edit each version as native professional prose rather than mechanically translating sentence by sentence.
+
+For Polish technical terminology:
+- Prefer expressions actually used by Polish IT practitioners over word-for-word calques from English. Do not invent Polish equivalents solely to avoid English.
+- Retain established English industry terms when the Polish translation is unnatural, ambiguous or less recognizable. Explain less familiar terms briefly at first mention in plain Polish; do not repeat a parenthetical definition at every occurrence.
+- Example: use **feature flag** (first mention: *feature flag, czyli flaga funkcjonalności*) rather than **flaga funkcji** or **flaga funkcjonalna**. A reader-friendly alternative such as *przełącznik funkcjonalności* is acceptable only where it preserves the intended technical meaning.
+- Use terminology consistently in the headline, standfirst, article, diagrams, metadata and calls to action. Preserve meaningful distinctions (e.g. feature disablement is not necessarily rollback).
+- Avoid unnecessary English where a clear, established Polish term exists; avoid pseudo-technical jargon, inflated language and marketing-style promises.
+- Proofread headlines for naturalness, grammar and semantic precision. Keep links, code identifiers, standard names and quoted API vocabulary accurate.
+
+For English, use idiomatic professional English, established technical terms and concise sentences. Avoid Polish syntax carried into translation. Review PL and EN independently for fluency and together for semantic parity.
+
+Before requesting publication approval, perform an explicit PL/EN language pass and record in the PR what was actually checked. AI-assisted language review must not be represented as human review. Any resulting commit changes the SHA and requires renewed explicit publisher approval under the publication gate above.
+
 ## Publication checklist
 
 - Learning goal, audience and concrete added value are stated.
