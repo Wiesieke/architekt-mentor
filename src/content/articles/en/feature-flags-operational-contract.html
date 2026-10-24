@@ -1,0 +1,31 @@
+<p><strong>Learning goal:</strong> design a feature flag so that disabling it is a predictable operational action rather than another failure mode.</p>
+<h2>A switch is not a rollback plan</h2>
+<p><em>Fictional educational scenario.</em> A public-service portal processes applications. A new automatic data prefill is enabled for 10% of users, with a planned increase to 50%. The team controls it with a flag named <code>new-prefill</code>. An hour later, malformed applications begin to rise. An operator turns the flag off, but some workers still use cached evaluations and queued jobs were already created under the new rules.</p>
+<p>A flag selects a code path. It does not reverse business effects that have already occurred. The ability to flip a switch is therefore not, by itself, a rollback strategy.</p>
+<h2>Three decisions before rollout</h2>
+<ol>
+<li><strong>Where is the flag evaluated?</strong> Decide whether the choice is made when a process starts, on every request or at a particular operation. One application needs consistent behaviour. If you assign a variant at process creation, store that assignment with the process instance; do not expect a later flag change to rewrite its history.</li>
+<li><strong>What happens when the flag provider fails?</strong> Specify a default for each operation. Here, an uncertain configuration might disable automatic prefill while leaving manual submission available. “Always return false” is not a universal safety policy: assess security and availability consequences first.</li>
+<li><strong>Who may disable the feature, and on what evidence?</strong> Name an owner, access rights, an alert threshold, a propagation mechanism, an acceptable reaction time and a way to prove that the old path is actually in use.</li>
+</ol>
+<h2>A six-field operational contract</h2>
+<p>Document the <strong>owner</strong>, <strong>blast radius</strong> (services, users and processes), <strong>fallback value</strong>, <strong>shutdown trigger</strong> (metric and threshold), <strong>propagation time</strong> and <strong>removal date</strong>. This is a proposed engineering practice, not a requirement imposed by the OpenFeature specification.</p>
+<p>Distinguish a temporary release flag from a durable business setting. The release flag needs a retirement plan, including removal of the dead code path. A lasting product setting belongs to the product model and requires different governance. Every additional flag combination creates more system states to understand and test.</p>
+<h2>Five tests before calling the rollout controllable</h2>
+<ol>
+<li>Disable the flag while a process is running. Verify the documented behaviour for in-flight and newly started applications.</li>
+<li>Disconnect the flag provider. Test errors, missing configuration and stale data rather than only the happy path.</li>
+<li>Measure propagation across instances and asynchronous workers. A successful click in a dashboard is not proof that the whole service has changed behaviour.</li>
+<li>Verify that an authorised operator can change the flag and an unauthorised actor cannot. Record who changed it, when and why.</li>
+<li>After rollout, remove the flag and unused branch of code, then run regression tests.</li>
+</ol>
+<h2>Specification versus design choice</h2>
+<p>OpenFeature specifies evaluation defaults, evaluation context and provider events such as <code>PROVIDER_READY</code>, <code>PROVIDER_ERROR</code> and <code>PROVIDER_STALE</code>. It does not prescribe a universal propagation deadline or business shutdown threshold. Those values must be chosen and measured for the actual implementation. Pete Hodgson's article distinguishes categories of toggles and explains the maintenance cost of keeping them around. The six-field contract above is our proposed way to turn those concerns into operational decisions.</p>
+<p><strong>Architect's question:</strong> if you must disable a feature at 14:00, what evidence at 14:05 proves that new operations no longer use it — and what happens to operations already in progress?</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://openfeature.dev/specification/sections/flag-evaluation/">OpenFeature — Flag Evaluation API</a> (defaults and evaluation behaviour).</li>
+<li><a href="https://openfeature.dev/specification/sections/events/">OpenFeature — Events</a> (provider lifecycle and events).</li>
+<li><a href="https://openfeature.dev/specification/sections/evaluation-context/">OpenFeature — Evaluation Context</a> (targeting and context).</li>
+<li><a href="https://martinfowler.com/articles/feature-toggles.html">Pete Hodgson, Feature Toggles</a> (9 October 2017; categories and maintenance costs).</li>
+</ul>
