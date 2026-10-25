@@ -1,0 +1,29 @@
+<p><em>Fikcyjny scenariusz edukacyjny.</em> Portal obsługuje wnioski dla wielu organizacji. Frontend przekazuje do usług nagłówek <code>baggage: tenant.id=alpha</code>, aby łatwiej analizować ślady rozproszone. Jeden z zespołów proponuje, by usługa raportowa używała tej wartości również do wyboru danych klienta. To wygodne: identyfikator dociera automatycznie wraz z żądaniem. Czy jest jednak wiarygodny?</p>
+<h2>Dwa konteksty, dwie odpowiedzialności</h2>
+<p>W OpenTelemetry <em>baggage</em> to pary klucz–wartość przenoszone między procesami, zwykle w nagłówkach HTTP. Pomagają wzbogacać telemetrię. Nie stanowią jednak poświadczenia tożsamości ani dowodu uprawnienia do danych. Wartości nagłówka mogą pochodzić z niezaufanego żądania; standard W3C nie przypisuje im semantyki autoryzacyjnej, a dokumentacja OpenTelemetry ostrzega przed ujawnieniem informacji i brakiem wbudowanej kontroli integralności baggage.</p>
+<p><code>traceparent</code> służy korelacji śladów, <code>baggage</code> przenosi dodatkowy kontekst obserwowalności, natomiast decyzja o dostępie musi opierać się na zaufanej tożsamości, uprawnieniach i kontekście zasobu. To odrębne kontrakty architektoniczne.</p>
+<h2>Trzy warianty projektu</h2>
+<ol>
+<li><strong>Wariant A — tenant z baggage jako filtr zapytania.</strong> Najmniej kodu, ale nieakceptowalne zaufanie do danych sterowanych przez klienta. Podmiana nagłówka może skierować zapytanie do niewłaściwego tenanta. Nie wybieramy tego wariantu do autoryzacji.</li>
+<li><strong>Wariant B — zaufany kontekst bezpieczeństwa osobno, baggage tylko do diagnostyki.</strong> Gateway lub usługa uwierzytelniająca weryfikuje poświadczenie, a każda usługa egzekwująca dostęp ustala tenant i zakres uprawnień z zaufanych danych. Baggage może zawierać niesekretną etykietę diagnostyczną, ale nie decyduje o dostępie. To wariant bazowy.</li>
+<li><strong>Wariant C — ograniczona propagacja diagnostyki.</strong> W systemach o wysokich wymaganiach poufności wyłączamy propagację baggage poza wskazane granice albo przepuszczamy tylko listę dopuszczonych kluczy. Zyskujemy mniejszą ekspozycję, kosztem części korelacji i konfiguracji propagatorów.</li>
+</ol>
+<h2>Kontrakt granicy zaufania</h2>
+<p>Dla każdego przejścia między usługami zapisz: <strong>źródło tożsamości</strong>, <strong>miejsce weryfikacji uprawnień</strong>, <strong>dozwolone pola telemetryczne</strong>, <strong>regułę usuwania baggage</strong> przy wyjściu do dostawcy zewnętrznego oraz <strong>dowód testowy</strong>. Nie przenoś tokenów, adresów e-mail, numerów kont ani innych danych wrażliwych w baggage. Nawet niesekretny identyfikator może stać się informacją identyfikującą w połączeniu z innymi danymi.</p>
+<h2>Pięć testów przed akceptacją architektury</h2>
+<ol>
+<li>Wyślij poprawnie uwierzytelnione żądanie tenanta A z <code>baggage: tenant.id=B</code>. Oczekiwany wynik: brak dostępu do danych B; ewentualna etykieta diagnostyczna nie zmienia decyzji autoryzacyjnej.</li>
+<li>Wyślij żądanie bez uwierzytelnienia, ale z poprawnym składniowo <code>traceparent</code> i <code>baggage</code>. Oczekiwany wynik: brak dostępu do zasobu chronionego.</li>
+<li>Wywołaj zewnętrzne API i przechwyć wychodzące nagłówki. Potwierdź brak niedozwolonego baggage i informacji wewnętrznych; sprawdź rzeczywistą konfigurację instrumentacji.</li>
+<li>Wstrzyknij nadmiernie długi lub niepoprawny nagłówek. Zweryfikuj limity, bezpieczne parsowanie oraz to, że błąd telemetrii nie daje dodatkowych uprawnień.</li>
+<li>Porównaj ślad, logi i decyzję autoryzacyjną dla tego samego żądania. Upewnij się, że obserwowalność nie tworzy alternatywnego źródła prawdy o tożsamości.</li>
+</ol>
+<h2>Co mówią źródła, a co proponujemy?</h2>
+<p>W3C definiuje format baggage i wskazuje ryzyka przekraczania granic zaufania. OpenTelemetry opisuje propagację kontekstu i ostrzega przed ujawnianiem wrażliwych wartości. Rozdzielenie telemetrycznego baggage od kontekstu autoryzacji oraz powyższy zestaw testów to nasza rekomendacja projektowa — nie gotowa polityka bezpieczeństwa narzucona przez te specyfikacje.</p>
+<p><strong>Pytanie do architekta:</strong> jeśli użytkownik zmieni <code>tenant.id</code> w nagłówku, który komponent udowodni, że zakres widocznych danych się nie zmienił?</p>
+<h2>Źródła pierwotne</h2>
+<ul>
+<li><a href="https://www.w3.org/TR/baggage/">W3C — Baggage</a>, rozdziały Security i Privacy Considerations.</li>
+<li><a href="https://opentelemetry.io/docs/concepts/signals/baggage/">OpenTelemetry — Baggage</a>, ostrzeżenia o propagacji i integralności.</li>
+<li><a href="https://opentelemetry.io/docs/concepts/context-propagation/">OpenTelemetry — Context propagation</a>, model i praktyki bezpieczeństwa.</li>
+</ul>
