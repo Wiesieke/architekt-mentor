@@ -28,5 +28,6 @@ jobs:
       - name: Run comment tests
         run: npm run test:comments
 
-# Quality checks do NOT authorize merging or publishing.
-# Only explicit publisher approval of the exact final SHA can authorize release.
+# Passing build checks alone do NOT authorize merge or publication.
+# Under the 25 Oct 2026 delegation, an exact-SHA editorial, language, legal,
+# source, image-rights and preview gate record is also mandatory.

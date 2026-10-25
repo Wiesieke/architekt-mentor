@@ -10,17 +10,17 @@ Publish to help a reader make a concrete architectural decision. Each item must 
 
 Check technical claims in primary sources. Link to relevant documentation, incidents or organizer pages; record dates and distinguish fact, interpretation and assumption. Never invent references, benchmark results, model calls, client projects, outcomes or first-hand experience. Use “Practice-inspired educational scenario” only when a confirmed source supports the scenario. Otherwise explicitly use “Fictional educational scenario” or “Composite educational scenario”. Remove confidential and identifying details; anonymization alone does not prove a source is safe to publish.
 
-## Human editorial approval and publication gate (effective 17 October 2026)
+## Delegated editorial approval and publication gate (effective 25 October 2026)
 
 ArchitectMentor is an independent expert-education publication. AI tools may support research, drafting, translation, illustrations, editing and technical checks. AI is not the publisher and may not certify that a human reviewed any text.
 
-The publisher and editor responsible, Wiesław Ejsymont, reviews, corrects and makes the final decision on each new publication, in both PL and EN. Explicit approval must identify the exact final commit SHA and cover both language versions and associated assets. A new content revision invalidates that approval and requires a new decision. A general standing authorization is not approval of a specific issue.
+Wiesław Ejsymont remains the responsible publisher and retains the right to intervene, edit, pause or revoke the mandate. By explicit publisher instruction on 25 October 2026, routine Daily and Weekly releases may be approved by the delegated editorial automation without Wiesław's per-commit approval, but only after all mandatory editorial, linguistic, legal, technical and production-preview checks pass on the exact release SHA. This is delegated release authority, not a claim that Wiesław personally reviewed an issue. Every commit change requires a fresh full gate.
 
-Until approval, ChatGPT may create a branch, draft PR and Vercel Preview; GitHub Actions may run tests. It must not merge, promote a deployment to production or mark a draft as published. Approval must be recorded as genuine evidence (e.g. a publisher-authored PR approval or an explicit approval in a conversation referencing the exact SHA); never invent a human reviewer or infer approval from successful CI.
+Before a successful quality decision, automation may only create/edit a branch, draft PR and Vercel Preview. Merge and production release require an exact SHA-bound release record containing primary-source verification, PL/EN independent language review, provenance/confidentiality/legal and image-rights review, content quality assessment, passing automated checks, working PL/EN Preview and explicit no-blockers verdict. Record the decision as `delegated-automation`, reviewer `null`, publisher personal approval `null`, with actual timestamps and evidence; never invent human review or infer editorial quality from CI alone. Material marked uncertain or failing a gate must remain draft.
 
 On production, publish a public PL/EN editorial manifesto that accurately explains AI assistance and the publisher's responsibility. Do not retroactively assert personal review of historic articles without evidence. Public structured data should identify genuine authors and publisher, not claim human authorship for unreviewed drafts.
 
-The intended enforced control is a GitHub branch ruleset on main requiring pull requests, successful checks and a review by an authorized human other than the automation actor; stale approvals must be dismissed on new commits, bypass restricted, and direct pushes disabled. Repository text and CI alone are not an adequate substitute for an enforced branch rule. Configure in GitHub Settings and verify the rule is active before relying on it.
+The intended enforced control is a GitHub branch ruleset on main requiring PRs, successful checks and the release-evidence check for the exact SHA; direct pushes and bypasses should be restricted. Human review remains optional for routine delegated releases but mandatory for publisher-paused, confidential, protected/third-party or otherwise escalated material. GitHub repository text and CI alone are not adequate substitutes for enforced branch protection: verify ruleset settings before relying on them. If enforcement cannot be verified, report this as an operational gap and do not claim an end-to-end hardened automatic release.
 
 ## Publication checklist
 
@@ -47,11 +47,11 @@ Checked revision: exact commit SHA
 Decision: draft / blocked / ready / published
 Human reviewer: null unless an actual review occurred
 Human-reviewed revision: null unless an actual review occurred
-Personal approval evidence: null unless actually provided
+Delegated publication decision and evidence: null until verified; personal approval evidence: null unless actually provided
 Quality/technical checks: actual outcomes, failures and limitations
 Deployed revision and production verification: pending until deployed
 
-An unresolved quality or technical check is a blocking state. **Absent personal review and explicit publisher approval of the exact final SHA are also blocking states.** AI checks remain AI checks; record their outcomes honestly. Do not merge or publish until Wiesław Ejsymont personally approves the final SHA covering PL, EN and assets. Any later content change invalidates that approval. Publish only the approved and checked scope, verify production and record the deployed revision.
+Any unresolved editorial, language, legal, provenance, artwork, technical, preview or authorization check is a blocker. Delegated approval requires an evidence-linked decision for the final SHA, covering PL and EN and associated assets; it never means human-reviewed. Any later content change invalidates the gate. Publish only the validated scope, verify production and record the deployed revision.
 
 ## Corrections, transparency and commercial relationships
 
@@ -59,15 +59,15 @@ Explain AI assistance and responsibility on /jak-powstaja-materialy/ and /en/edi
 
 ## Existing catalogue and recurring work
 
-Maintain a review backlog for existing materials, starting with factual claims, first-hand narratives, external news and diagram accuracy. Do not claim the backlog is completed. The existing task schedule controls preparation; this policy does not create a new schedule. Publish only after quality and technical checks and the publisher's explicit approval of the exact final SHA, even when this reduces frequency. Check organizer facts again before publishing event recommendations. The event pilot plan and technical measurement details belong in internal documentation, with appropriate data notices on the dedicated public page.
+Maintain a review backlog for existing materials, starting with factual claims, first-hand narratives, external news and diagram accuracy. Do not claim the backlog is completed. The existing task schedule controls preparation; this policy does not create a new schedule. Publish only after full editorial, legal, language, technical and preview gates and an exact-SHA delegated release decision. The publisher may require personal approval for any material or pause publication, even when this reduces frequency. Check organizer facts again before publishing event recommendations. The event pilot plan and technical measurement details belong in internal documentation, with appropriate data notices on the dedicated public page.
 
 Reference guidance checked 2 October 2026:
 - https://developers.google.com/search/docs/fundamentals/using-gen-ai-content
 - https://developers.google.com/search/docs/essentials/spam-policies
 - https://developers.google.com/search/docs/fundamentals/creating-helpful-content
 
-## Publication report and mandatory personal review
+## Publication report and delegated release evidence
 
 The run summary includes titles and permanent PL/EN pairs, a verified readable Preview URL, GitHub PR, exact checked/deployed commit, primary sources, checks and remaining limitations. Never present production as a preview of unpublished content. If Preview is unavailable, record that technical block and keep the candidate unpublished.
 
-Wiesław may request edits, review a specific revision or narrow/revoke authorization at any time. Record an actual personal review only when it happens. Under the current authorization, a missing personal review or exact-SHA approval always prevents merging and publishing, regardless of other checks. Preserve the evidence of checks and corrections for each release.
+Wiesław may request edits, review a specific revision or narrow/revoke authorization at any time. Record an actual personal review only when it happens. Under the 25 October authorization, a missing exact-SHA delegated gate report or any unresolved check prevents merging and publishing. Do not claim personal review unless Wiesław actually performed it. Preserve the evidence of checks and corrections for each release.

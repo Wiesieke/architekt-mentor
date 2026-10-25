@@ -8,8 +8,8 @@ const date = new Intl.DateTimeFormat('en-CA', {timeZone: 'Europe/Warsaw', year:'
 const health = process.argv.includes('--daily-health');
 const issues = [];
 const auth = JSON.parse(read('docs/publication-authorization.json'));
-if (auth.mode !== 'human-approved-final-revision-only' || auth.personalReviewRequired !== true) {
-  issues.push('Publisher approval policy is missing or weakened');
+if (auth.mode !== 'delegated-quality-gated-release' || auth.personalReviewRequired !== false || !auth.approvalRequirements?.evidence || !auth.approvalRequirements?.technicalChecks) {
+  issues.push('Delegated publisher authorization and mandatory release gates are missing');
 }
 const today = [...editions.matchAll(/published:\s*['"]([^'"]+)['"]/g)].filter(m => m[1] === date);
 const paths = [...editions.matchAll(/href:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
@@ -19,7 +19,7 @@ if (health) {
   const line = `Daily health for ${date}: ${today.length} indexed entries. This does not prove successful production deployment.\n`;
   if (summary) fs.appendFileSync(summary, line);
   console.log(line.trim());
-  if (!today.length) console.warn('No approved edition indexed today; draft may be awaiting publisher review. This is not a reason to bypass approval.');
+  if (!today.length) console.warn('No validated edition indexed today; preparation or release gates may be incomplete. Do not bypass the delegated quality gate.');
 }
 if (issues.length) {
   for (const issue of issues) console.error('BLOCKER:', issue);
