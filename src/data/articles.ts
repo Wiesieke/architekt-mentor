@@ -1,3 +1,4 @@
+import baggageBoundary from '../content/articles/baggage-nie-jest-autoryzacja.html?raw';
 import featureFlags from '../content/articles/flagi-funkcji-kontrakt-operacyjny.html?raw';
 import businessAudit from '../content/articles/audyt-zdarzen-biznesowych.html?raw';
 import agentAction from '../content/articles/agent-ai-bramka-decyzji.html?raw';
@@ -48,6 +49,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:'podstawy-architektury', slug:'baggage-nie-jest-autoryzacja', title:'Baggage to nie kontekst autoryzacji', description:'Nagłówek telemetryczny nie może decydować o dostępie do danych. Trzy warianty projektu, granica zaufania i pięć testów.', topic:'Obserwowalność i bezpieczeństwo', published:'2026-10-25', authorId:'architectmentor', body:baggageBoundary },
   { section:'podstawy-architektury', slug:'flagi-funkcji-kontrakt-operacyjny', title:'Feature flag to nie strategia wycofania zmiany', description:'Sześciopolowy kontrakt operacyjny feature flag: właściciel, zasięg, wartość awaryjna, próg wyłączenia, propagacja i termin usunięcia.', topic:'Wdrożenia i odporność operacyjna', published:'2026-10-24', authorId:'architectmentor', body:featureFlags },
   { section:'podstawy-architektury', slug:'audyt-zdarzen-biznesowych', title:'Log nie jest audytem. Jak zaprojektować wiarygodny ślad operacji?', description:'Log HTTP 200 nie dowodzi zmiany stanu. Trzy warianty, transactional outbox i pięć testów wiarygodności audytu.', topic:'Audyt, integralność i architektura danych', published:'2026-10-21', body:businessAudit },
   { section:'podstawy-architektury', slug:'dostepnosc-procesu-biznesowego', title:'Dostępność procesu: od zielonych komponentów do wyniku użytkownika', description:'Drabina dowodów od liveness i readiness przez postęp pracy do mierzalnego wyniku całej ścieżki.', topic:'Obserwowalność i SLO', published:'2026-10-19', authorId:'wieslaw-ejsymont', body:processAvailability },
