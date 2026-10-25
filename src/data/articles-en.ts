@@ -1,3 +1,4 @@
+import baggageBoundary from '../content/articles/en/baggage-is-not-authorization.html?raw';
 import featureFlags from '../content/articles/en/feature-flags-operational-contract.html?raw';
 import businessAudit from '../content/articles/en/business-audit-events.html?raw';
 import agentAction from '../content/articles/en/agent-action-gateway.html?raw';
@@ -39,6 +40,7 @@ import type { Article } from './articles';
 export type EnglishArticle = Omit<Article, 'section' | 'slug'> & { section: 'architecture-in-motion' | 'foundations' | 'architecture-with-ai'; slug: string; plSlug: string };
 
 export const englishArticles: EnglishArticle[] = [
+  { section:'foundations', slug:'baggage-is-not-authorization', plSlug:'baggage-nie-jest-autoryzacja', title:'Baggage is not an authorization context', description:'A telemetry header cannot grant data access. Three design options, a trust-boundary contract and five acceptance tests.', topic:'Observability and security', published:'2026-10-25', authorId:'architectmentor', body:baggageBoundary },
   { section:'foundations', slug:'feature-flags-operational-contract', plSlug:'flagi-funkcji-kontrakt-operacyjny', title:'A feature flag is not a rollback plan', description:'A six-field operational contract: owner, blast radius, fallback, shutdown trigger, propagation time and removal date.', topic:'Delivery and operational resilience', published:'2026-10-24', authorId:'architectmentor', body:featureFlags },
   { section:'foundations', slug:'business-audit-events', plSlug:'audyt-zdarzen-biznesowych', title:'A log is not an audit trail. How do you prove a business operation?', description:'HTTP 200 is not evidence of a state change. Three options, transactional outbox and five audit acceptance tests.', topic:'Audit, integrity and data architecture', published:'2026-10-21', body:businessAudit },
   { section:'foundations', slug:'business-process-availability', plSlug:'dostepnosc-procesu-biznesowego', title:'Business-process availability: from green components to a user outcome', description:'An evidence ladder from liveness and readiness through work progress to a measurable end-to-end outcome.', topic:'Observability and SLOs', published:'2026-10-19', authorId:'wieslaw-ejsymont', body:processAvailability },
