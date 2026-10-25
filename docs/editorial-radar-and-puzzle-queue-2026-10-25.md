@@ -1,6 +1,6 @@
 # ArchitectMentor — redakcyjna kolejka Daily / Weekly (25.10.2026)
 
-Status: **warsztat i plan redakcyjny, nie opublikowane materiały, nie automatyczna zgoda na wydanie**. Obowiązuje polityka jakości repo oraz decyzja wydawcy z 25.10 o delegacji publikacji dopiero po pełnej kontroli (PR #65 musi wejść do main i bramki muszą działać).
+Status: **warsztat i plan redakcyjny, nie opublikowane materiały, nie automatyczna zgoda na wydanie**. Obowiązuje polityka jakości repo oraz decyzja wydawcy z 25.10 o delegacji publikacji dopiero po pełnej kontroli (PR #65 jest scalony do main, ale egzekwowanie ochrony gałęzi i wszystkie bramki muszą być potwierdzone przed wydaniem).
 
 ## Cel
 
