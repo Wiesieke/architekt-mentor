@@ -56,3 +56,47 @@ Budować spójny temat tygodnia na bazie 3–5 najważniejszych decyzji i jednej
 ## Release — obowiązki redakcji i techniki
 
 Research → kandydat PL/EN + evidence → niezależna redakcja i fact-check → poufność/licencje → PR → CI (build, content, routes, accessibility) → Vercel Preview PL/EN → QA obejmujące cały numer i SHA → delegowana decyzja (nie podszywająca się pod review Wiesława) → merge zgodny z branch protection → produkcja READY + publiczny HTTP/metadata/RSS/sitemap check. Brak któregokolwiek dowodu = pozostaje draft. Bez newsletterów i dodatkowych harmonogramów.
+
+## Przegląd kolejki i bezpieczeństwa redakcyjnego — 25.10.2026, 16:00 Europe/Warsaw
+
+Ten PR pozostaje **wyłącznie dokumentem warsztatowym**. Nie zawiera zgody na publikację, nie stanowi osobnego Daily ani Weekly i nie zastępuje SHA-bound release evidence. Jeden numer = jeden osobny PR. Istniejący kandydat Daily 25.10 to **PR #66**; nie tworzyć drugiego PR na tę datę.
+
+### Kontrola powtórek i pochodzenia
+
+- **P07**: istnieje już Daily z 24.10 o feature flag i rollbacku. Nie wydawać tej samej tezy ponownie; nowy materiał wymaga nowej sytuacji decyzyjnej i mierzalnie odmiennej wartości.
+- **GitHub Actions workflow lockfiles**: materiał z 19.10 już jest w katalogu „Architektura w ruchu”; nowy tekst tylko w razie rzeczywistej, udokumentowanej zmiany statusu lub istotnych nowych skutków architektonicznych.
+- **P01, P02, P04, P05**: motywy mogą przypominać realne programy i projekty organizacyjne. Przed rozwinięciem wymagana kontrola podobieństwa scenariusza, doboru parametrów, nazw, diagramów, dat, produktów i integracji do informacji niepublicznych. Nie przenosić struktury projektów, rozwiązań ani szczegółów pracodawcy nawet po anonimizacji. Bezpieczniejszy punkt startowy: P03 lub całkowicie nowy scenariusz niezwiązany z projektami użytkownika.
+- **AWS Lambda Web Functions**: oficjalne ogłoszenie AWS z 12.10.2026 potwierdza uruchomienie w wymienionych regionach (m.in. Europa/Irlandia), Node.js i model bezpośredniej obsługi HTTP. Status: ogłoszona dostępność w tych regionach; nie nazywać bez dowodu globalnym GA ani dostępnością we wszystkich regionach. Źródło: https://aws.amazon.com/about-aws/whats-new/2026/10/aws-lambda-web-functions/ . Wymagana ponowna weryfikacja przed publikacją, w tym kosztów i ograniczeń.
+- **Baggage / OpenTelemetry**: kandydat #66 nie jest wiadomością o premierze produktu, tylko problemem granicy zaufania; powinien pozostać materiałem edukacyjnym/łamigłówką, a nie sztuczną „Architekturą w ruchu”.
+
+### Wzorcowa łamigłówka P03 — szkic PL (niepublikowany)
+
+**Fikcyjny scenariusz:** mały dostawca usługi dokumentowej chce móc przenieść aplikację między dwiema chmurami w ciągu 90 dni. Usługa korzysta z bazy relacyjnej, obiektowego magazynu plików i kolejki. Brak ustalonego RTO i budżetu migracji. Zespół chce wybrać architekturę przed pomiarem wolumenu danych.
+
+**Pytanie:** którą decyzję uzasadnisz, zanim padnie hasło „cloud-agnostic”?
+
+1. **A — otwarte API i usługi zarządzane dostawcy.** Krótszy czas dostarczenia i mniej operacji, lecz ryzyko kosztownej migracji danych oraz różnic w semantyce usług. Wiarygodne, jeśli migracja jest mało prawdopodobna, a koszt zależności jawnie zaakceptowany.
+2. **B — własna warstwa abstrakcji i wspólny runtime.** Więcej kontroli nad interfejsami i wdrożeniem, ale większy koszt platformowy i ryzyko pozornej przenośności danych. Wiarygodne przy udowodnionej potrzebie wielochmurowej i zasobach na utrzymanie platformy.
+3. **C — usługi zarządzane z testowaną ścieżką wyjścia.** Utrzymaj produktywność usług natywnych, lecz opisz eksport danych, mapowanie zdarzeń i automatyzację odtworzenia w drugiej chmurze. Wiarygodne, jeśli wymaganie dotyczy rzeczywistej zdolności migracji, a nie identycznego kodu na obu platformach.
+
+**Feedback mentora:** A nie jest „błędem”, jeśli ekonomika i ryzyko zostały świadomie przyjęte. B nie daje przenośności bez testu danych i semantyki. C nie jest darmowym kompromisem: testy migracji i kompatybilności są kosztem stałym. Przed wyborem zapytaj o ilość i tempo zmian danych, akceptowalny przestój, licencje, zależności sieciowe, wymagania regulacyjne i maksymalny koszt wyjścia.
+
+**ADR (przykładowy, warunkowy):** decyzja wstępna C; uzasadnienie — mierzalna ścieżka migracji zamiast deklaracji neutralności. Warunki: zmierzyć czas eksportu i importu reprezentatywnego zbioru, odtworzyć kolejność/idempotencję zdarzeń, uruchomić test funkcjonalny po przełączeniu, policzyć transfer i operacje, udokumentować RPO/RTO. Jeśli test nie spełni progów określonych przez właściciela produktu, wrócić do wariantów A/B. To ćwiczenie, nie rekomendacja dla konkretnej organizacji.
+
+### Reference puzzle P03 — English working draft (not for publication)
+
+**Fictional scenario:** a small document-service provider wants the option to move its application between two cloud platforms within 90 days. It uses a relational database, object storage and a queue. Neither recovery objectives nor a migration budget have been agreed. The team wants to commit to an architecture before measuring the data volume.
+
+**Decision:** which approach would you defend, and what evidence would change your mind?
+
+1. **A — managed native services behind well-defined interfaces.** Faster delivery and lower operational overhead, but potentially expensive data migration and provider-specific behaviour. Rational when a move is unlikely and the lock-in cost is explicitly accepted.
+2. **B — a shared runtime and an in-house abstraction layer.** Greater control over deployment and interfaces, at the price of platform ownership and possible false confidence about data portability. Rational when multi-cloud operation is a demonstrated requirement and the team can maintain the platform.
+3. **C — managed services with a rehearsed exit path.** Keep native-service benefits while documenting data export, event mapping and recovery in the second cloud. Rational when the actual requirement is a credible migration option rather than identical infrastructure.
+
+**Mentor feedback:** A is not inherently wrong if the trade-off is conscious. B cannot guarantee portable data or semantics. C has recurring test and compatibility costs. Ask about data size and change rate, downtime, licensing, network dependencies, compliance and exit budget before deciding.
+
+**Illustrative ADR:** provisionally select C, subject to measured export/import duration, event-order and idempotency checks, functional tests after failover, transfer-cost modelling and explicit RPO/RTO thresholds. Revisit A/B if the rehearsal fails. This is a fictional exercise, not a recommendation for a real client.
+
+### Dowody wymagane przed publikacją łamigłówki
+
+Przekształcenie szkicu w materiał wydawniczy wymaga osobnego PR, autorskiej redakcji obu języków, weryfikacji źródeł i praw, testów wyświetlania trzech opcji/feedbacku, responsywności, dostępności, RSS/sitemap i działającego PL/EN Preview. Recenzent ludzki = null, o ile nie ma dowodu. Brak potwierdzonej ochrony main lub niezależnej redakcji językowej blokuje delegowany merge. Nie publikować na podstawie tego szkicu.
