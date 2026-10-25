@@ -1,0 +1,29 @@
+---
+import { marked } from 'marked';
+import pl from '../../../../docs/drafts/weekly-next-pl.md?raw';
+import en from '../../../../docs/drafts/weekly-next-en.md?raw';
+export function getStaticPaths() {
+  return process.env.VERCEL_ENV === 'preview'
+    ? ['pl', 'en'].map(locale => ({ params: { locale } })) : [];
+}
+const locale = Astro.params.locale === 'en' ? 'en' : 'pl';
+const other = locale === 'en' ? 'pl' : 'en';
+const html = marked.parse(locale === 'pl' ? pl : en);
+---
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>{locale === 'pl' ? 'Warsztat redakcyjny Weekly — nieopublikowany' : 'Weekly editorial workshop — unpublished'}</title>
+  </head>
+  <body>
+    <header><a href="#main">{locale === 'pl' ? 'Przejdź do treści' : 'Skip to content'}</a><a href={`/redakcja/weekly-candidate/${other}/`} lang={other}>{other === 'pl' ? 'Polski' : 'English'}</a></header>
+    <aside>{locale === 'pl' ? 'SZKIC · publikacja zablokowana · PR #67 · brak automatycznej oceny mentora' : 'DRAFT · publication blocked · PR #67 · no automatic mentor scoring'}</aside>
+    <main id="main" set:html={html} />
+  </body>
+</html>
+<style is:global>
+html{color:#152c38;background:#f7f7f3;font:18px/1.65 system-ui,sans-serif}body{margin:0 auto;max-width:80ch;padding:20px clamp(16px,4vw,36px)}header{display:flex;justify-content:space-between;gap:20px}aside{padding:16px;border:2px solid #9a6400;background:#fff4d4;margin-block:24px}h1{font-size:clamp(2rem,5vw,3rem);line-height:1.15}h2{margin-top:2.2em;line-height:1.3}h3{line-height:1.4}a{color:#00636e;text-underline-offset:3px}a:focus-visible{outline:3px solid #9a6400;outline-offset:4px}table{display:block;overflow-x:auto;border-collapse:collapse;font-size:.9em}td,th{border:1px solid #aab8bb;padding:10px;min-width:110px;text-align:left;vertical-align:top}code{overflow-wrap:anywhere}p,li{overflow-wrap:break-word}
+</style>

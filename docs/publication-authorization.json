@@ -1,34 +1,31 @@
 {
   "project": "ArchitectMentor",
   "authorizedBy": "Wiesław Ejsymont",
-  "recordedAt": "2026-10-09T15:47:23+02:00",
-  "evidence": "Publisher instruction on 2026-10-17: editorial review and final publication approval belong to Wiesław Ejsymont; AI may assist but cannot approve.",
+  "recordedAt": "2026-10-25",
+  "evidence": "Publisher's explicit instruction 2026-10-25: authorize automatic ArchitectMentor Daily and Weekly without each final SHA personal approval, only after full editorial, linguistic, legal and technical gates.",
   "scope": [
-    "articles",
-    "exercises",
-    "anti-patterns",
-    "tutorials",
-    "event recommendations",
-    "PL/EN",
-    "existing drafts after fresh checks"
+    "Daily PL/EN",
+    "Weekly PL/EN",
+    "original associated assets and metadata"
   ],
-  "mode": "human-approved-final-revision-only",
-  "personalReviewRequired": true,
+  "mode": "delegated-quality-gated-release",
+  "personalReviewRequired": false,
   "personalApproval": null,
-  "supersedes": "General autonomous publication authorization recorded on 2026-10-09",
+  "supersedes": "Human-per-SHA approval mode of 2026-10-17 for routine Daily/Weekly only",
   "excludes": [
     "newsletter/email sends",
     "commercial commitments",
     "confidential material"
   ],
   "scheduleChanged": false,
-  "policyUpdatedAt": "2026-10-17",
+  "policyUpdatedAt": "2026-10-25",
   "approvalRequirements": {
-    "approver": "Wiesław Ejsymont",
-    "scope": "each exact final content revision including PL and EN",
-    "evidence": "explicit recorded approval of final commit SHA",
-    "onContentChange": "approval expires; review and approve new SHA",
-    "beforeApproval": "draft PR and Vercel Preview only; no merge to main or production release",
-    "technicalChecks": "GitHub Actions checks and Vercel Preview must pass for approved SHA"
+    "approver": "delegated editorial automation under Wiesław Ejsymont authority",
+    "scope": "each exact final Daily or Weekly revision including PL/EN and assets",
+    "evidence": "SHA-bound real editorial/source/rights/language/technical QA report, all checks passing and preview verified",
+    "onContentChange": "delegated gate invalidated; rerun all checks",
+    "beforeApproval": "draft PR and Vercel Preview only; no merge or production release",
+    "technicalChecks": "CI, build, source/provenance, rights, PL/EN, Vercel Preview, production verification",
+    "humanReview": "do not assert; required only on explicit publisher hold or escalated scope"
   }
 }

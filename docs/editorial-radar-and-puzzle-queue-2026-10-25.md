@@ -100,3 +100,8 @@ Ten PR pozostaje **wyłącznie dokumentem warsztatowym**. Nie zawiera zgody na p
 ### Dowody wymagane przed publikacją łamigłówki
 
 Przekształcenie szkicu w materiał wydawniczy wymaga osobnego PR, autorskiej redakcji obu języków, weryfikacji źródeł i praw, testów wyświetlania trzech opcji/feedbacku, responsywności, dostępności, RSS/sitemap i działającego PL/EN Preview. Recenzent ludzki = null, o ile nie ma dowodu. Brak potwierdzonej ochrony main lub niezależnej redakcji językowej blokuje delegowany merge. Nie publikować na podstawie tego szkicu.
+
+
+## Dalsza praca Weekly — 25.10, szkic do podglądu
+
+Zachowano powyższy szkic P03. Dodatkowo opracowano P07 jako NOWE zastosowanie: jawnie niezgodny stan danych i workera, selektywna pauza i los zadań w toku, zamiast powtórzenia kontraktu feature flag z 24.10. Pełne PL/EN: `docs/drafts/weekly-next-pl.md` i `docs/drafts/weekly-next-en.md`. Zawierają łamigłówkę, trzy kryteria mentora, ADR i 40-minutowy warsztat. Preview-only: `/redakcja/weekly-candidate/pl/` i `/redakcja/weekly-candidate/en/`. To nie jest numer ani zgoda na publikację. Nie uruchomiono API mentora. Stan kontroli i blokad: `docs/reviews/2026-10-25-weekly-workshop.md`. Ochrona main i niezależna redakcja językowa pozostają niepotwierdzone.
