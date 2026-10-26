@@ -2,13 +2,19 @@
 import { marked } from 'marked';
 import pl from '../../../../docs/drafts/weekly-next-pl.md?raw';
 import en from '../../../../docs/drafts/weekly-next-en.md?raw';
+import WeeklyDecision from '../../../components/WeeklyDecision.astro';
 export function getStaticPaths() {
   return process.env.VERCEL_ENV === 'preview'
     ? ['pl', 'en'].map(locale => ({ params: { locale } })) : [];
 }
 const locale = Astro.params.locale === 'en' ? 'en' : 'pl';
 const other = locale === 'en' ? 'pl' : 'en';
-const html = marked.parse(locale === 'pl' ? pl : en);
+const source = locale === 'pl' ? pl : en;
+const marker = locale === 'pl' ? '### Szybka decyzja' : '### Quick decision';
+const position = source.indexOf(marker);
+if (position < 0) throw new Error('Missing Weekly decision insertion point');
+const before = marked.parse(source.slice(0, position));
+const after = marked.parse(source.slice(position));
 ---
 <!doctype html>
 <html lang={locale}>
@@ -21,7 +27,7 @@ const html = marked.parse(locale === 'pl' ? pl : en);
   <body>
     <header><a href="#main">{locale === 'pl' ? 'Przejdź do treści' : 'Skip to content'}</a><a href={`/redakcja/weekly-candidate/${other}/`} lang={other}>{other === 'pl' ? 'Polski' : 'English'}</a></header>
     <aside>{locale === 'pl' ? 'SZKIC · publikacja zablokowana · PR #67 · brak automatycznej oceny mentora' : 'DRAFT · publication blocked · PR #67 · no automatic mentor scoring'}</aside>
-    <main id="main" set:html={html} />
+    <main id="main"><div set:html={before} /><WeeklyDecision locale={locale} /><div set:html={after} /></main>
   </body>
 </html>
 <style is:global>

@@ -1,6 +1,6 @@
 # Switching it off does not undo its effects
 
-ArchitectMentor Weekly candidate. Editorial workshop, not a published issue. Prepared on 25 October 2026; release date not assigned.
+ArchitectMentor Weekly candidate. Editorial workshop, not a published issue. Updated on 26 October 2026; release date not assigned.
 
 ## From the editor
 

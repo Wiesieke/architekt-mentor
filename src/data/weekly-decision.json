@@ -1,0 +1,52 @@
+{
+  "id": "weekly-rollback-inflight",
+  "correctId": "B",
+  "pl": {
+    "title": "Sprawdź swoją decyzję",
+    "quick": "Szybki wybór",
+    "mentor": "Uzasadnij decyzję",
+    "question": "Co zrobisz z nowymi wnioskami i zadaniami, które już trafiły do kolejki?",
+    "options": [
+      {"id":"A","text":"Wyłącz nową ścieżkę i od razu przywróć poprzednią wersję aplikacji oraz workera.","explanation":"Ten wariant ogranicza ilość nowego kodu, ale stary worker nie rozumie stanu awaiting-check. Najpierw potrzebny jest dowód zgodności albo bezpieczna migracja danych i zadań. Samo przywrócenie kodu tego nie zapewni."},
+      {"id":"B","text":"Wyłącz nową ścieżkę dla kolejnych wniosków, zachowaj zgodny worker i wydziel rozpoczęte operacje do sprawdzenia.","explanation":"To najlepszy punkt wyjścia przy podanych założeniach. Ograniczasz dalsze skutki bez zatrzymywania bezpiecznej obsługi ręcznej. Zidentyfikuj zadania nowego wariantu; niepewne wyniki wstrzymaj do oceny, zamiast bezwarunkowo przetwarzać całą kolejkę."},
+      {"id":"C","text":"Wstrzymaj przyjmowanie wszystkich wniosków i przetwarzanie do zakończenia uzgodnienia danych.","explanation":"Pełna pauza jest uzasadniona, jeśli nie da się oddzielić dotkniętych operacji albo nie znamy zasięgu błędu. W tym scenariuszu rozdzielenie jest możliwe, więc B ogranicza koszty przerwy. Jeżeli to założenie upadnie, wróć do C."}
+    ],
+    "check": "Pokaż wyjaśnienie",
+    "missing": "Najpierw wybierz A, B lub C. Możesz też przejść do uzasadnienia decyzji.",
+    "best": "Najlepszy punkt wyjścia przy tych założeniach: B.",
+    "other": "Sprawdź warunki wybranego wariantu; przy podanych założeniach punktem wyjścia jest B.",
+    "hintButton": "Pokaż wskazówkę",
+    "hint": "Czy poprzednia wersja rozumie każdy stan, który istnieje już w danych i kolejce?",
+    "initialLabel": "Twoja decyzja i uzasadnienie (2–3 zdania)",
+    "followupLabel": "Twoja odpowiedź na pytanie naprowadzające",
+    "questionButton": "Pokaż pytanie naprowadzające",
+    "followup": "Jak sprawdzisz, czy opóźnione lub ponowione zadanie nie spowoduje powtórzenia skutku biznesowego?",
+    "privacy": "Szkic pozostaje tylko w pamięci tej strony. Nie jest wysyłany ani zapisywany. Odświeżenie lub zmiana języka usuwa wpisy. Nie wpisuj danych poufnych.",
+    "notice": "Podgląd warsztatowy: brak automatycznej oceny i połączenia z API mentora. Kryteria i analiza są poniżej.",
+    "noscript": "Interakcja wymaga JavaScript. Warianty, kryteria i pełna analiza pozostają dostępne w tekście."
+  },
+  "en": {
+    "title": "Test your decision",
+    "quick": "Quick choice",
+    "mentor": "Explain your reasoning",
+    "question": "What will you do with new applications and jobs already in the queue?",
+    "options": [
+      {"id":"A","text":"Disable the new path and immediately restore the previous application and worker release.","explanation":"This reduces the amount of new code, but the old worker cannot interpret awaiting-check. First establish compatibility or safely migrate records and jobs. Restoring the old code does not do that."},
+      {"id":"B","text":"Disable the new path for incoming applications, retain the compatible worker and separate accepted work for review.","explanation":"This is the best starting point under the stated assumptions. You contain further effects without stopping safe manual intake. Identify jobs from the new path and hold uncertain results for review rather than blindly draining the queue."},
+      {"id":"C","text":"Pause all application intake and processing until data reconciliation is complete.","explanation":"A full pause is justified if affected work cannot be separated or the defect's scope is unknown. Separation is possible here, so B reduces interruption costs. Reconsider C if that assumption proves false."}
+    ],
+    "check": "Show explanation",
+    "missing": "Choose A, B or C first, or switch to explaining your reasoning.",
+    "best": "Best starting point under these assumptions: B.",
+    "other": "Check the conditions for your option; under the stated assumptions, B is the starting point.",
+    "hintButton": "Show hint",
+    "hint": "Can the previous release interpret every state already present in the database and queue?",
+    "initialLabel": "Your decision and reasoning (2–3 sentences)",
+    "followupLabel": "Your answer to the guiding question",
+    "questionButton": "Show guiding question",
+    "followup": "How will you check that a delayed or retried job cannot duplicate a business effect?",
+    "privacy": "Your draft stays only in this page's memory. It is not sent or saved. Reloading or changing language clears it. Do not enter confidential information.",
+    "notice": "Workshop preview: no automatic scoring or mentor API connection. The rubric and analysis are below.",
+    "noscript": "Interaction requires JavaScript. Options, criteria and full analysis remain available in the text."
+  }
+}

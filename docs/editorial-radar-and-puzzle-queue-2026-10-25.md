@@ -105,3 +105,7 @@ Przekształcenie szkicu w materiał wydawniczy wymaga osobnego PR, autorskiej re
 ## Dalsza praca Weekly — 25.10, szkic do podglądu
 
 Zachowano powyższy szkic P03. Dodatkowo opracowano P07 jako NOWE zastosowanie: jawnie niezgodny stan danych i workera, selektywna pauza i los zadań w toku, zamiast powtórzenia kontraktu feature flag z 24.10. Pełne PL/EN: `docs/drafts/weekly-next-pl.md` i `docs/drafts/weekly-next-en.md`. Zawierają łamigłówkę, trzy kryteria mentora, ADR i 40-minutowy warsztat. Preview-only: `/redakcja/weekly-candidate/pl/` i `/redakcja/weekly-candidate/en/`. To nie jest numer ani zgoda na publikację. Nie uruchomiono API mentora. Stan kontroli i blokad: `docs/reviews/2026-10-25-weekly-workshop.md`. Ochrona main i niezależna redakcja językowa pozostają niepotwierdzone.
+
+## CHECKPOINT 26.10 — interakcja kandydata Weekly
+
+Dopracowano istniejący P07, bez nowego numeru i bez dublowania PR. Podgląd PL/EN ma wybór A/B/C z wyjaśnieniem, wskazówkę, dwa osobne pola uzasadnienia i przełączanie trybów zachowujące wpisy w pamięci strony. Brak AI scoringu i wysyłania odpowiedzi. Pięć nowych testów; pełny lokalny zestaw: 59/59. Kolejny krok: niezależny QA językowy i pełna selekcja nowości, następnie integracja ćwiczenia z produkcyjnym kontraktem API. Szczegóły i jawne ograniczenia: `docs/reviews/2026-10-26-weekly-interaction.md`. Wyniki dla dokładnego nowego SHA znajdują się w datowanym checkpoincie PR #67; wyniki 25.10 pozostają historyczne.

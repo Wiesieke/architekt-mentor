@@ -1,10 +1,10 @@
 # Wyłączenie nie cofa skutków
 
-Kandydat ArchitectMentor Weekly. Warsztat redakcyjny, nie opublikowany numer. Stan na 25 października 2026. Ostateczna data wydania nie została ustalona.
+Kandydat ArchitectMentor Weekly. Warsztat redakcyjny, nieopublikowany numer. Stan na 26 października 2026. Ostateczna data wydania nie została ustalona.
 
 ## Od redakcji
 
-Przycisk „Wyłącz” wygląda uspokajająco. W końcu jest prosty, wyraźny i ktoś go przetestował. Tylko co właściwie wyłącza: nowe żądania, pracowników kolejki, zapis do bazy czy naszą skłonność do zadawania dalszych pytań?
+Przycisk „Wyłącz” wygląda uspokajająco. W końcu jest prosty, wyraźny i ktoś go przetestował. Tylko co właściwie wyłącza: nowe żądania, procesy obsługujące kolejkę, zapis do bazy czy naszą skłonność do zadawania dalszych pytań?
 
 W tym warsztacie rozdzielamy trzy rzeczy: zatrzymanie nowej pracy, dokończenie pracy rozpoczętej oraz naprawienie jej skutków. To nie są trzy nazwy jednego rollbacku. Każda potrzebuje własnego kryterium powodzenia. Celem numeru jest przejście od deklaracji „możemy wrócić” do procedury, która określa, co stanie się z każdą grupą operacji.
 
@@ -34,7 +34,7 @@ C. Wstrzymaj wszystkie nowe wnioski i przetwarzanie do zakończenia uzgodnienia 
 
 W podanych warunkach punktem wyjścia jest B. Mamy zgodny worker i możliwość rozdzielenia wniosków, więc pełne zatrzymanie nie jest jeszcze konieczne. Nie oznacza to automatycznego puszczenia całej kolejki dalej: operacje nowego wariantu należy zidentyfikować i, tam gdzie wynik jest niepewny, wstrzymać do oceny.
 
-A może być dobrym planem po wcześniejszym zapewnieniu zgodności wstecznej albo migracji do stanu obsługiwanego przez starą wersję. W tym scenariuszu taka zgodność nie istnieje. Cofnięcie binariów nie zmieni jej w fakt.
+A może być dobrym planem po wcześniejszym zapewnieniu zgodności wstecznej albo migracji do stanu obsługiwanego przez starą wersję. W tym scenariuszu taka zgodność nie istnieje. Przywrócenie poprzedniej wersji kodu nie zapewni takiej zgodności.
 
 C jest rozsądnym środkiem ograniczającym szkody, gdy nie ma pewnej granicy dotkniętego zakresu. Tu ma większy koszt niż B. Jeśli założenie o rozdzieleniu wniosków okaże się fałszywe, należy wrócić do C. Dobra decyzja ma warunek zmiany, nie immunitet na nowe fakty.
 
