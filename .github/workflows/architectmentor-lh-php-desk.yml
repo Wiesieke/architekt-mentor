@@ -4,6 +4,7 @@ on:
     paths:
       - "radar/lh/desk/**"
       - "radar/db/002_architectmentor_editorial_audit.sql"
+      - "radar/db/003_architectmentor_editorial_priority.sql"
       - "radar/lh/private/config.private.example.php"
       - ".github/workflows/architectmentor-lh-php-desk.yml"
   workflow_dispatch:
