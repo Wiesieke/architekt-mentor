@@ -1,0 +1,3 @@
+# Mandatory Apache deny rule: verify HTTP 403 before uploading any config.
+Options -Indexes
+Require all denied
