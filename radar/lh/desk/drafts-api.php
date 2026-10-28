@@ -45,7 +45,7 @@ function amdd_audit(PDO $db,array $row,string $action,string $now): void {
 function amdd_summary(array $row): array {
  return [
   'draft_id'=>(int)$row['draft_id'],'item_id'=>$row['item_id'],
-  'title'=>$row['title'],'status'=>$row['status'],
+  'title'=>$row['title'],'source_id'=>$row['source_id'],'status'=>$row['status'],
   'revision'=>(int)$row['revision'],'updated_at_utc'=>$row['updated_at_utc'],
  ];
 }
