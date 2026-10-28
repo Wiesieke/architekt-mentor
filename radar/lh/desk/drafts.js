@@ -301,6 +301,14 @@
     download.type="button";
     download.addEventListener("click",()=>downloadApproved(d,format));
    }
+   const copyHtml=add(buttons,"button","quiet","Kopiuj HTML");
+   copyHtml.type="button";
+   copyHtml.addEventListener("click",async()=>{
+    try {
+     await navigator.clipboard.writeText(exportContent(d,"html").content);
+     notice("Zatwierdzony artykuł skopiowany jako HTML. Możesz wkleić go ręcznie do edytora WordPress.");
+    }catch{notice("Schowek jest niedostępny. Skorzystaj z przycisku „Pobierz HTML”.",true);}
+   });
   }else add(form,"p","muted rating-hint","Eksport HTML i Markdown będzie dostępny po ręcznej akceptacji artykułu.");
   if(!approved) {
    const save=add(buttons,"button","quiet","Zapisz szkic");save.type="button";save.disabled=!writable;
