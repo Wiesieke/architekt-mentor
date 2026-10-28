@@ -1,36 +1,39 @@
-# ArchitectMentor Architecture Desk (osobny projekt Vercel)
+# ArchitectMentor Architecture Desk — prywatny panel
 
-**Kod gotowy do przeglądu; niezainstalowany i nieaktywowany.** Ten folder jest rootem **osobnego** projektu Vercel. Nie zmieniaj ustawienia Astro ani domeny `ejsymont.com`. Wersja Node 22+.
+**Status:** osobny projekt Next.js w draftowym PR; nic nie zostało wdrożone na Vercel ani LH.pl. Nie zmieniaj produkcyjnego Astro `ejsymont.com` i istniejącego Crona.
 
-## Bezpieczeństwo i granice
+## Funkcje i separacja
 
-- Clerk (prywatny login i MFA) + dokładna allowlista `DESK_ALLOWED_USER_IDS` sprawdzana w *każdym* żądaniu serwerowym. Samo zalogowanie nie uprawnia do dostępu.
-- Dwa niezależne sekrety LH API, trzymane w Vercel po stronie serwera; **żadne** klucze/hasła nie trafiają do przeglądarki.
-- Własna baza `serwer428682_architectradar`, prefix `amr_`, katalog prywatny `/architectmentor-radar-private`. Zero dostępu do bazy WRYCUT i bazy HLD.
-- Tylko ręczne decyzje. Nie ma endpointu publikacji, aktualizacji źródeł ani automatycznego generowania treści. Kandydat nie jest zweryfikowaną wiadomością.
-- API zapisowe ma osobny przełącznik `AM_RADAR_EDITOR_WRITE_ENABLED=0` do czasu kontroli.
+- Panel pobiera kandydatów ArchitectMentor Radar przez chroniony odczytowy endpoint LH.pl z dedykowanej bazy `serwer428682_architectradar` (tabele `amr_`).
+- Umożliwia **ręczne** decyzje redakcyjne, zmianę rewizji i zapis do `amr_decisions` oraz `amr_decision_audit`.
+- Brak automatycznego sprawdzania faktów, publikowania, generowania artykułów, edycji źródeł czy uruchamiania Crona. Bazy WRYCUT i HLD pozostają nietknięte.
 
-## Przygotowanie LH.pl (ręczne, po backupie)
+## Uwierzytelnianie bez abonamentu
 
-1. Potwierdź `SELECT DATABASE();` = **właściwa, dedykowana** baza ArchitectMentor radar, nie HLD ani WRYCUT.
-2. Wykonaj jednokrotnie `radar/db/002_architectmentor_editorial_audit.sql`. Wymagana jest kolumna `amr_decisions.revision` i tabela `amr_decision_audit`. Skrypt ALTER nie jest idempotentny; przy ponownym uruchomieniu zgłosi duplikat kolumny.
-3. W `/architectmentor-radar-private/config.private.php` dopisz **nowe różne** losowe tokeny `AM_RADAR_API_TOKEN` i `AM_RADAR_EDITOR_API_TOKEN` (32+ znaków), na razie z `AM_RADAR_EDITOR_WRITE_ENABLED=0`. Nie udostępniaj ich przez ChatGPT ani Git.
-4. Kopiuj `radar/lh/public/index.php` i `editorial.php` do `~/public_html/mentor-api.sensinte.com/architect-radar-api/` (bez przenoszenia `radar.php` i `config.private.php` do public_html). Alternatywnie ustaw `AM_RADAR_PRIVATE_DIR` na dokładną ścieżkę katalogu prywatnego, jeśli hosting wspiera tę zmienną.
-5. Na HTTPS sprawdź: bez Bearer odpowiedź 401; z poprawnym tokenem read API zwraca zdarzenia, bez zapisu; zapis przy wyłączonym przełączniku zwraca 503. Przy nowych kluczach testuj bez ujawniania ich w rozmowie.
-6. Dopiero gdy migracja, logowanie i testy autoryzacji są ukończone, można osobno włączyć zapis.
+- Logowanie GitHub OAuth przez **Auth.js**. Nie wymaga subskrypcji Clerk ani nowej bazy użytkowników.
+- Serwerowa allowlista `DESK_ALLOWED_GITHUB_IDS` zawiera dokładne numeryczne GitHub ID, rozdzielone przecinkami. Jest sprawdzana podczas OAuth oraz **przed każdym** odczytem i zapisem. Gdy pusta — odmowa dostępu.
+- Włącz 2FA na kontach GitHub dopuszczonych do pracy redakcyjnej. Panel nie wymusza osobno wyzwania MFA przy każdej sesji.
+- Utwórz **oddzielną GitHub OAuth App** dla ArchitectMentor (nie współdziel konfiguracji WRYCUT). Callback: `https://TWOJ-ADRES-PANELU/api/auth/callback/github`. Nie żądaj uprawnienia `repo`.
+- Sekrety `AUTH_SECRET`, `AUTH_GITHUB_SECRET` i oba tokeny LH są dostępne wyłącznie po stronie serwera Vercel. Nie umieszczaj ich w Git ani w rozmowie.
 
-## Oddzielny projekt Vercel
+## Przygotowanie LH.pl (ręcznie, po backupie)
 
-1. Dodaj nowy projekt z repo `Wiesieke/architekt-mentor`, **Root Directory = `desk`**. Nie zmieniaj istniejącego projektu Astro.
-2. Skonfiguruj własną aplikację Clerk dla ArchitectMentor; włącz wymóg drugiego czynnika uwierzytelnienia / MFA w konsoli Clerk i ogranicz rejestrację do zaproszonych.
-3. Ustaw zmienne z `desk/.env.example`: `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `DESK_ALLOWED_USER_IDS`, URL i Bearer dla osobnych API LH. `DESK_ALLOWED_USER_IDS` musi zawierać rzeczywiste Clerk user ID (np. `user_...`); bez tego każdy odczyt i zapis zwróci odmowę.
-4. Sprawdź lokalnie `npm install`, `npm run typecheck`, `npm run build`; nie publikuj bez zielonych testów. Nie dołączaj `.env.local` do repozytorium.
-5. Projekt pozostaw w trybie testowym, zanim powstanie decyzja o domenie prywatnego panelu, zaproszonych użytkownikach i włączeniu edycji.
+1. Zweryfikuj `SELECT DATABASE();` przed operacją: jedynie dedykowana baza ArchitectMentor, nie HLD i nie WRYCUT.
+2. Po kopii bezpieczeństwa wykonaj jednokrotnie `radar/db/002_architectmentor_editorial_audit.sql` — kolumna `amr_decisions.revision` i tabela `amr_decision_audit`. Migracja ALTER nie jest idempotentna.
+3. W prywatnym `/architectmentor-radar-private/config.private.php` ustaw **różne** nowe tokeny `AM_RADAR_API_TOKEN` i `AM_RADAR_EDITOR_API_TOKEN` (co najmniej 32 znaki); `AM_RADAR_EDITOR_WRITE_ENABLED=0` do odbioru.
+4. Przenieś wyłącznie `radar/lh/public/index.php` i `editorial.php` do `~/public_html/mentor-api.sensinte.com/architect-radar-api/`, a konfigurację pozostaw poza `public_html`.
+5. Przetestuj odmowę 401 bez Bearer, poprawny read z Bearer i 503 dla wyłączonego write.
+
+## Osobny projekt Vercel
+
+1. Utwórz osobny projekt z repo `Wiesieke/architekt-mentor`, **Root Directory = `desk`**. Nie przestawiaj projektu Astro.
+2. Po ustaleniu docelowego HTTPS adresu Vercel utwórz GitHub OAuth App i ustaw w jej konfiguracji dokładny callback `https://TWOJ-ADRES-PANELU/api/auth/callback/github`.
+3. W prywatnych zmiennych Vercel ustaw `AUTH_SECRET` (losowy, unikalny dla panelu), `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `DESK_ALLOWED_GITHUB_IDS` oraz zmienne LH z `desk/.env.example`. Pusta allowlista oznacza brak dostępu.
+4. Lokalnie i w CI sprawdź `npm install`, `npm run typecheck`, `npm run build`. Testuj anonimowego, dopuszczonego i niedopuszczonego użytkownika, brak dostępu do kluczy, ręczny zapis, rewizje i konflikt 409.
+5. Dopiero po podpisaniu testów uruchom zapis; do tego czasu `AM_RADAR_EDITOR_WRITE_ENABLED=0`. Hosting Vercel może mieć odrębne limity i opłaty, ale Auth.js/GitHub OAuth nie wymaga abonamentu.
 
 ## Kryteria odbioru
 
-- Niezalogowany i zalogowany spoza allowlisty: zero listy wydarzeń i zero zapisu.
-- Odczyt danych z dedykowanej bazy, co najmniej 10 wpisów z testu GitHub Changelog.
-- Zapis ręcznej decyzji, aktualizacja rewizji i wpis w `amr_decision_audit`.
-- Dwa równoległe zapisy tej samej rewizji: jeden dostaje 409 i musi odświeżyć.
-- Żadnej publikacji, niezmienione cron i działająca publiczna strona.
+- Brak sesji lub GitHub ID poza allowlistą = brak danych i brak zapisu.
+- Oddzielne tokeny LH dla read i write; brak sekretów w przeglądarce.
+- Bez automatycznej publikacji, bez modyfikowania stron i Crona.
