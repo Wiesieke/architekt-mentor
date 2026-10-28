@@ -131,11 +131,15 @@ $logged=$state!==null&&($state['verified']??false)===true&&amd_auth_valid();
  <main class="shell">
   <section class="intro"><div><p class="eyebrow">ARCHITEKTURA W RUCHU / PRIVATE REVIEW</p><h1>Radar decyzji</h1><p>Materiały z radaru są kandydatami do analizy, a nie zweryfikowanymi wiadomościami. Decyzja nie powoduje publikacji.</p></div><button class="quiet" type="button" id="reload">Odśwież dane</button></section>
   <div class="alert hidden" id="global-alert" role="alert"></div>
-  <section class="stats"><div><small>Pozycje w radarze</small><strong id="metric-total">—</strong></div><div><small>Wybrane do analizy</small><strong id="metric-selected">—</strong></div><div><small>Ostatnie pobranie UTC</small><strong id="metric-last" class="date">—</strong></div></section>
+  <section class="stats"><div><small>Pozycje w radarze</small><strong id="metric-total">—</strong></div><div><small>Wybrane do analizy</small><strong id="metric-selected">—</strong></div><div><small>Priorytet P1</small><strong id="metric-high">—</strong></div><div><small>Ostatnie pobranie UTC</small><strong id="metric-last" class="date">—</strong></div></section>
   <div class="workspace">
    <section class="queue"><header><h2>Kolejka materiałów <span id="queue-count"></span></h2><p>Dane z wydzielonej bazy ArchitectMentor</p></header>
     <div class="filters"><input id="search" placeholder="Szukaj tematu lub źródła" aria-label="Szukaj materiału"><select id="filter" aria-label="Filtr decyzji">
      <option value="all">Wszystkie decyzje</option><option value="UNREVIEWED">Bez decyzji</option><option value="SELECTED">Wybrane</option><option value="HOLD">Odłożone</option><option value="REQUEST_RESEARCH">Do sprawdzenia</option><option value="REJECTED">Odrzucone</option>
+    </select><select id="priority-filter" aria-label="Filtr priorytetu">
+     <option value="all">Wszystkie priorytety</option><option value="3">P1 · Pilne</option><option value="2">P2 · Ważne</option><option value="1">P3 · Obserwuj</option><option value="0">Bez priorytetu</option>
+    </select><select id="sort" aria-label="Sortowanie kolejki">
+     <option value="newest">Najnowsze</option><option value="priority">Najpierw P1</option>
     </select></div><div class="itemlist" id="itemlist"><p class="muted">Trwa wczytywanie…</p></div>
    </section>
    <section class="editor" id="editor"><p class="muted">Wybierz materiał z kolejki.</p></section>
