@@ -22,7 +22,8 @@ if($method==='GET'&&$action==='items'){
     (SELECT COUNT(*) FROM amr_items) AS total_items,
     (SELECT COUNT(*) FROM amr_decisions WHERE decision='SELECTED') AS selected,
     (SELECT MAX(completed_at_utc) FROM amr_cycles WHERE outcome='success') AS last_success_utc")->fetch();
-  amd_reply(200,['ok'=>true,'items'=>$items,'sources'=>$sources,'metrics'=>$metrics,'generated_at_utc'=>gmdate('c')]);
+  amd_reply(200,['ok'=>true,'items'=>$items,'sources'=>$sources,'metrics'=>$metrics,'generated_at_utc'=>gmdate('c'),
+   'write_enabled'=>amr_env('AM_DESK_WRITE_ENABLED')==='1'&&amr_env('AM_RADAR_EDITOR_WRITE_ENABLED')==='1']);
  }catch(Throwable $e){
   error_log('ArchitectMentor PHP Desk read: '.get_class($e));
   amd_reply(503,['ok'=>false,'code'=>'read_unavailable_check_migration_002']);
