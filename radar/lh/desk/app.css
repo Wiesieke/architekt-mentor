@@ -38,3 +38,21 @@ button.quiet{background:#e9f0ff;color:var(--blue);border:1px solid #d8e6ff}butto
 footer{font-size:12px;color:var(--muted);padding-top:25px;text-align:center}
 @media(max-width:900px){.workspace{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.intro{align-items:start}.itemlist{max-height:420px}}
 @media(max-width:620px){.stats{grid-template-columns:1fr}.intro{display:grid}.filters{grid-template-columns:1fr}.editor form .twocol{grid-template-columns:1fr}.topbar{padding:14px 18px}.wordmark{font-size:12px}.shell{padding:20px 12px}.editor header,.queue header{padding:18px}.evidence{margin:16px}.editor form{padding:0 16px}}
+
+
+/* Private drafts module: intentionally no publish control or background generation. */
+.desk-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 26px;border-bottom:1px solid var(--line);padding-bottom:12px}
+button.tab{background:transparent;color:#526783;border:1px solid transparent;padding:10px 18px}
+button.tab:hover:not(:disabled){background:#eaf1ff}button.tab.active{background:#e9f0ff;border-color:#c5d8f7;color:#174fae}
+.draft-shortcut{margin:0 23px 20px}.draft-shortcut button{width:100%}
+.draft-form input[type="text"],.draft-form input:not([type]),.draft-form textarea{width:100%;background:#fff;color:var(--ink);border:1px solid #c7d5e8;border-radius:9px;padding:11px 12px;outline-color:var(--blue)}
+.draft-form textarea[name="body_text"]{min-height:360px;white-space:pre-wrap;line-height:1.65}
+.draft-form textarea[disabled],.draft-form input[disabled]{background:#f5f7fb;color:#50627b}
+.draft-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.draft-actions button{flex:1 1 210px}
+.approval-panel{display:grid;gap:12px;border:1px solid #e1b85f;background:#fffaef;padding:17px;border-radius:12px}
+.approval-panel h3{font-size:17px;margin:0}
+.editor form label.draft-check{display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:500;line-height:1.45}
+.draft-check input[type="checkbox"]{width:18px;height:18px;flex:none;accent-color:var(--blue);margin:1px 0 0}
+.approval-panel button{justify-self:start}
+@media(max-width:620px){.draft-shortcut{margin:0 16px 16px}.desk-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px}.desk-tabs .tab{padding:9px 7px}.approval-panel button{width:100%}}
