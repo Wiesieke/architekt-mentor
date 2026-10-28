@@ -39,6 +39,13 @@
    invalid_lead:"Lead może mieć najwyżej 2000 znaków.",
    invalid_body:"Tekst może mieć najwyżej 20 000 znaków.",
    origin_forbidden:"Niedozwolone pochodzenie żądania.",
+   migration_005_required:"Wykonaj najpierw migrację 005 w bazie danych.",
+   wp_not_configured:"Połączenie z WordPressem nie jest jeszcze włączone w prywatnej konfiguracji LH.pl.",
+   wp_outcome_unknown:"Wynik niepewny — sprawdź szkice w WordPressie. Ponowna wysyłka jest zablokowana, aby uniknąć duplikatu.",
+   already_handed_off:"Artykuł został już przekazany lub próba jest w toku. Sprawdź status WordPressa.",
+   approval_required:"Do WordPressa można przekazać tylko ręcznie zatwierdzony artykuł.",
+   handoff_locked:"Artykuł przekazany do WordPressa nie może być ponownie edytowany.",
+   handoff_unavailable:"Przekazanie niedostępne. Sprawdź migrację 005 i konfigurację bazy.",
    item_not_found:"Materiał nie istnieje w Radarze.",
   };
   return messages[code]||("Operacja się nie udała ("+(code||"nieznany błąd")+").");
@@ -63,6 +70,18 @@
   catch{throw new Error("unreadable_response");}
   if(resp.status===401){location.assign("index.php");throw new Error("login_required");}
   if(!resp.ok||data.ok!==true)throw new Error(data.code||"request_failed");
+  return data;
+ }
+ async function wpRequest(action,options={}) {
+  const response=await fetch("wordpress-draft-api.php?action="+encodeURIComponent(action)
+   +(options.id?"&item_id="+encodeURIComponent(options.id):""),{
+   method:options.payload?"POST":"GET",credentials:"same-origin",cache:"no-store",
+   headers:options.payload?{"Content-Type":"application/json","X-CSRF-Token":csrf}:{},
+   body:options.payload?JSON.stringify(options.payload):undefined,
+  });
+  let data;try{data=await response.json();}catch{throw new Error("unreadable_response");}
+  if(response.status===401){location.assign("index.php");throw new Error("login_required");}
+  if(!response.ok||data.ok!==true)throw new Error(data.code||"request_failed");
   return data;
  }
  function renderList() {
@@ -208,6 +227,55 @@
    notice("Nie udało się pobrać pliku. Spróbuj ponownie lub sprawdź ustawienia przeglądarki.",true);
   }
  }
+ function renderWpHandoff(parent,d) {
+  const box=add(parent,"section","wp-handoff");
+  add(box,"h3","","Przekazanie do WordPressa");
+  add(box,"p","muted","Wyłącznie szkic. Publikacja wymaga osobnej, ręcznej decyzji w WordPressie.");
+  const status=add(box,"p","wp-handoff-status","Sprawdzam status…");
+  const actions=add(box,"div","draft-actions");
+  const refresh=add(box,"button","quiet","Odśwież status WordPressa");
+  refresh.type="button";
+  async function loadStatus(){
+   if(current?.item_id!==d.item_id)return;
+   actions.replaceChildren();
+   try{
+    const info=await wpRequest("status",{id:d.item_id});
+    if(current?.item_id!==d.item_id)return;
+    if(info.handoff){
+     const h=info.handoff;
+     status.textContent=h.state==="CREATED"
+      ?"Utworzono szkic WordPress (ID "+h.post_id+"). Nie opublikowano go."
+      :h.state==="PENDING"?"Przekazywanie rozpoczęte. Nie można wysłać ponownie."
+      :"Niepewny wynik. Sprawdź szkice w WordPressie; ponowne przekazanie jest zablokowane.";
+     const reopen=byId("reopen-approved");if(reopen)reopen.disabled=true;
+     const safe=httpsUrl(h.edit_url);
+     if(h.state==="CREATED"&&safe){
+      const link=add(actions,"a","wp-edit-link","Otwórz szkic w WordPressie ↗");
+      link.href=safe;link.target="_blank";link.rel="noopener noreferrer";
+     }
+     return;
+    }
+    if(!info.enabled){
+     status.textContent="Integracja jeszcze nie skonfigurowana. Można nadal eksportować HTML/MD ręcznie.";
+     return;
+    }
+    status.textContent="Gotowy do jednorazowego przekazania jako szkic.";
+    const btn=add(actions,"button","","Przekaż do WordPressa jako szkic");
+    btn.type="button";btn.disabled=!writable||working;
+    btn.addEventListener("click",async()=>{
+     if(working||!writable)return;
+     if(!window.confirm("Utworzyć w WordPressie WYŁĄCZNIE SZKIC zatwierdzonego tekstu? Publikacja pozostanie ręczna."))return;
+     working=true;btn.disabled=true;
+     try{
+      const result=await wpRequest("send",{payload:{item_id:d.item_id,revision:d.revision,confirm_draft_only:true}});
+      notice("WordPress: utworzono szkic ID "+result.wp_post_id+". Nie opublikowano go.");
+     }catch(e){notice(errorMessage(e instanceof Error?e.message:"handoff_unavailable"),true);}
+     finally{working=false;await loadStatus();}
+    });
+   }catch(e){status.textContent=errorMessage(e instanceof Error?e.message:"handoff_unavailable");}
+  }
+  refresh.addEventListener("click",()=>void loadStatus());void loadStatus();
+ }
  function editorialDetails(parent,d,url) {
   const panel=add(parent,"aside","editorial-details");
   add(panel,"h3","","Metryka redakcyjna");
@@ -254,7 +322,7 @@
   const body=field(form,"Treść artykułu (tekst autorski)","textarea","body_text",d.body_text,20000,18);
   title.disabled=approved;lead.disabled=approved;body.disabled=approved;
   add(form,"p","muted rating-hint","Tekst wklejony z ChatGPT trzeba sprawdzić z pierwotnym źródłem. Nie kopiuj cudzych artykułów. Żaden szkic nie jest wysyłany do API AI.");
-  const tip=add(form,"p","warning","Status „Zatwierdzony” oznacza wyłącznie wewnętrzną akceptację. Nie ma połączenia z systemem publikacji.");
+  const tip=add(form,"p","warning","Status „Zatwierdzony” oznacza akceptację wewnętrzną. Opcjonalne przekazanie do WordPressa tworzy wyłącznie szkic.");
   tip.setAttribute("role","note");
   const status=add(form,"div","editor-bottom");
   add(status,"span","muted","Wersja "+d.revision+(d.approved_by?" · zaakceptował: "+d.approved_by:""));
@@ -310,6 +378,7 @@
     }catch{notice("Schowek jest niedostępny. Skorzystaj z przycisku „Pobierz HTML”.",true);}
    });
   }else add(form,"p","muted rating-hint","Eksport HTML i Markdown będzie dostępny po ręcznej akceptacji artykułu.");
+  if(approved)renderWpHandoff(form,d);
   if(!approved) {
    const save=add(buttons,"button","quiet","Zapisz szkic");save.type="button";save.disabled=!writable;
    save.addEventListener("click",()=>void saveDraft(false));
@@ -317,7 +386,7 @@
    review.addEventListener("click",()=>void saveDraft(true));
   } else {
    const reopen=add(buttons,"button","quiet","Wznów edycję (cofnij akceptację)");
-   reopen.type="button";reopen.disabled=!writable;
+   reopen.type="button";reopen.id="reopen-approved";reopen.disabled=!writable;
    reopen.addEventListener("click",()=>void mutate("reopen",{
     item_id:d.item_id,revision:d.revision
    },"Wznowić edycję? To cofnie poprzednią akceptację i zostanie zapisane w historii."));
