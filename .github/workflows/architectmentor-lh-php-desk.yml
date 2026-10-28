@@ -15,6 +15,7 @@ jobs:
       - name: PHP syntax
         run: |
           php -l radar/lh/desk/auth.php
+          php -l radar/lh/desk/desk-db.php
           php -l radar/lh/desk/totp.php
           php -l radar/lh/desk/index.php
           php -l radar/lh/desk/api.php
