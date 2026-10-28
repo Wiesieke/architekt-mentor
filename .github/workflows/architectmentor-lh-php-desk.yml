@@ -1,0 +1,29 @@
+name: ArchitectMentor LH PHP Desk quality
+on:
+  pull_request:
+    paths:
+      - "radar/lh/desk/**"
+      - "radar/db/002_architectmentor_editorial_audit.sql"
+      - "radar/lh/private/config.private.example.php"
+      - ".github/workflows/architectmentor-lh-php-desk.yml"
+  workflow_dispatch:
+jobs:
+  php-desk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP syntax
+        run: |
+          php -l radar/lh/desk/auth.php
+          php -l radar/lh/desk/desk-db.php
+          php -l radar/lh/desk/totp.php
+          php -l radar/lh/desk/index.php
+          php -l radar/lh/desk/api.php
+          php -l radar/lh/desk/tests/totp_test.php
+      - name: TOTP RFC security tests
+        run: php radar/lh/desk/tests/totp_test.php
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: JavaScript syntax
+        run: node --check radar/lh/desk/app.js

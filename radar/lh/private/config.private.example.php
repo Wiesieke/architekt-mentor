@@ -8,4 +8,6 @@ return [
  'AM_RADAR_DB_USER'=>'',
  'AM_RADAR_DB_PASSWORD'=>'',
  'AM_RADAR_WORKER_ENABLED'=>'0',
+ 'AM_DESK_SETUP_TOKEN'=>'', // NEW random 32+ chars, only in private config; never send in chat.
+ 'AM_DESK_WRITE_ENABLED'=>'0', // Independent fail-closed desk write switch.
 ];
