@@ -82,7 +82,6 @@
   }
  }
  async function refreshList(silent=false) {
-  if(working)return;
   try {
    const data=await request("list");
    drafts=data.drafts;
