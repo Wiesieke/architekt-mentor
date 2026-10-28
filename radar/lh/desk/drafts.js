@@ -117,6 +117,121 @@
   const banner=byId("draft-unsaved");
   if(banner)banner.textContent=dirty?"Niezapisane zmiany. Akceptacja wymaga ponownego przekazania tekstu do oceny.":"";
  }
+
+ // Markdown is rendered through DOM text nodes only. Raw HTML is never interpreted.
+ function inlineText(parent,value) {
+  for(const part of String(value).split(/(\*\*[^*]+\*\*)/g)) {
+   if(!part)continue;
+   if(part.startsWith("**")&&part.endsWith("**"))add(parent,"strong","",part.slice(2,-2));
+   else parent.appendChild(document.createTextNode(part));
+  }
+ }
+ function renderArticleBody(parent,raw) {
+  let paragraph=[],list=null,listType="";
+  const flush=()=>{
+   if(!paragraph.length)return;
+   const p=add(parent,"p");inlineText(p,paragraph.join(" "));
+   paragraph=[];
+  };
+  for(const line of String(raw??"").replace(/\r\n?/g,"\n").split("\n")) {
+   const value=line.trim();
+   if(!value){flush();list=null;listType="";continue;}
+   const heading=/^(#{1,3})\s+(.+)$/.exec(value);
+   if(heading) {
+    flush();list=null;listType="";
+    const h=add(parent,"h"+String(heading[1].length+1));
+    inlineText(h,heading[2]);continue;
+   }
+   const marker=/^(?:([-*])|(\d+)[.)])\s+(.+)$/.exec(value);
+   if(marker) {
+    flush();
+    const type=marker[2]?"ol":"ul";
+    if(!list||listType!==type){list=add(parent,type);listType=type;}
+    const li=add(list,"li");inlineText(li,marker[3]);continue;
+   }
+   list=null;listType="";paragraph.push(value);
+  }
+  flush();
+ }
+ function articleElement(d,values) {
+  const root=node("article","export-article");
+  add(root,"h1","",values.title);
+  add(root,"p","article-lead",values.lead_text);
+  const body=add(root,"div","article-body");
+  renderArticleBody(body,values.body_text);
+  const source=httpsUrl(d.source_url);
+  if(source) {
+   const credit=add(root,"p","source-credit");
+   add(credit,"span","","Źródło pierwotne: ");
+   const link=add(credit,"a","","GitHub / materiał źródłowy");
+   link.href=source;link.target="_blank";link.rel="noopener noreferrer";
+  }
+  return root;
+ }
+ function makeSlug(title) {
+  const clean=String(title).normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+   .toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,65);
+  return clean||"artykul";
+ }
+ function safeMarkdownText(value) {
+  return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+ }
+ function exportContent(d,format) {
+  if(d.status!=="APPROVED"||!d.draft_id)throw new Error("not_approved");
+  const source=httpsUrl(d.source_url);
+  if(format==="html") {
+   const article=articleElement(d,{title:d.title,lead_text:d.lead_text,body_text:d.body_text});
+   return {content:"<!-- ArchitectMentor: ręczny eksport zatwierdzonego artykułu; bez automatycznej publikacji. -->\n"+article.outerHTML+"\n",
+    type:"text/html;charset=utf-8",ext:"html"};
+  }
+  if(format==="md") {
+   const md="# "+safeMarkdownText(d.title)+"\n\n"
+    +safeMarkdownText(d.lead_text)+"\n\n"
+    +safeMarkdownText(d.body_text)+"\n\n"
+    +(source?"Źródło pierwotne: "+source+"\n":"");
+   return {content:md,type:"text/markdown;charset=utf-8",ext:"md"};
+  }
+  throw new Error("invalid_export");
+ }
+ function downloadApproved(d,format) {
+  try {
+   const result=exportContent(d,format);
+   const blob=new Blob([result.content],{type:result.type});
+   const href=URL.createObjectURL(blob);
+   const a=document.createElement("a");
+   a.href=href;a.download="architectmentor-"+makeSlug(d.title)+"-"+d.item_id.slice(0,8)+"."+result.ext;
+   a.style.display="none";
+   document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(href),30000);
+   notice("Przygotowano plik "+result.ext.toUpperCase()+". Pobieranie nie publikuje artykułu.");
+  }catch(error){
+   notice("Nie udało się pobrać pliku. Spróbuj ponownie lub sprawdź ustawienia przeglądarki.",true);
+  }
+ }
+ function editorialDetails(parent,d,url) {
+  const panel=add(parent,"aside","editorial-details");
+  add(panel,"h3","","Metryka redakcyjna");
+  const fields=[
+   ["Status tekstu",labels[d.status]??d.status],
+   ["Status faktów w Radarze",d.fact_check_status||"nieustalony"],
+   ["Źródło w Radarze",d.source_id||"brak"],
+   ["Wersja",String(d.revision)],
+   ["Zatwierdził",d.approved_by||"jeszcze nie zatwierdzono"],
+   ["Data akceptacji UTC",d.approved_at_utc||"—"],
+  ];
+  const dl=add(panel,"dl","editorial-grid");
+  for(const [name,value] of fields) {
+   add(dl,"dt","",name);add(dl,"dd","",value);
+  }
+  if(url){
+   const p=add(panel,"p","source-link");
+   add(p,"span","","Link źródłowy: ");
+   const a=add(p,"a","","Otwórz oryginalny komunikat ↗");
+   a.href=url;a.target="_blank";a.rel="noopener noreferrer";
+  }
+  if(d.fact_check_status!=="verified")
+   add(panel,"p","muted","Uwaga: zatwierdzenie redakcyjne nie zmienia automatycznie statusu weryfikacji faktów w Radarze.");
+ }
  function renderEditor() {
   const root=byId("draft-editor");root.replaceChildren();
   if(!current){add(root,"p","muted empty","Wybierz szkic lub utwórz go z materiału w Radarze.");return;}
@@ -132,6 +247,7 @@
    const a=add(evidence,"a","","Otwórz źródło ↗");
    a.href=url;a.target="_blank";a.rel="noopener noreferrer";
   } else add(evidence,"b","","Brak wiarygodnego adresu HTTPS");
+  editorialDetails(root,d,url);
   const form=add(root,"form","draft-form");form.noValidate=true;
   const title=field(form,"Tytuł artykułu","input","title",d.title,240);
   const lead=field(form,"Lead / wprowadzenie","textarea","lead_text",d.lead_text,2000,5);
@@ -162,6 +278,30 @@
    }catch{notice("Schowek jest niedostępny. Skopiuj brief w przeglądarce obsługującej schowek HTTPS.",true);}
   });
   const buttons=add(form,"div","draft-actions");
+  const previewBtn=add(buttons,"button","quiet","Podgląd artykułu");
+  previewBtn.type="button";
+  previewBtn.addEventListener("click",()=>{
+   const previous=root.querySelector(".draft-preview");
+   if(previous){previous.remove();previewBtn.textContent="Podgląd artykułu";return;}
+   const preview=add(root,"section","draft-preview");
+   add(preview,"p","eyebrow","PODGLĄD REDAKCYJNY / BEZ PUBLIKACJI");
+   add(preview,"p","muted","Podgląd struktury tekstu. Ostateczny wygląd zależy od motywu WordPress.");
+   if(dirty)add(preview,"p","warning","Pokazano niezapisane zmiany — przed zatwierdzeniem najpierw zapisz tekst.");
+   preview.appendChild(articleElement(d,{title:title.value,lead_text:lead.value,body_text:body.value}));
+   previewBtn.textContent="Zamknij podgląd";
+   preview.scrollIntoView({behavior:"smooth",block:"nearest"});
+  });
+  for(const ctrl of [title,lead,body])ctrl.addEventListener("input",()=>{
+   const previous=root.querySelector(".draft-preview");
+   if(previous){previous.remove();previewBtn.textContent="Podgląd artykułu";}
+  });
+  if(approved) {
+   for(const format of ["html","md"]) {
+    const download=add(buttons,"button","quiet","Pobierz "+format.toUpperCase());
+    download.type="button";
+    download.addEventListener("click",()=>downloadApproved(d,format));
+   }
+  }else add(form,"p","muted rating-hint","Eksport HTML i Markdown będzie dostępny po ręcznej akceptacji artykułu.");
   if(!approved) {
    const save=add(buttons,"button","quiet","Zapisz szkic");save.type="button";save.disabled=!writable;
    save.addEventListener("click",()=>void saveDraft(false));
