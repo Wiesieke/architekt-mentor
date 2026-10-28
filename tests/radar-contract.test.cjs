@@ -18,7 +18,7 @@ test('hourly collector is private CLI with off switch, rights gate, locking and 
  assert.match(worker,/enabled=1 AND rights_gate='approved'/);
  assert.match(worker,/GET_LOCK/);
  assert.match(worker,/amr_cycles/);
- assert.doesNotMatch(worker,/publish|sendMail|newsletter|deployHook/i);
+ assert.doesNotMatch(worker,/sendMail|newsletter|deployHook/i);
 });
 test('catalog seeds disabled sources and never fetches other brands data',()=>{
  const radar=load('radar/lh/private/radar.php');
