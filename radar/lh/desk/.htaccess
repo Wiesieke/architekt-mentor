@@ -2,7 +2,7 @@
 Options -Indexes
 RewriteEngine On
 RewriteRule ^\.vault(?:/|$) - [F,L,NC]
-<FilesMatch "^(auth|totp|desk-db)\.php$">
+<FilesMatch "^(auth|totp|desk-db|wordpress-draft)\.php$">
  Require all denied
 </FilesMatch>
 <FilesMatch "\.(?:md|json|log|sql|yml|yaml|ini|env|bak|old|orig)$">

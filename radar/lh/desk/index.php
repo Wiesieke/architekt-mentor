@@ -164,7 +164,7 @@ $logged=$state!==null&&($state['verified']??false)===true&&amd_auth_valid();
     </section>
     <section class="editor draft-editor" id="draft-editor"><p class="muted empty">W Radarze wybierz materiał i kliknij „Utwórz szkic”.</p></section>
    </div>
-   <footer>Brak integracji z publikacją · bez kluczy API AI · zatwierdzenie wyłącznie ręczne</footer>
+   <footer>WordPress: wyłącznie szkice po ręcznym przekazaniu · publikacja tylko w panelu WordPress</footer>
   </section>
  </main>
 <?php endif;?>
