@@ -1,0 +1,118 @@
+"use strict";
+(function(){
+ const byId=id=>document.getElementById(id);
+ const csrf=document.querySelector('meta[name="am-desk-csrf"]')?.content??"";
+ let dataset=null,selected="",query="",filter="all",busy=false;
+ const names={UNREVIEWED:"Bez decyzji",SELECTED:"Wybrane",HOLD:"Odłożone",REJECTED:"Odrzucone",REQUEST_RESEARCH:"Do sprawdzenia"};
+ const allowedDecisions=Object.keys(names),editions={none:"Brak / magazyn",daily:"Daily",weekly:"Weekly"};
+ function el(tag,cls,text){
+  const node=document.createElement(tag);
+  if(cls)node.className=cls;
+  if(text!==undefined)node.textContent=String(text);
+  return node;
+ }
+ function add(parent,tag,cls,text){const child=el(tag,cls,text);parent.appendChild(child);return child;}
+ function option(value,label){const o=el("option","",label);o.value=value;return o;}
+ function message(code){
+  const map={login_required:"Sesja wygasła. Zaloguj się ponownie.",csrf_failed:"Sesja wygasła. Odśwież stronę.",writes_disabled:"Zapis jest wyłączony na LH.pl — na razie tylko odczyt.",revision_conflict:"Istnieje nowsza wersja decyzji. Odśwież listę.",read_unavailable_check_migration_002:"Brak odczytu. Sprawdź migrację 002 oraz konfigurację bazy.",save_unavailable:"Zapis niedostępny — sprawdź migrację i konfigurację.",origin_forbidden:"Żądanie pochodzi z innego adresu.",item_not_found:"Materiał nie istnieje."};
+  return map[code]??("Operacja się nie udała ("+(code||"błąd") +").");
+ }
+ function alertText(value){
+  const e=byId("global-alert");e.textContent=value;e.classList.toggle("hidden",!value);
+ }
+ function httpsUrl(value){
+  try{const u=new URL(String(value));return u.protocol==="https:"&&!u.username&&!u.password?u.href:null;}catch{return null;}
+ }
+ function renderQueue(){
+  if(!dataset)return;
+  const list=byId("itemlist");list.replaceChildren();
+  const q=query.toLocaleLowerCase();
+  const visible=dataset.items.filter(x=>(filter==="all"||x.decision===filter)
+   &&(String(x.title)+" "+String(x.source_id)).toLocaleLowerCase().includes(q));
+  byId("queue-count").textContent=String(visible.length);
+  if(!visible.length){add(list,"p","muted empty","Brak materiałów spełniających filtr.");return;}
+  for(const item of visible){
+   const btn=add(list,"button","item"+(item.item_id===selected?" active":""));
+   btn.type="button";btn.setAttribute("aria-pressed",String(item.item_id===selected));
+   add(btn,"span","item-meta",item.source_id+" · "+item.topic);
+   add(btn,"span","item-title",item.title);
+   const bottom=add(btn,"span","item-bottom");
+   add(bottom,"span","",String(item.published_at_utc??"Brak daty").slice(0,16)+" UTC");
+   add(bottom,"em","",names[item.decision]??item.decision);
+   btn.addEventListener("click",()=>{selected=item.item_id;renderQueue();renderEditor();});
+  }
+ }
+ function chooseField(parent,title,values,current,name){
+  const label=add(parent,"label","",title),select=add(label,"select");
+  select.name=name;
+  for(const [value,text] of Object.entries(values))select.appendChild(option(value,text));
+  select.value=current in values?current:Object.keys(values)[0];
+  return select;
+ }
+ function renderEditor(){
+  const root=byId("editor");root.replaceChildren();
+  const item=dataset?.items.find(x=>x.item_id===selected);
+  if(!item){add(root,"p","muted empty","Wybierz materiał z kolejki.");return;}
+  const header=add(root,"header");
+  add(header,"p","eyebrow","RĘCZNA DECYZJA REDAKCYJNA");
+  add(header,"h2","",item.title);
+  add(header,"p","muted",item.source_id+" · "+item.first_seen_at_utc+" UTC");
+  const evidence=add(root,"div","evidence");
+  const badge=add(evidence,"span","", "Status faktów: ");
+  add(badge,"b","",item.fact_check_status);
+  const url=httpsUrl(item.original_url);
+  if(url){const a=add(evidence,"a","","Sprawdź źródło pierwotne ↗");a.href=url;a.target="_blank";a.rel="noopener noreferrer";}
+  else add(evidence,"span","","Brak poprawnego linku");
+  const form=add(root,"form");form.id="decision-form";
+  const two=add(form,"div","twocol");
+  const choice=chooseField(two,"Decyzja",names,item.decision,"decision");
+  const edition=chooseField(two,"Planowana edycja",editions,item.intended_edition??"none","edition");
+  const noteLabel=add(form,"label","","Notatka redaktora");
+  const textarea=add(noteLabel,"textarea");
+  textarea.rows=8;textarea.maxLength=2000;
+  textarea.placeholder="Ocena wpływu, źródła, zastrzeżenia, status GA/preview…";
+  textarea.value=String(item.note??"");
+  const bottom=add(form,"div","editor-bottom");
+  add(bottom,"span","muted","Wersja "+item.revision);
+  const save=add(bottom,"button","","Zapisz decyzję");save.type="submit";
+  add(form,"p","warning","Zapis tworzy historię rewizji, ale nie publikuje wiadomości.");
+  const feedback=add(form,"p","save-feedback");feedback.setAttribute("role","status");
+  form.addEventListener("submit",async event=>{
+   event.preventDefault();if(save.disabled)return;
+   save.disabled=true;save.textContent="Zapisywanie…";feedback.textContent="";
+   const payload={item_id:item.item_id,revision:Number(item.revision),decision:choice.value,intended_edition:edition.value,note:textarea.value};
+   try{
+    const response=await fetch("api.php?action=decision",{method:"POST",credentials:"same-origin",cache:"no-store",
+      headers:{"Content-Type":"application/json","X-CSRF-Token":csrf},body:JSON.stringify(payload)});
+    const json=await response.json();
+    if(response.status===401){location.assign("index.php");return;}
+    if(!response.ok||json.ok!==true||typeof json.revision!=="number")throw new Error(json.code??"save_failed");
+    Object.assign(item,{decision:payload.decision,intended_edition:payload.intended_edition,note:payload.note,revision:json.revision});
+    feedback.textContent="Decyzja zapisana z historią. Publikacja nie została uruchomiona.";
+    renderQueue();await refresh(false);
+   }catch(error){feedback.textContent=message(error instanceof Error?error.message:"save_failed");}
+   finally{save.disabled=false;save.textContent="Zapisz decyzję";}
+  });
+ }
+ async function refresh(resetSelection=true){
+  if(busy)return;busy=true;byId("reload").disabled=true;alertText("");
+  try{
+   const response=await fetch("api.php?action=items",{credentials:"same-origin",cache:"no-store"});
+   const data=await response.json();
+   if(response.status===401){location.assign("index.php");return;}
+   if(!response.ok||data.ok!==true||!Array.isArray(data.items))throw new Error(data.code??"read_failed");
+   dataset=data;
+   if(resetSelection||!data.items.some(x=>x.item_id===selected))selected=data.items[0]?.item_id??"";
+   byId("metric-total").textContent=String(data.metrics?.total_items??"—");
+   byId("metric-selected").textContent=String(data.metrics?.selected??"—");
+   byId("metric-last").textContent=String(data.metrics?.last_success_utc??"—");
+   byId("sources-count").textContent=String(data.sources?.filter(x=>Number(x.enabled)===1).length??"—");
+   renderQueue();renderEditor();
+  }catch(error){alertText(message(error instanceof Error?error.message:"read_failed"));}
+  finally{busy=false;byId("reload").disabled=false;}
+ }
+ byId("reload").addEventListener("click",()=>refresh(false));
+ byId("search").addEventListener("input",event=>{query=event.target.value;renderQueue();});
+ byId("filter").addEventListener("change",event=>{filter=event.target.value;renderQueue();});
+ void refresh();
+})();
