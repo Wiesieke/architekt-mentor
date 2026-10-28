@@ -79,3 +79,11 @@ button.tab:hover:not(:disabled){background:#eaf1ff}button.tab.active{background:
 .export-article .article-body li{margin:5px 0}
 .export-article .source-credit{font-size:12px;border-top:1px solid #e4e9f2;margin-top:36px;padding-top:12px;color:#64758f}
 @media(max-width:620px){.editorial-details{margin:0 16px 18px;padding:13px}.editorial-grid{grid-template-columns:1fr;gap:1px}.editorial-grid dd{margin-bottom:8px}.draft-preview{margin:18px 12px 0;padding:10px}.export-article{padding:16px}}
+
+/* Explicit WordPress draft handoff (no publish action). */
+.wp-handoff{border:1px solid #b7d1ef;border-radius:12px;background:#f0f6ff;padding:17px;display:grid;gap:10px}
+.wp-handoff h3{font-size:17px;margin:0}
+.wp-handoff .muted{font-size:12px;margin:0}
+.wp-handoff-status{font-size:13px;color:#26496e;margin:0;line-height:1.5}
+.wp-handoff>.quiet{justify-self:start}
+.wp-edit-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #bcd1ed;background:#fff;padding:12px 14px;border-radius:9px;font-size:13px;font-weight:700}
