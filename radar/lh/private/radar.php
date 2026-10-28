@@ -86,11 +86,11 @@ function amr_ingest(PDO $db,string $sourceId,array $source,array $items): array 
  $created=0;$now=amr_now();
  $db->beginTransaction();
  try{
-  $insert=$db->prepare('INSERT IGNORE INTO amr_items (item_id,source_id,title,original_url,published_at_utc,first_seen_at_utc,last_seen_at_utc,topic,fact_check_status) VALUES (?,?,?,?,?,?,?,?,"unverified")');
+  $insert=$db->prepare('INSERT IGNORE INTO amr_items (item_id,source_id,title,original_url,published_at_utc,first_seen_at_utc,last_seen_at_utc,topic,fact_check_status) VALUES (?,?,?,?,?,?,?,?,?)');
   $touch=$db->prepare('UPDATE amr_items SET last_seen_at_utc=? WHERE item_id=?');
   foreach($items as $item){
    $id=hash('sha256','ArchitectMentor|'.$sourceId.'|'.hash('sha256',$item['url']));
-   $insert->execute([$id,$sourceId,$item['title'],$item['url'],$item['published'],$now,$now,$source['topic']]);
+   $insert->execute([$id,$sourceId,$item['title'],$item['url'],$item['published'],$now,$now,$source['topic'],'unverified']);
    $created+=$insert->rowCount();
    $touch->execute([$now,$id]);
   }
