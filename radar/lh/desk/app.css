@@ -56,3 +56,26 @@ button.tab:hover:not(:disabled){background:#eaf1ff}button.tab.active{background:
 .draft-check input[type="checkbox"]{width:18px;height:18px;flex:none;accent-color:var(--blue);margin:1px 0 0}
 .approval-panel button{justify-self:start}
 @media(max-width:620px){.draft-shortcut{margin:0 16px 16px}.desk-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px}.desk-tabs .tab{padding:9px 7px}.approval-panel button{width:100%}}
+
+
+/* Draft preview / export controls. No remote assets or publication endpoints. */
+.editorial-details{margin:0 23px 22px;padding:16px 18px;border:1px solid #cbdcf2;background:#f8fbff;border-radius:11px}
+.editorial-details h3{font-size:15px;line-height:1.35;margin:0 0 12px}
+.editorial-grid{display:grid;grid-template-columns:minmax(130px,1fr) minmax(0,1.7fr);gap:5px 12px;margin:0;font-size:12px}
+.editorial-grid dt{color:#5c718e;font-weight:700}
+.editorial-grid dd{margin:0;overflow-wrap:anywhere;color:#243f65}
+.editorial-details .source-link{font-size:12px;margin-top:10px;overflow-wrap:anywhere}
+.editorial-details .muted{font-size:12px;margin-top:10px}
+.draft-preview{margin:24px 23px 0;padding:22px;border:1px solid #baccdf;border-radius:14px;background:#eef4ff}
+.draft-preview>.muted{font-size:12px;margin:5px 0 14px}
+.export-article{background:#fff;border:1px solid #e2e7f0;border-radius:11px;padding:clamp(18px,3vw,42px);color:#203149;overflow-wrap:anywhere;line-height:1.75}
+.export-article h1{font-size:clamp(25px,3vw,34px);letter-spacing:-.035em;margin:0 0 16px}
+.export-article .article-lead{font-size:17px;color:#3f536d;line-height:1.65;font-weight:600;margin:0 0 30px}
+.export-article .article-body h2{font-size:23px;margin:30px 0 12px;line-height:1.35}
+.export-article .article-body h3{font-size:19px;margin:25px 0 11px;line-height:1.4}
+.export-article .article-body h4{font-size:17px;margin:20px 0 10px}
+.export-article .article-body p{margin:0 0 16px}
+.export-article .article-body ul,.export-article .article-body ol{margin:0 0 20px;padding-left:25px}
+.export-article .article-body li{margin:5px 0}
+.export-article .source-credit{font-size:12px;border-top:1px solid #e4e9f2;margin-top:36px;padding-top:12px;color:#64758f}
+@media(max-width:620px){.editorial-details{margin:0 16px 18px;padding:13px}.editorial-grid{grid-template-columns:1fr;gap:1px}.editorial-grid dd{margin-bottom:8px}.draft-preview{margin:18px 12px 0;padding:10px}.export-article{padding:16px}}
