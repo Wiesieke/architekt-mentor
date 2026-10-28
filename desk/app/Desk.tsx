@@ -31,7 +31,7 @@ export function Desk(){
  },[]);
  useEffect(()=>{void refresh();},[refresh]);
  const item=useMemo(()=>data?.items.find(v=>v.item_id===selected)??null,[data,selected]);
- useEffect(()=>{if(!item)return;setDecision(item.decision);setEdition(item.intended_edition??"none");setNote(item.note??"");setNotice("");},[item]);
+ useEffect(()=>{if(!item)return;setDecision(item.decision);setEdition(item.intended_edition??"none");setNote(item.note??"");setNotice("");},[item?.item_id]);
  const visible=(data?.items??[]).filter(v=>(filter==="all"||v.decision===filter)&&(v.title+" "+v.source_id).toLocaleLowerCase().includes(query.toLocaleLowerCase()));
  async function save(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();if(!item||saving)return;
