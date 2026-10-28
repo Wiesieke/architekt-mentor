@@ -212,6 +212,12 @@ try {
   if (!$old||$old['status']!=='APPROVED') {
    $db->rollBack();amd_reply(409,['ok'=>false,'code'=>'not_approved']);
   }
+  // After a WordPress handoff claim the approved source remains immutable.
+  $h=$db->prepare('SELECT handoff_id FROM amr_wp_draft_handoffs WHERE draft_id=? LIMIT 1');
+  $h->execute([(int)$old['draft_id']]);
+  if($h->fetchColumn()!==false) {
+   $db->rollBack();amd_reply(409,['ok'=>false,'code'=>'handoff_locked']);
+  }
   $next=$present+1;$status='DRAFT';
   $q=$db->prepare('UPDATE amr_article_drafts SET status=?,revision=?,editor_label=?,
     approved_by=NULL,approved_at_utc=NULL,updated_at_utc=? WHERE draft_id=?');
