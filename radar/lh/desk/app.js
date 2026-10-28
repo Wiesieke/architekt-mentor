@@ -74,8 +74,9 @@
   textarea.value=String(item.note??"");
   const bottom=add(form,"div","editor-bottom");
   add(bottom,"span","muted","Wersja "+item.revision);
-  const save=add(bottom,"button","","Zapisz decyzję");save.type="submit";
-  add(form,"p","warning","Zapis tworzy historię rewizji, ale nie publikuje wiadomości.");
+  const writable=dataset?.write_enabled===true;
+  const save=add(bottom,"button","",writable?"Zapisz decyzję":"Zapis wyłączony");save.type="submit";save.disabled=!writable;
+  add(form,"p","warning",writable?"Zapis tworzy historię rewizji, ale nie publikuje wiadomości.":"Tryb tylko do odczytu. Włączenie zapisu wymaga świadomej zgody i testu na LH.pl.");
   const feedback=add(form,"p","save-feedback");feedback.setAttribute("role","status");
   form.addEventListener("submit",async event=>{
    event.preventDefault();if(save.disabled)return;
