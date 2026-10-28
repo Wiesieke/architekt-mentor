@@ -45,9 +45,9 @@ if(!is_string($edition)||!in_array($edition,['none','daily','weekly'],true))
 if(!is_string($note)||mb_strlen($note)>2000)amr_edit_reply(422,'invalid_note');
 $note=trim($note);
 $editor=amr_env('AM_RADAR_EDITOR_LABEL')?:'ArchitectMentor editorial operator';
-// Bearer-authenticated proxy supplies the actual Clerk user ID; no browser-supplied label.
+// Bearer-authenticated proxy supplies the allowlisted GitHub numeric user ID; no browser-supplied label.
 $actor=(string)($_SERVER['HTTP_X_EDITORIAL_ACTOR']??'');
-if(preg_match('/^user_[A-Za-z0-9]{10,64}$/D',$actor))$editor=$actor;
+if(preg_match('/^github_[0-9]{1,20}$/D',$actor))$editor=$actor;
 $editor=mb_substr($editor,0,100);$now=gmdate('Y-m-d H:i:s');
 try{
  $db=amr_db();$db->beginTransaction();
