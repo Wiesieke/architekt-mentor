@@ -71,6 +71,10 @@
   const url=httpsUrl(item.original_url);
   if(url){const a=add(evidence,"a","","Sprawdź źródło pierwotne ↗");a.href=url;a.target="_blank";a.rel="noopener noreferrer";}
   else add(evidence,"span","","Brak poprawnego linku");
+  const shortcut=add(root,"div","draft-shortcut");
+  const makeDraft=add(shortcut,"button","quiet","Utwórz szkic artykułu →");
+  makeDraft.type="button";
+  makeDraft.addEventListener("click",()=>window.dispatchEvent(new CustomEvent("am:draft-from-item",{detail:{item_id:item.item_id}})));
   const form=add(root,"form");form.id="decision-form";
   const two=add(form,"div","twocol");
   const choice=chooseField(two,"Decyzja",names,item.decision,"decision");
