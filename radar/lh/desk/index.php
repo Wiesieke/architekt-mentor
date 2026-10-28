@@ -78,7 +78,7 @@ $logged=$state!==null&&($state['verified']??false)===true&&amd_auth_valid();
  <meta name="am-desk-csrf" content="<?=amd_esc($csrf)?>">
  <title>ArchitectMentor · prywatny Desk</title>
  <link rel="stylesheet" href="app.css">
- <?php if($logged):?><script src="app.js" defer></script><?php endif;?>
+ <?php if($logged):?><script src="app.js" defer></script><script src="drafts.js" defer></script><?php endif;?>
 </head>
 <body>
 <?php if(!$logged):?>
@@ -129,6 +129,11 @@ $logged=$state!==null&&($state['verified']??false)===true&&amd_auth_valid();
   <form method="post" action="index.php"><input type="hidden" name="mode" value="logout"><input type="hidden" name="csrf" value="<?=amd_esc($csrf)?>"><button class="quiet" type="submit">Wyloguj się</button></form>
  </header>
  <main class="shell">
+  <nav class="desk-tabs" role="tablist" aria-label="Moduły panelu">
+   <button type="button" id="tab-radar" class="tab active" role="tab" aria-selected="true" aria-controls="radar-view">Radar decyzji</button>
+   <button type="button" id="tab-drafts" class="tab" role="tab" aria-selected="false" aria-controls="drafts-view">Szkice artykułów</button>
+  </nav>
+  <div id="radar-view" role="tabpanel" aria-labelledby="tab-radar">
   <section class="intro"><div><p class="eyebrow">ARCHITEKTURA W RUCHU / PRIVATE REVIEW</p><h1>Radar decyzji</h1><p>Materiały z radaru są kandydatami do analizy, a nie zweryfikowanymi wiadomościami. Decyzja nie powoduje publikacji.</p></div><button class="quiet" type="button" id="reload">Odśwież dane</button></section>
   <div class="alert hidden" id="global-alert" role="alert"></div>
   <section class="stats"><div><small>Pozycje w radarze</small><strong id="metric-total">—</strong></div><div><small>Wybrane do analizy</small><strong id="metric-selected">—</strong></div><div><small>Priorytet P1</small><strong id="metric-high">—</strong></div><div><small>Ostatnie pobranie UTC</small><strong id="metric-last" class="date">—</strong></div></section>
@@ -145,6 +150,22 @@ $logged=$state!==null&&($state['verified']??false)===true&&amd_auth_valid();
    <section class="editor" id="editor"><p class="muted">Wybierz materiał z kolejki.</p></section>
   </div>
   <footer>ArchitectMentor Radar · panel wewnętrzny · <span id="sources-count">—</span> aktywnych źródeł</footer>
+  </div>
+  <section id="drafts-view" class="hidden" role="tabpanel" aria-labelledby="tab-drafts">
+   <section class="intro"><div><p class="eyebrow">ARCHITECTMENTOR / PRYWATNA REDAKCJA</p>
+    <h1>Szkice artykułów</h1>
+    <p>Tekst przygotujesz w ChatGPT, a tutaj zapiszesz i sprawdzisz. Akceptacja jest ręczna. System nigdy nie publikuje automatycznie.</p>
+   </div><button class="quiet" id="drafts-reload" type="button">Odśwież szkice</button></section>
+   <div class="alert hidden" id="drafts-alert" role="status"></div>
+   <div class="workspace">
+    <section class="queue"><header><h2>Szkice <span id="drafts-count">0</span></h2>
+     <p>Archiwum roboczych tekstów powiązanych z Radarem</p></header>
+     <div class="itemlist" id="drafts-list"><p class="muted empty">Wczytywanie…</p></div>
+    </section>
+    <section class="editor draft-editor" id="draft-editor"><p class="muted empty">W Radarze wybierz materiał i kliknij „Utwórz szkic”.</p></section>
+   </div>
+   <footer>Brak integracji z publikacją · bez kluczy API AI · zatwierdzenie wyłącznie ręczne</footer>
+  </section>
  </main>
 <?php endif;?>
 </body></html>

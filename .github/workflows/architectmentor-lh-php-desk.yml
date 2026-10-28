@@ -5,6 +5,7 @@ on:
       - "radar/lh/desk/**"
       - "radar/db/002_architectmentor_editorial_audit.sql"
       - "radar/db/003_architectmentor_editorial_priority.sql"
+      - "radar/db/004_architectmentor_article_drafts.sql"
       - "radar/lh/private/config.private.example.php"
       - ".github/workflows/architectmentor-lh-php-desk.yml"
   workflow_dispatch:
@@ -20,6 +21,7 @@ jobs:
           php -l radar/lh/desk/totp.php
           php -l radar/lh/desk/index.php
           php -l radar/lh/desk/api.php
+          php -l radar/lh/desk/drafts-api.php
           php -l radar/lh/desk/tests/totp_test.php
       - name: TOTP RFC security tests
         run: php radar/lh/desk/tests/totp_test.php
@@ -27,4 +29,6 @@ jobs:
         with:
           node-version: "22"
       - name: JavaScript syntax
-        run: node --check radar/lh/desk/app.js
+        run: |
+          node --check radar/lh/desk/app.js
+          node --check radar/lh/desk/drafts.js
