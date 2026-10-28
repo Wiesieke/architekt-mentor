@@ -22,7 +22,7 @@ if($method==='GET'&&$action==='items'){
   $metrics=$db->query("SELECT
     (SELECT COUNT(*) FROM amr_items) AS total_items,
     (SELECT COUNT(*) FROM amr_decisions WHERE decision='SELECTED') AS selected,
-    (SELECT COUNT(*) FROM amr_decisions WHERE priority=3) AS high_priority,
+    (SELECT COUNT(*) FROM amr_decisions WHERE priority=3) AS `high_priority`,
     (SELECT MAX(completed_at_utc) FROM amr_cycles WHERE outcome='success') AS last_success_utc")->fetch();
   amd_reply(200,['ok'=>true,'items'=>$items,'sources'=>$sources,'metrics'=>$metrics,'generated_at_utc'=>gmdate('c'),
    'write_enabled'=>amr_env('AM_DESK_WRITE_ENABLED')==='1'&&amr_env('AM_RADAR_EDITOR_WRITE_ENABLED')==='1']);
