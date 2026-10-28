@@ -1,0 +1,2 @@
+ArchitectMentor protected-vault check (non-secret).
+If this text is visible in a browser, STOP. The vault is unsafe.
