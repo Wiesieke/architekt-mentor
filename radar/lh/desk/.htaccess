@@ -1,0 +1,8 @@
+# Upload this file together with index.php, api.php and assets to the dedicated HTTPS desk directory.
+Options -Indexes
+<FilesMatch "^(auth|totp)\.php$">
+ Require all denied
+</FilesMatch>
+<FilesMatch "\.(?:md|json|log|sql|yml|yaml)$">
+ Require all denied
+</FilesMatch>
