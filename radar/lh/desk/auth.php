@@ -4,13 +4,14 @@ declare(strict_types=1);
 require_once __DIR__.'/totp.php';
 
 function amd_private_dir(): string {
- $env=getenv('AM_RADAR_PRIVATE_DIR');
- $path=is_string($env)&&trim($env)!==''?trim($env):dirname(__DIR__,3).'/architectmentor-radar-private';
- $real=realpath($path);
- if($real===false||!is_dir($real))throw new RuntimeException('Private radar directory missing');
- $doc=realpath((string)($_SERVER['DOCUMENT_ROOT']??''));
- if($doc!==false&&str_starts_with($real.DIRECTORY_SEPARATOR,$doc.DIRECTORY_SEPARATOR))
-  throw new RuntimeException('Private directory must be outside web root');
+ // LH.pl web PHP is confined to the current vhost: require the explicitly denied vault.
+ $web=realpath(__DIR__);
+ $real=realpath(__DIR__.'/.vault');
+ if($web===false||$real===false||$real!==$web.'/.vault'||!is_dir($real))
+  throw new RuntimeException('LH protected vault missing or linked elsewhere');
+ $rules=@file_get_contents($real.'/.htaccess');
+ if(!is_string($rules)||!preg_match('/^\\s*Require\\s+all\\s+denied\\s*$/mi',$rules))
+  throw new RuntimeException('LH protected vault access rule missing');
  return $real;
 }
 function amd_boot(): void {
@@ -33,9 +34,8 @@ function amd_boot(): void {
   session_set_cookie_params(['lifetime'=>0,'path'=>$path===''?'/':$path.'/','secure'=>true,'httponly'=>true,'samesite'=>'Strict']);
   if(session_start()!==true)throw new RuntimeException('Session unavailable');
  }
- $file=amd_private_dir().'/radar.php';
- if(!is_file($file))throw new RuntimeException('Radar private library missing');
- require_once $file;
+ amd_private_dir();
+ require_once __DIR__.'/desk-db.php';
 }
 function amd_auth_path(): string {return amd_private_dir().'/architect-desk-auth.json';}
 function amd_setup_token(): string {return amr_env('AM_DESK_SETUP_TOKEN');}
