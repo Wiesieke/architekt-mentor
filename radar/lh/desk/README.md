@@ -1,5 +1,7 @@
 # ArchitectMentor Desk — LH.pl „open_basedir” edition (wariant awaryjny)
 
+> **Rozszerzenie v0.4 (Szkice artykułów):** osobna instrukcja bezpiecznej migracji 004 i wgrania przez FileZilla znajduje się w [DRAFTS_DEPLOY.md](DRAFTS_DEPLOY.md). Nie wykonuj poniższej ponownej instalacji konta — działającego uwierzytelniania nie zmieniamy.
+
 **Status: draft / bezpieczeństwo do potwierdzenia na hostingu.** Wersja pierwotna wymagała dostępu do `/architectmentor-radar-private` spoza vhosta, a LH.pl zwróciło `open_basedir restriction`. Ta wersja działa wewnątrz dozwolonego katalogu domeny, **bez zmiany ograniczeń PHP** i bez ingerencji w istniejący Cron, radar, WRYCUT ani stronę publiczną.
 
 ## Ważny kompromis bezpieczeństwa
