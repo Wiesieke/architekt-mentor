@@ -1,79 +1,77 @@
-# ArchitectMentor Desk na LH.pl — PHP + hasło + Authenticator (bez abonamentu)
+# ArchitectMentor Desk — LH.pl „open_basedir” edition (wariant awaryjny)
 
-**Status: PR testowy. Nic nie zostało wdrożone na LH.pl. Nie modyfikuj publicznego Astro, Crona ani innych baz.**
+**Status: draft / bezpieczeństwo do potwierdzenia na hostingu.** Wersja pierwotna wymagała dostępu do `/architectmentor-radar-private` spoza vhosta, a LH.pl zwróciło `open_basedir restriction`. Ta wersja działa wewnątrz dozwolonego katalogu domeny, **bez zmiany ograniczeń PHP** i bez ingerencji w istniejący Cron, radar, WRYCUT ani stronę publiczną.
 
-To jest nowy wariant panelu redakcyjnego bez Next.js, Vercel, Clerk i GitHub OAuth. Korzysta z istniejącego PHP 8.4, odizolowanej bazy `serwer428682_architectradar` i prywatnej biblioteki radaru. Wszystkie żądania przechodzą przez sesję PHP; nie ma publicznego API Bearer ani automatycznej publikacji.
+## Ważny kompromis bezpieczeństwa
 
-## Pliki i katalogi
+Ten wariant używa `architect-desk/.vault/` **fizycznie pod public_html**, ale wymaga dwóch niezależnych reguł Apache blokujących HTTP do tego podkatalogu. Nie jest to tak silna izolacja jak prywatny katalog poza WWW. Jeśli LH.pl umożliwi dostęp PHP do prywatnego katalogu poza WWW, **preferuj wersję pierwotną**.
 
-Na LH.pl przez FileZilla utwórz:
+**NIE kopiuj haseł ani konfiguracji do .vault, dopóki test HTTP nie zwróci 403.** Zabezpieczenia `.htaccess` mogą przestać działać po zmianie konfiguracji serwera; regularnie sprawdzaj blokadę. Nie przechowuj kopii `.bak`, `.txt` czy ZIP z hasłami w public_html. Wszystkie pliki konfiguracji PHP zachowują `<?php return [...];` (nie zwykły tekst).
 
-- **Katalog publiczny:** `/public_html/mentor-api.sensinte.com/architect-desk/`
-- **Istniejący katalog prywatny (poza WWW):** `/architectmentor-radar-private/`, zawierający `radar.php` i `config.private.php`.
+## Krok 1 — aktualizacja kodu PHP na LH.pl
 
-Do katalogu publicznego wgraj **tylko** siedem plików z `radar/lh/desk/`:
+Z gałęzi `feature/architectmentor-lh-php-desk-20261028`, katalog `radar/lh/desk`, prześlij przez FileZilla do:
+`/public_html/mentor-api.sensinte.com/architect-desk/`
 
-1. `.htaccess` (ważny plik z kropką — upewnij się, że FileZilla go widzi)
-2. `index.php`
-3. `api.php`
-4. `auth.php`
-5. `totp.php`
-6. `app.js`
-7. `app.css`
+- `.htaccess` (**nadpisz stary**)
+- `auth.php` (**nadpisz stary**)
+- `desk-db.php` (**nowy, nie zawiera sekretów**)
+- zachowaj bez zmian poprzednie `api.php`, `index.php`, `totp.php`, `app.js`, `app.css`.
 
-**Nie wgrywaj** `README.md`, `tests/`, migracji SQL, `radar.php` ani `config.private.php` do katalogu publicznego.
+Nie przesyłaj `README.md`, katalogu `tests/` ani migracji SQL.
 
-## Krok A — prywatna konfiguracja
+## Krok 2 — TEST BEZPIECZEŃSTWA: przed kopiowaniem sekretów
 
-W istniejącym **prywatnym** pliku `/architectmentor-radar-private/config.private.php` dodaj do zwracanej tablicy:
+W katalogu `architect-desk/` utwórz podkatalog `.vault/` i prześlij z repozytorium tylko dwa pliki:
 
-```php
-'AM_DESK_SETUP_TOKEN'=>'WPISZ_NOWY_LOSOWY_TAJNY_KLUCZ_MINIMUM_32_ZNAKI',
-'AM_DESK_WRITE_ENABLED'=>'0',
-```
+- `.vault/.htaccess` (blokada: `Require all denied`)
+- `.vault/deny-test.txt` (tekst **bez sekretów**).
 
-Klucz instalacyjny wygeneruj lokalnie, np. w menedżerze haseł (losowy, 40+ znaków). **Nie przesyłaj go do ChatGPT i nie publikuj w Git.** Nie używaj hasła do MySQL ani starych tokenów API w roli klucza instalacyjnego.
+Sprawdź z przeglądarki (także w karcie incognito):
 
-Skonfigurowany klucz powinien pozostać w prywatnym pliku: jest używany do klucza ochrony przed próbami łamania hasła. Zapis pozostaje `0`.
+`https://mentor-api.sensinte.com/architect-desk/.vault/deny-test.txt`
 
-## Krok B — migracja bazy danych
+**Wynik wymagany: HTTP 403 Forbidden.** Jeśli widzisz tekst testowy, jest 200, lub nietypowa odpowiedź — **STOP**. Nie wgrywaj żadnych sekretów, zgłoś blokadę. Odmowa 404 również wymaga wyjaśnienia; nie traktuj automatycznie jako potwierdzenia.
 
-Po kopii zapasowej otwórz phpMyAdmin dla dedykowanej bazy ArchitectMentor (sprawdź `SELECT DATABASE()` i nazwę bazy). Jednorazowo wykonaj `radar/db/002_architectmentor_editorial_audit.sql`.
+Gdy test przejdzie, sprawdź również przez domenę techniczną LH, jeśli jest skonfigurowana w sposób umożliwiający dotarcie do katalogu. Każda ścieżka HTTP do `.vault` musi być blokowana.
 
-Ta migracja dodaje `amr_decisions.revision` oraz `amr_decision_audit`. **Nie jest idempotentna**: nie uruchamiaj ponownie bez sprawdzenia kolumny. Nigdy nie wykonuj jej w bazie WRYCUT ani HLD.
+## Krok 3 — kopia konfiguracji dla samego panelu (po 403)
 
-## Krok C — utworzenie konta (raz)
+**Nie przenoś** oryginału `/architectmentor-radar-private/config.private.php`: jest niezbędny działającemu radarowi i pozostaje nietknięty.
 
-1. Otwórz `https://mentor-api.sensinte.com/architect-desk/index.php`.
-2. Na ekranie pierwszej konfiguracji podaj losowy klucz z kroku A, wybierz login i nowe hasło o długości minimum 14 znaków.
-3. Kliknij `Utwórz konto`. Serwer zapisze wyłącznie skrót hasła w `/architectmentor-radar-private/architect-desk-auth.json` (uprawnienia 0600) i wygeneruje TOTP.
-4. W darmowej aplikacji Authenticator na telefonie dodaj konto ręcznie, wpisując widoczny 32-znakowy klucz Base32; algorytm SHA-1, 6 cyfr, okres 30 s.
-5. Bezpiecznie zachowaj prywatny klucz TOTP **poza publicznym serwerem** w menedżerze haseł lub sejfie. Przy utracie telefonu umożliwi odzyskanie dostępu.
-6. Podaj ponownie klucz instalacyjny i sześciocyfrowy kod z aplikacji; zakończ konfigurację.
-7. Zaloguj się nowym loginem, hasłem i kodem. Nie wysyłaj żadnego z tych sekretów w rozmowie.
+Po wykonaniu backupu skopiuj przez FileZilla istniejący, prywatny plik `config.private.php` (ten zawierający wpisy `AM_DESK_SETUP_TOKEN` i `AM_DESK_WRITE_ENABLED=>'0'`) do:
 
-Po zakończeniu instalacji formularz ponownej rejestracji jest zamknięty. Próby logowania są ograniczane: 8 błędów w 30 min blokuje kolejne. Sesja wygasa po 30 minutach bezczynności i maksymalnie po 8 godzinach. `SameSite=Strict`, `HttpOnly`, `Secure` cookies i losowe tokeny CSRF zabezpieczają żądania.
+`/public_html/mentor-api.sensinte.com/architect-desk/.vault/config.private.php`
 
-## Krok D — testy przed uruchomieniem zapisu
+Nigdy do samego `architect-desk/`. Ustaw uprawnienia 0600, o ile PHP na LH potrafi taki plik odczytać; w razie odmowy odczytu nie rozszerzaj uprawnień na publiczne, najpierw diagnozuj. Nie publikuj pliku ani zrzutów z zawartością.
 
-- Adres musi działać wyłącznie przez HTTPS. Strony `auth.php` i `totp.php` mają zwracać 403.
-- Niezalogowane wywołanie `api.php?action=items` ma zwracać 401.
-- Po zalogowaniu widać rekordy z **tylko** bazy ArchitectMentor, listę źródeł i kolejkę.
-- Bez względu na uprawnienia i gotowość migracji, przy `AM_DESK_WRITE_ENABLED=0` nie można zapisać decyzji (503).
-- Przywróć ustawienie `AM_DESK_WRITE_ENABLED=0` przed każdym testem podejrzanym.
-- Po formalnym odbiorze i kopii zapasowej możesz osobno zezwolić na zapis, ustawiając **obydwa** prywatne przełączniki: `AM_DESK_WRITE_ENABLED=1` i `AM_RADAR_EDITOR_WRITE_ENABLED=1`.
-- Po włączeniu zapisu: test jednej ręcznej decyzji, wzrostu `revision`, wiersza w `amr_decision_audit`, konfliktu 409 przy starszej rewizji; bez publikacji.
-- Żadna modyfikacja Crona i źródeł nie jest potrzebna.
+`auth.php` zapisuje w `.vault/` również `architect-desk-auth.json` (skrót hasła + klucz TOTP) oraz `architect-desk-attempts.json`. Te pliki muszą podlegać tej samej blokadzie HTTP.
 
-## Bezpieczeństwo i ograniczenia
+## Krok 4 — migracja wyłącznie bazy ArchitectMentor
 
-- Jedno konto administratora; brak rejestracji publicznej, resetu hasła e-mailem, samodzielnego zakładania użytkowników i zewnętrznych usług.
-- Hasło jest hashowane przez PHP `password_hash` (Argon2id jeśli serwer obsługuje); TOTP według RFC 6238, bez zewnętrznego serwisu QR.
-- Prywatny katalog musi pozostać **poza** katalogiem WWW. PHP w panelu odmawia użycia prywatnego katalogu umieszczonego wewnątrz webroota.
-- Wszystkie operacje edytorskie są wykonywane na serwerze i rejestrowane w tabeli audytowej; ich autor pochodzi z sesji.
-- `auth.json` i `architect-desk-attempts.json` powstają na serwerze w katalogu prywatnym; nie przesyłaj ich nikomu.
-- Wersja Next.js pozostaje w oddzielnym **starym draftowym PR**; ten PHP Desk nie wymaga jej wdrażania.
+Po backupie w phpMyAdmin:
+1. Sprawdź `SELECT DATABASE();` i upewnij się, że to **serwer428682_architectradar**, nie WRYCUT.
+2. Sprawdź `SHOW COLUMNS FROM amr_decisions LIKE 'revision';` i `SHOW TABLES LIKE 'amr_decision_audit';`.
+3. Jeśli obie zmiany jeszcze nie istnieją, wykonaj **raz** `radar/db/002_architectmentor_editorial_audit.sql`. Migracja nie jest idempotentna.
 
-## Testy automatyczne
+## Krok 5 — logowanie
 
-GitHub Actions sprawdza `php -l` dla wszystkich plików PHP, standardowy wektor RFC 6238 i `node --check` dla JS. To **nie zastępuje** testu logowania i izolacji bazy na LH.pl po ręcznej instalacji.
+Otwórz `https://mentor-api.sensinte.com/architect-desk/`; przy pierwszym wejściu użyj klucza instalacyjnego z **kopii** konfiguracji, nowego loginu, silnego hasła i skonfiguruj TOTP w Authenticatorze. Nie wysyłaj sekretów ani kodów w czacie.
+
+Sprawdź:
+- `/.vault/deny-test.txt` — 403.
+- `/.vault/config.private.php` — 403.
+- `/auth.php`, `/totp.php`, `/desk-db.php` — 403.
+- `/api.php?action=items` bez sesji — 401.
+- Panel po zalogowaniu czyta tylko bazę ArchitectMentor.
+- Zapis pozostaje niedostępny przy `AM_DESK_WRITE_ENABLED=0`; dwa przełączniki nie mogą być samoczynnie aktywowane.
+
+Jeśli jakakolwiek reguła 403 przestaje działać, nie używaj panelu; usuń **kopię konfiguracji z .vault** z zachowaniem bezpiecznego backupu i skontaktuj się ze wsparciem LH.pl.
+
+## Ograniczenia
+
+- Izolacja opiera się na Apache `.htaccess`, a nie na fizycznej lokalizacji poza dokument root.
+- Żaden sekret nie trafia do repozytorium. `.vault/config.private.php` powstaje tylko na serwerze przez użytkownika.
+- Brak automatycznej publikacji, brak dodatkowego Crona.
+- PHP 8.0+, hasło `password_hash`, TOTP 6 cyfr, sesja Secure/HttpOnly/SameSite Strict, CSRF, 8 nieudanych prób w 30 min.
+- Testy GitHub nie potrafią potwierdzić skuteczności `.htaccess` na LH.pl; sprawdzian 403 jest obowiązkowym etapem ręcznym.
