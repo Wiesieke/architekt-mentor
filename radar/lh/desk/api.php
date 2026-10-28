@@ -13,7 +13,8 @@ if($method==='GET'&&$action==='items'){
    i.first_seen_at_utc,i.topic,i.fact_check_status,
    COALESCE(d.decision,'UNREVIEWED') AS decision,
    COALESCE(d.intended_edition,'none') AS intended_edition,
-   COALESCE(d.note,'') AS note,COALESCE(d.revision,0) AS revision,d.decided_at_utc
+   COALESCE(d.note,'') AS note,COALESCE(d.revision,0) AS revision,
+   COALESCE(d.priority,0) AS priority,COALESCE(d.impact_score,0) AS impact_score,d.decided_at_utc
    FROM amr_items i LEFT JOIN amr_decisions d ON d.item_id=i.item_id
    ORDER BY i.first_seen_at_utc DESC LIMIT 100";
   $items=$db->query($sql)->fetchAll();
@@ -21,6 +22,7 @@ if($method==='GET'&&$action==='items'){
   $metrics=$db->query("SELECT
     (SELECT COUNT(*) FROM amr_items) AS total_items,
     (SELECT COUNT(*) FROM amr_decisions WHERE decision='SELECTED') AS selected,
+    (SELECT COUNT(*) FROM amr_decisions WHERE priority=3) AS high_priority,
     (SELECT MAX(completed_at_utc) FROM amr_cycles WHERE outcome='success') AS last_success_utc")->fetch();
   amd_reply(200,['ok'=>true,'items'=>$items,'sources'=>$sources,'metrics'=>$metrics,'generated_at_utc'=>gmdate('c'),
    'write_enabled'=>amr_env('AM_DESK_WRITE_ENABLED')==='1'&&amr_env('AM_RADAR_EDITOR_WRITE_ENABLED')==='1']);
@@ -51,7 +53,7 @@ try{$input=json_decode($raw,true,12,JSON_THROW_ON_ERROR);}
 catch(Throwable $e){amd_reply(400,['ok'=>false,'code'=>'invalid_json']);}
 if(!is_array($input)||array_is_list($input))amd_reply(400,['ok'=>false,'code'=>'invalid_payload']);
 foreach(array_keys($input) as $key){
- if(!in_array($key,['item_id','revision','decision','intended_edition','note'],true))
+ if(!in_array($key,['item_id','revision','decision','intended_edition','note','priority','impact_score'],true))
   amd_reply(400,['ok'=>false,'code'=>'unknown_field']);
 }
 $id=$input['item_id']??null;$rev=$input['revision']??null;
@@ -63,6 +65,10 @@ if(!is_string($decision)||!in_array($decision,['UNREVIEWED','SELECTED','HOLD','R
 if(!is_string($edition)||!in_array($edition,['none','daily','weekly'],true))
  amd_reply(422,['ok'=>false,'code'=>'invalid_edition']);
 if(!is_string($note)||mb_strlen($note)>2000)amd_reply(422,['ok'=>false,'code'=>'invalid_note']);
+if(array_key_exists('priority',$input)&&(!is_int($input['priority'])||$input['priority']<0||$input['priority']>3))
+ amd_reply(422,['ok'=>false,'code'=>'invalid_priority']);
+if(array_key_exists('impact_score',$input)&&(!is_int($input['impact_score'])||$input['impact_score']<0||$input['impact_score']>5))
+ amd_reply(422,['ok'=>false,'code'=>'invalid_impact_score']);
 $note=trim($note);
 $label=mb_substr('lh:'.(string)($_SESSION['username']??'operator'),0,100);
 $now=gmdate('Y-m-d H:i:s');
@@ -71,20 +77,23 @@ try{
  $item=$db->prepare('SELECT item_id FROM amr_items WHERE item_id=? FOR UPDATE');
  $item->execute([$id]);
  if(!$item->fetch()){$db->rollBack();amd_reply(404,['ok'=>false,'code'=>'item_not_found']);}
- $current=$db->prepare('SELECT revision FROM amr_decisions WHERE item_id=? FOR UPDATE');
+ $current=$db->prepare('SELECT revision,priority,impact_score FROM amr_decisions WHERE item_id=? FOR UPDATE');
  $current->execute([$id]);$old=$current->fetch();$present=$old?(int)$old['revision']:0;
  if($present!==$rev){$db->rollBack();amd_reply(409,['ok'=>false,'code'=>'revision_conflict','current_revision'=>$present]);}
  $next=$present+1;
+ $priority=array_key_exists('priority',$input)?$input['priority']:(int)($old['priority']??0);
+ $impactScore=array_key_exists('impact_score',$input)?$input['impact_score']:(int)($old['impact_score']??0);
  $save=$db->prepare('INSERT INTO amr_decisions
-   (item_id,decision,intended_edition,reviewer_label,note,decided_at_utc,revision)
-   VALUES (?,?,?,?,?,?,?)
+   (item_id,decision,intended_edition,reviewer_label,note,decided_at_utc,revision,priority,impact_score)
+   VALUES (?,?,?,?,?,?,?,?,?)
    ON DUPLICATE KEY UPDATE decision=VALUES(decision),intended_edition=VALUES(intended_edition),
-   reviewer_label=VALUES(reviewer_label),note=VALUES(note),decided_at_utc=VALUES(decided_at_utc),revision=VALUES(revision)');
- $save->execute([$id,$decision,$edition,$label,$note,$now,$next]);
+   reviewer_label=VALUES(reviewer_label),note=VALUES(note),decided_at_utc=VALUES(decided_at_utc),revision=VALUES(revision),
+   priority=VALUES(priority),impact_score=VALUES(impact_score)');
+ $save->execute([$id,$decision,$edition,$label,$note,$now,$next,$priority,$impactScore]);
  $audit=$db->prepare('INSERT INTO amr_decision_audit
    (item_id,revision,saved_at_utc,editor_label,snapshot_json) VALUES (?,?,?,?,?)');
  $audit->execute([$id,$next,$now,$label,json_encode(
-  ['decision'=>$decision,'intended_edition'=>$edition,'note'=>$note],
+  ['decision'=>$decision,'intended_edition'=>$edition,'priority'=>$priority,'impact_score'=>$impactScore,'note'=>$note],
   JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)]);
  $db->commit();
  amd_reply(200,['ok'=>true,'code'=>'saved','item_id'=>$id,'revision'=>$next,'saved_at_utc'=>$now]);
