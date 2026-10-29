@@ -18,6 +18,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
+      - name: Require dedicated publishing credential before claiming a job
+        env:
+          GH_TOKEN: ${{ secrets.AM_RELEASE_GITHUB_TOKEN }}
+          WORKER_TOKEN: ${{ secrets.AM_RELEASE_WORKER_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ] || [ -z "$WORKER_TOKEN" ]; then
+            echo '::error::Dedicated GitHub and Desk worker secrets must be configured before enabling releases.'
+            exit 1
+          fi
       - name: Check out reviewed production workflow
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
