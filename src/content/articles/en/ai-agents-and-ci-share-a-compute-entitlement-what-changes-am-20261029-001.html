@@ -1,0 +1,33 @@
+<h2>What changed — and what remains a vendor statement?</h2>
+<p>On 28 October 2026, GitHub announced a shared, dollar-based compute entitlement for standard GitHub Actions runners, Copilot cloud sandboxes and, on eligible plans, larger hosted runners. GitHub says billing for cloud sandboxes begins in November 2026. The connected Copilot cloud experience requires a paid Copilot plan. These are vendor announcements, not results of our independent performance or billing tests.</p>
+<p>GitHub&#39;s billing documentation adds an important architectural detail: eligible workloads draw from the same included compute value, and no usage type takes priority. Standard runners in public repositories retain separate free-usage treatment.</p>
+<h2>Why this matters to architects</h2>
+<p>Teams have often budgeted CI/CD separately from exploratory AI workloads. A shared entitlement creates a new dependency: agent work can consume an allowance also used by build and test automation. That does <strong>not</strong> prove a pipeline will stop. The outcome depends on the plan, budget settings, and payment configuration. But it does mean shared resource exhaustion belongs in the operational architecture.</p>
+<h2>Pattern: an agent execution contract</h2>
+<p>Define an execution contract for every agent workload: accountable owner, repository and data scope, permitted runtime, time and spending limits, stopping policy, usage telemetry, and the response to exhausted budget. Treat this as an architecture decision, not a cosmetic tool preference.</p>
+<p>A practical control set:</p>
+<ol>
+<li><strong>Separate workload classes.</strong> Distinguish release-critical builds and tests from exploratory agents, with clear owners and workload profiles.</li>
+<li><strong>Enforce budgets.</strong> Verify whether an account configuration actually blocks unplanned spend. An alert alone may not halt a process.</li>
+<li><strong>Limit authority.</strong> A cloud sandbox is not permission to give an agent broad repository, secret, or deployment access.</li>
+<li><strong>Observe the coupling.</strong> Record sessions, duration, resource consumption, and stop outcomes; compare them with CI reliability.</li>
+<li><strong>Rehearse allowance exhaustion.</strong> Test what happens to pipelines, agent sessions, and human recovery when limits are reached.</li>
+</ol>
+<h2>Anti-pattern: “it is included, so it is effectively unlimited”</h2>
+<p>An included entitlement is finite. Once depleted, usage may be blocked or billed according to the account&#39;s configuration. The organizational failure mode is unclear ownership: no one can explain which workload should yield, who may stop it, or who accepts the consequences.</p>
+<h2>Questions for the architecture decision</h2>
+<ul>
+<li>Do we know the shared allowance, reset period, and eligible services?</li>
+<li>Will essential CI continue to function after that allowance is exhausted?</li>
+<li>Who can start or stop a long-running agent session?</li>
+<li>How do we separate spending responsibility from the agent&#39;s execution privileges and the release pipeline&#39;s authority?</li>
+</ul>
+<p><strong>Architectural takeaway:</strong> the vendor is connecting not only agent interfaces but also the economics of execution. In enterprise architecture, runtime governance and budget governance need a common design.</p>
+<h3>Primary sources</h3>
+<ul>
+<li>GitHub Changelog, 28 October 2026 — <em>Work from anywhere with a new, connected Copilot cloud experience</em>: <a href="https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/" rel="noopener noreferrer">https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/</a></li>
+<li>GitHub Docs — <em>Billing for cloud and local sandboxes for GitHub Copilot</em>: <a href="https://docs.github.com/en/billing/concepts/product-billing/cloud-and-local-sandboxes" rel="noopener noreferrer">https://docs.github.com/en/billing/concepts/product-billing/cloud-and-local-sandboxes</a></li>
+</ul>
+<p>Information checked on 29 October 2026. Recheck plan-specific terms and budget settings before publication.</p>
+
+<div class="source"><strong>Primary source:</strong> <a href="https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/" rel="noopener noreferrer">https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/</a>. ArchitectMentor analysis.</div>

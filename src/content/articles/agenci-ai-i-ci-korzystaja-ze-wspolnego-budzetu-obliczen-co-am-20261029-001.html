@@ -1,0 +1,33 @@
+<h2>Co się zmienia — a co jest tylko deklaracją producenta?</h2>
+<p>W komunikacie z 28 października 2026 r. GitHub przedstawił wspólną, wartościową pulę uprawnień do użycia zasobów obliczeniowych: dla standardowych runnerów GitHub Actions, chmurowych sandboxów Copilot i — w wybranych planach — większych runnerów. Według GitHuba rozliczanie sandboxów chmurowych ma rozpocząć się w listopadzie 2026 r. Dostęp do nowych sesji Copilot w chmurze dotyczy płatnych planów Copilot. Są to informacje dostawcy, a nie wyniki naszego niezależnego pomiaru.</p>
+<p>Dokumentacja rozliczeń GitHub dodaje szczegół architektonicznie istotny: różne typy użycia mogą pobierać środki z tej samej puli, ale żaden nie ma automatycznego pierwszeństwa. Publiczne repozytoria korzystające ze standardowych runnerów zachowują odrębne zasady bezpłatnego użycia.</p>
+<h2>Dlaczego architekt powinien się tym zainteresować?</h2>
+<p>Dotąd zespoły często rozdzielały koszty CI/CD od kosztów eksperymentów AI. Wspólna pula oznacza współzależność: uruchomiony agent może zużywać limit przeznaczony w planie na automatyzację budowania. Nie znaczy to automatycznie, że pipeline zostanie przerwany — skutki zależą od planu, budżetów i ustawień płatności. Znaczy natomiast, że <strong>wspólne ograniczenie zasobów</strong> musi znaleźć się w modelu operacyjnym.</p>
+<h2>Wzorzec: kontrakt uruchomienia agenta</h2>
+<p>Dla każdego zadania agentowego określmy: właściciela, repozytorium lub zakres danych, dopuszczalne środowisko, limit czasu i środków, politykę zatrzymania, sposób śledzenia zużycia oraz procedurę, gdy budżet się wyczerpie. Nie traktujmy tego jako drobnej konfiguracji narzędzia. To część architektury uruchamiania zmian.</p>
+<p>Praktyczna kontrola może wyglądać tak:</p>
+<ol>
+<li><strong>Oddziel klasy pracy.</strong> Wydziel krytyczne buildy i testy od eksperymentów, oznaczając właścicieli i profile obciążeń.</li>
+<li><strong>Zdefiniuj budżety.</strong> Weryfikuj, czy ustawienia konta naprawdę blokują nieplanowany koszt; nie zakładaj, że samo powiadomienie zatrzyma proces.</li>
+<li><strong>Ogranicz uprawnienia.</strong> Agent nie powinien otrzymywać szerszego dostępu do repozytoriów, sekretów i systemów wdrożeniowych tylko dlatego, że uruchamia się w sandboxie.</li>
+<li><strong>Obserwuj zależności.</strong> Rejestruj zadania, czasy sesji, zużycie zasobów i skutki zatrzymania. Zestawiaj je ze skutecznością CI.</li>
+<li><strong>Testuj wyczerpanie limitu.</strong> Sprawdź reakcję pipeline&#39;ów, agentów oraz procesu ręcznego wznowienia pracy.</li>
+</ol>
+<h2>Antywzorzec: „mamy limit w pakiecie, więc agent może pracować bez końca”</h2>
+<p>Wliczony zasób nie jest zasobem nieskończonym. Po wykorzystaniu puli dalsze korzystanie może zostać zablokowane albo rozliczane zgodnie z konfiguracją konta. Krytyczny problem powstaje wtedy, gdy nikt nie jest właścicielem budżetu i nikt nie potrafi wskazać, które zadanie powinno ustąpić.</p>
+<h2>Pytania do decyzji architektonicznej</h2>
+<ul>
+<li>Czy znamy wspólny limit, jego okres odnowienia i zakres rozliczanych usług?</li>
+<li>Czy krytyczne CI nadal zadziała po wyczerpaniu puli?</li>
+<li>Kto może uruchomić długą sesję agenta, a kto może ją zatrzymać?</li>
+<li>Jak oddzielamy budżet, odpowiedzialność i uprawnienia agenta od uprawnień pipeline&#39;u wydawniczego?</li>
+</ul>
+<p><strong>Wniosek:</strong> dostawca łączy nie tylko interfejsy pracy agentów, lecz także ekonomię ich uruchamiania. W architekturze korporacyjnej kontrola wykonywania zadań i kontrola budżetu powinny być projektowane razem.</p>
+<h3>Źródła</h3>
+<ul>
+<li>GitHub Changelog, 28.10.2026 — <em>Work from anywhere with a new, connected Copilot cloud experience</em>: <a href="https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/" rel="noopener noreferrer">https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/</a></li>
+<li>GitHub Docs — <em>Billing for cloud and local sandboxes for GitHub Copilot</em>: <a href="https://docs.github.com/en/billing/concepts/product-billing/cloud-and-local-sandboxes" rel="noopener noreferrer">https://docs.github.com/en/billing/concepts/product-billing/cloud-and-local-sandboxes</a></li>
+</ul>
+<p>Stan informacji: 29.10.2026. Przed publikacją należy sprawdzić aktualne warunki konkretnego planu i ustawienia budżetów.</p>
+
+<div class="source"><strong>Źródło pierwotne:</strong> <a href="https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/" rel="noopener noreferrer">https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/</a>. Analiza ArchitectMentor.</div>
