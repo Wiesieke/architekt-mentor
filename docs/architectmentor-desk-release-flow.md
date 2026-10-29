@@ -22,8 +22,9 @@ and Weekly follow their own independent editorial process and are out of scope.
    checksum for accidental-change detection, not an authentication signature.
 5. The publisher separately issues a release instruction for that revision.
    A Desk approval alone is **not** permission to deploy.
-6. ChatGPT creates a draft PR with the original PL/EN article, sections and
-   metadata, sources, preview links, testing evidence and release identity.
+6. The reviewed GitHub Actions publisher retrieves the exact authorized Desk
+   snapshot and generates a PR with the original PL/EN article, sections,
+   metadata, sources and release identity. No JSON handoff through ChatGPT.
 7. CI checks build, links, PL/EN routes, sources, rights checklist, RSS and
    sitemap. Verify a working Vercel Preview for the exact PR revision.
 8. After the independent release instruction and green checks, authorize the
@@ -42,13 +43,16 @@ and Weekly follow their own independent editorial process and are out of scope.
 - The publication repo's `main` should have enforceable branch protection;
   verify actual GitHub plan rules rather than assuming a policy file enforces it.
 - No release on a scheduled timer or merely because a CI build is green.
-- In the current low-cost PoC, handoff from Desk to ChatGPT is a manual JSON
-  download/attachment. There is **no** paid OpenAI API background worker.
+- In the one-click PoC, Desk stores an immutable release snapshot and a
+  separate GitHub Actions worker consumes it using scoped credentials. The
+  publisher does **not** require manually downloading or attaching JSON and
+  uses **no** paid OpenAI API background worker.
 - No WordPress integration; the publication site is Astro/Vercel.
 
 ## Current implementation boundary
 
-The private Desk exporter has been prepared but not yet tested on a real
-approved non-test revision. This document and the authorization JSON are a
-policy proposal, not evidence that all CI/branch enforcement or a publish
-automation has been deployed. No production release is authorized by this PR.
+The private Desk export has been tested on a real approved non-test revision.
+The one-click release queue and GitHub publisher have passed repository CI,
+but end-to-end publishing has not yet been verified. This policy proposal does
+not itself authorize publishing any article. Enable flags only after verifying
+CI, branch protection, callbacks, Preview, and production deployment.
