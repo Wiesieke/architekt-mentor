@@ -27,6 +27,8 @@ jobs:
         run: npm run build
       - name: Run comment tests
         run: npm run test:comments
+      - name: Test Desk release input validation and HTML safety
+        run: node --test tests/am-release-lib.test.mjs
 
 # Passing build checks alone do NOT authorize merge or publication.
 # Under the 25 Oct 2026 delegation, an exact-SHA editorial, language, legal,
