@@ -1,0 +1,54 @@
+name: ArchitectMentor Desk one-click publication (off by default)
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: architectmentor-desk-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish-approved:
+    if: github.repository == 'Wiesieke/architekt-mentor' && github.ref == 'refs/heads/main' && vars.AM_RELEASE_ENABLED == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out reviewed production workflow
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          token: ${{ secrets.AM_RELEASE_GITHUB_TOKEN }}
+          persist-credentials: true
+      - name: Set up Node 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Claim one explicitly ordered Desk release
+        id: claim
+        env:
+          AM_RELEASE_ENABLED: ${{ vars.AM_RELEASE_ENABLED }}
+          AM_RELEASE_WORKER_TOKEN: ${{ secrets.AM_RELEASE_WORKER_TOKEN }}
+        run: node scripts/am-release-transport.mjs --claim
+      - name: Install locked dependencies only when a release exists
+        if: steps.claim.outputs.has_job == 'true'
+        run: npm ci
+      - name: Generate, validate, open PR and publish after gates
+        if: steps.claim.outputs.has_job == 'true'
+        env:
+          AM_RELEASE_ENABLED: ${{ vars.AM_RELEASE_ENABLED }}
+          AM_RELEASE_AUTO_MERGE: ${{ vars.AM_RELEASE_AUTO_MERGE }}
+          AM_RELEASE_WORKER_TOKEN: ${{ secrets.AM_RELEASE_WORKER_TOKEN }}
+          GH_TOKEN: ${{ secrets.AM_RELEASE_GITHUB_TOKEN }}
+          PUBLIC_SITE_INDEXABLE: 'true'
+        run: node scripts/am-desk-publisher.mjs
+
+# Secrets and flags are intentionally NOT set in code.
+# AM_RELEASE_ENABLED must remain '0' until LH.pl queue and callbacks pass a dry run.
+# AM_RELEASE_AUTO_MERGE must remain '0' until PR checks, branch rules,
+# bilingual preview and production verification have been tested.
+# No pull_request trigger: secrets never run for untrusted PR code.
