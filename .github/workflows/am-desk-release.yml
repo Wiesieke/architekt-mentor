@@ -41,6 +41,7 @@ jobs:
         id: claim
         env:
           AM_RELEASE_ENABLED: ${{ vars.AM_RELEASE_ENABLED }}
+          AM_RELEASE_AUTO_MERGE: ${{ vars.AM_RELEASE_AUTO_MERGE }}
           AM_RELEASE_WORKER_TOKEN: ${{ secrets.AM_RELEASE_WORKER_TOKEN }}
         run: node scripts/am-release-transport.mjs --claim
       - name: Install locked dependencies only when a release exists
