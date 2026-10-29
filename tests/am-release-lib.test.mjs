@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import { parseApprovedJob, safeMarkdown, escapeHtml } from '../scripts/am-release-lib.mjs';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { parseApprovedJob, safeMarkdown, escapeHtml, makeReleaseFiles, writeReleaseFiles } from '../scripts/am-release-lib.mjs';
 
 function goodJob() {
   const bodyPl = '## Architektura\n' + 'Rozważmy granice odpowiedzialności i weryfikację dowodów. '.repeat(5);
@@ -57,4 +60,30 @@ test('rejects unsupported section even with a correctly recomputed hash',()=>{
  const handoff_json=JSON.stringify(h);
  const changed={...job,handoff_json,content_sha256:crypto.createHash('sha256').update(handoff_json).digest('hex')};
  assert.throws(()=>parseApprovedJob(changed));
+});
+
+test('generates two linked language editions from real catalogue layouts without touching the checkout',()=>{
+ const parsed=parseApprovedJob(goodJob());
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'am-release-catalog-'));
+ try {
+  const dataDir=path.join(temp,'src/data');
+  fs.mkdirSync(dataDir,{recursive:true});
+  fs.mkdirSync(path.join(temp,'src/content/articles/en'),{recursive:true});
+  for(const name of ['articles.ts','articles-en.ts'])
+   fs.copyFileSync(path.join(process.cwd(),'src/data',name),path.join(dataDir,name));
+  const files=makeReleaseFiles(temp,parsed,'2026-10-29');
+  assert.equal(files.length,4);
+  writeReleaseFiles(files);
+  const plIndex=fs.readFileSync(path.join(dataDir,'articles.ts'),'utf8');
+  const enIndex=fs.readFileSync(path.join(dataDir,'articles-en.ts'),'utf8');
+  assert(plIndex.includes('slug:"'+parsed.slugPl+'"'));
+  assert(enIndex.includes('slug:"'+parsed.slugEn+'"'));
+  assert(enIndex.includes('plSlug:"'+parsed.slugPl+'"'));
+  assert(plIndex.includes("published:\"2026-10-29\""));
+  assert(fs.readFileSync(path.join(temp,'src/content/articles',parsed.slugPl+'.html'),'utf8').includes('Źródło pierwotne'));
+  assert(fs.readFileSync(path.join(temp,'src/content/articles/en',parsed.slugEn+'.html'),'utf8').includes('Primary source'));
+  assert.throws(()=>makeReleaseFiles(temp,parsed,'2026-10-29'),'Duplicate article must fail closed');
+ } finally {
+  fs.rmSync(temp,{recursive:true,force:true});
+ }
 });
