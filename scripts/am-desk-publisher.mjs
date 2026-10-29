@@ -43,10 +43,10 @@ async function waitChecks(number) {
     const checks=Array.isArray(pr.statusCheckRollup)?pr.statusCheckRollup:[];
     const status=name=>checks.find(c=>c.name===name||c.context===name);
     const found=required.map(status);
-    const failed=found.some(c=>c&&['FAILURE','CANCELLED','TIMED_OUT','ACTION_REQUIRED'].includes(
+    const failed=found.some(c=>c&&['FAILURE','CANCELLED','TIMED_OUT','ACTION_REQUIRED','NEUTRAL','SKIPPED'].includes(
       String(c.conclusion??c.state??'').toUpperCase()));
     if(failed)throw new Error('Mandatory PR quality or Vercel Preview check failed');
-    const passed=found.every(c=>c&&['SUCCESS','NEUTRAL','SKIPPED'].includes(
+    const passed=found.every(c=>c&&['SUCCESS'].includes(
       String(c.conclusion??c.state??'').toUpperCase()));
     if(passed){
       if(pr.state!=='OPEN'||pr.baseRefName!=='main')throw new Error('Release PR target changed');
@@ -133,9 +133,9 @@ async function main() {
   assert(typeof process.env.GH_TOKEN==='string'&&process.env.GH_TOKEN.length>20,
     'Scoped GitHub publishing token missing');
   const job=JSON.parse(fs.readFileSync(jobFile(),'utf8'));
-  let pr=null,stage='validate';
+  let pr=null,parsed=null,publishedSha=null,stage='validate';
   try {
-    const parsed=parseApprovedJob(job);
+    parsed=parseApprovedJob(job);
     const auto=process.env.AM_RELEASE_AUTO_MERGE==='1';
     stage='existing_pr_lookup';
     pr=findExistingPR(parsed.branch);
@@ -156,6 +156,7 @@ async function main() {
       const v=prView(pr.number);
       const sha=v.mergeCommit?.oid;
       assert(/^[a-f0-9]{40}$/.test(sha??''),'Merged commit SHA unavailable');
+      publishedSha=sha;
       await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
         status:'PUBLISHED',pr_url:pr.url,published_sha:sha,
         published_url_pl:parsed.urls.pl,published_url_en:parsed.urls.en});
@@ -180,6 +181,7 @@ async function main() {
     assert(merged.state==='MERGED','PR not merged');
     const sha=merged.mergeCommit?.oid;
     assert(/^[a-f0-9]{40}$/.test(sha??''),'Merge commit SHA missing');
+    publishedSha=sha;
     stage='verify_production';
     await waitProduction(parsed);
     stage='report_published';
@@ -191,8 +193,28 @@ async function main() {
     const errorCode=stage.replace(/[^a-z0-9_]/g,'_').slice(0,100)+'_failed';
     console.error('ArchitectMentor release stopped at stage: '+stage);
     try{
-      await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
-        status:pr?'PR_READY':'FAILED',pr_url:pr?.url??'',error_code:errorCode});
+      // A merged PR is irreversible. Preserve this fact and retry deployment verification.
+      // Never report PR_READY or FAILED as if the production merge had not happened.
+      let merged=false;
+      if(pr){
+        try{
+          const latest=prView(pr.number);
+          merged=latest.state==='MERGED';
+          if(merged)publishedSha=latest.mergeCommit?.oid??publishedSha;
+        }catch{console.error('Cannot check PR state; Desk lease will recover.');throw error;}
+      }
+      if(merged){
+        assert(parsed&&/^[a-f0-9]{40}$/.test(publishedSha??''),
+          'Merged release evidence is incomplete');
+        await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
+          status:'VERIFY_PENDING',pr_url:pr.url,published_sha:publishedSha,
+          published_url_pl:parsed.urls.pl,published_url_en:parsed.urls.en,
+          error_code:'production_verification_pending'});
+        console.error('Merge complete; production verification queued for retry.');
+      }else{
+        await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
+          status:pr?'BLOCKED':'FAILED',pr_url:pr?.url??'',error_code:errorCode});
+      }
     }catch{console.error('Desk callback unavailable; leased job will be recovered.');}
     throw error;
   }
