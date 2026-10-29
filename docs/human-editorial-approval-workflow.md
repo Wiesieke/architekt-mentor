@@ -1,5 +1,7 @@
 # Editorial workflow — human-approved publishing (17 October 2026)
 
+> **Historical procedure.** This earlier per-SHA review document is retained for audit history. The current ArchitectMentor event-driven Desk approval and separate release flow is defined in [architectmentor-desk-release-flow.md](architectmentor-desk-release-flow.md) (29 October 2026). Do not interpret this historical text as permission for unattended Daily or Weekly publication.
+
 ## Roles and evidence
 
 ChatGPT: prepares complete PL/EN drafts, source notes, branch and draft PR; runs checks; never records human approval.
