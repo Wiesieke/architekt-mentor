@@ -38,7 +38,9 @@ async function claim() {
     console.log('ArchitectMentor release worker is disabled.');
     return;
   }
-  const result = await workerPost('claim', {});
+  const result = await workerPost('claim', {
+    allow_pr_ready: process.env.AM_RELEASE_AUTO_MERGE === '1'
+  });
   const job = result.job;
   if (!job) {
     console.log('No pending release; no build required.');
