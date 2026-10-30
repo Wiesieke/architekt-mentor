@@ -229,9 +229,9 @@ export function makeReleaseFiles(root, parsed, date) {
     files.push(...makeExerciseReleaseFiles(root, parsed, date));
     const id = parsed.exercise.id;
     files.find(f=>f.path===plHtmlPath).content +=
-      '<p><a href="/lamiglowki/' + id + '/">Przećwicz decyzję: szybki wybór lub mentor →</a></p>\\n';
+      '<p><a href="/lamiglowki/' + id + '/">Przećwicz decyzję: szybki wybór lub mentor →</a></p>\n';
     files.find(f=>f.path===enHtmlPath).content +=
-      '<p><a href="/en/practice/' + id + '/">Practice this decision: quick choice or mentor →</a></p>\\n';
+      '<p><a href="/en/practice/' + id + '/">Practice this decision: quick choice or mentor →</a></p>\n';
   }
   return files;
 }
