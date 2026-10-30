@@ -225,7 +225,7 @@ test('an exercise requires approved matching PL/EN options and three mentor crit
    content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});};
  assert.throws(parse,/requires PL\/EN quick decision/);
  const starter=JSON.parse(fs.readFileSync('data/starter-exercises.json','utf8'))[0];
- h.exercise={id:'2026-11-01-odpowiedzialnosc-test',pl:starter.pl,en:structuredClone(starter.en)};
+ h.exercise={id:'2026-11-01-odpowiedzialnosc-test',pl:structuredClone(starter.pl),en:structuredClone(starter.en)};
  assert.ok(parse().exercise);
  h.exercise.en.quick.correctId='a';
  assert.throws(parse,/best-choice IDs differ/);
