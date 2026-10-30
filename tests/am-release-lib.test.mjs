@@ -87,3 +87,36 @@ test('generates two linked language editions from real catalogue layouts without
   fs.rmSync(temp,{recursive:true,force:true});
  }
 });
+
+test('labels approved fictional practice scenarios as synthetic and cites patterns, not event evidence',()=>{
+ const original=goodJob();
+ const h=JSON.parse(original.handoff_json);
+ h.candidate_id='AM-PR-1-R1';
+ h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',
+  fictional_scenario:true,series:'Z praktyki architekta'};
+ h.source.url='https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/';
+ const handoff_json=JSON.stringify(h);
+ const parsed=parseApprovedJob({...original,handoff_json,
+  content_sha256:crypto.createHash('sha256').update(handoff_json).digest('hex')});
+ assert.equal(parsed.sections[0],'podstawy-architektury');
+ assert.equal(parsed.sections[1],'foundations');
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'am-release-fiction-'));
+ try {
+  const dataDir=path.join(temp,'src/data');
+  fs.mkdirSync(dataDir,{recursive:true});
+  fs.mkdirSync(path.join(temp,'src/content/articles/en'),{recursive:true});
+  for(const name of ['articles.ts','articles-en.ts'])
+   fs.copyFileSync(path.join(process.cwd(),'src/data',name),path.join(dataDir,name));
+  const files=makeReleaseFiles(temp,parsed,'2026-10-30');
+  const pl=files.find(f=>f.path.endsWith(parsed.slugPl+'.html')).content;
+  const en=files.find(f=>f.path.endsWith(parsed.slugEn+'.html')).content;
+  assert(pl.includes('Scenariusz fikcyjny.'));
+  assert(pl.includes('Źródło wzorca architektonicznego:'));
+  assert(!pl.includes('Źródło pierwotne:'));
+  assert(en.includes('Fictional teaching scenario.'));
+  assert(en.includes('Architecture pattern reference:'));
+  assert(!en.includes('Primary source:'));
+ } finally {
+  fs.rmSync(temp,{recursive:true,force:true});
+ }
+});

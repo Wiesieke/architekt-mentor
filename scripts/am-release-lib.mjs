@@ -156,10 +156,24 @@ export function makeReleaseFiles(root, parsed, date) {
   const nextPl = injectIndex(srcPl, plImport, 'export const articles: Article[] = [', plEntry, parsed.slugPl);
   const nextEn = injectIndex(srcEn, enImport, 'export const englishArticles: EnglishArticle[] = [', enEntry, parsed.slugEn);
   const source = escapeHtml(parsed.h.source.url);
-  const sourcePl = '<div class="source"><strong>Źródło pierwotne:</strong> <a href="' +
-    source + '" rel="noopener noreferrer">' + source + '</a>. Analiza ArchitectMentor.</div>';
-  const sourceEn = '<div class="source"><strong>Primary source:</strong> <a href="' +
-    source + '" rel="noopener noreferrer">' + source + '</a>. ArchitectMentor analysis.</div>';
+  // Explicit editorial flag, with a legacy safeguard for the private synthetic
+  // practice-series candidate namespace when the Desk has not yet been upgraded.
+  const fictional = parsed.h.editorial_hint?.fictional_scenario === true
+    || /^AM-PR-[A-Za-z0-9_-]+$/.test(parsed.h.candidate_id);
+  const sourcePl = fictional
+    ? '<div class="source"><strong>Scenariusz fikcyjny.</strong> ' +
+      'Źródło wzorca architektonicznego: <a href="' + source +
+      '" rel="noopener noreferrer">' + source + '</a>. ' +
+      'Link nie dokumentuje przedstawionego zdarzenia.</div>'
+    : '<div class="source"><strong>Źródło pierwotne:</strong> <a href="' +
+      source + '" rel="noopener noreferrer">' + source + '</a>. Analiza ArchitectMentor.</div>';
+  const sourceEn = fictional
+    ? '<div class="source"><strong>Fictional teaching scenario.</strong> ' +
+      'Architecture pattern reference: <a href="' + source +
+      '" rel="noopener noreferrer">' + source + '</a>. ' +
+      'This link does not document the described events.</div>'
+    : '<div class="source"><strong>Primary source:</strong> <a href="' +
+      source + '" rel="noopener noreferrer">' + source + '</a>. ArchitectMentor analysis.</div>';
   return [
     { path: plIndexPath, content: nextPl },
     { path: enIndexPath, content: nextEn },
