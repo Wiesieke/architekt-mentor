@@ -105,7 +105,7 @@ test('labels approved fictional practice scenarios as synthetic and cites patter
   const dataDir=path.join(temp,'src/data');
   fs.mkdirSync(dataDir,{recursive:true});
   fs.mkdirSync(path.join(temp,'src/content/articles/en'),{recursive:true});
-  for(const name of ['articles.ts','articles-en.ts'])
+  for(const name of ['articles.ts','articles-en.ts','learning.ts'])
    fs.copyFileSync(path.join(process.cwd(),'src/data',name),path.join(dataDir,name));
   const files=makeReleaseFiles(temp,parsed,'2026-10-30');
   const pl=files.find(f=>f.path.endsWith(parsed.slugPl+'.html')).content;
