@@ -1,3 +1,4 @@
+import amAMPR1R1Pl from '../content/articles/transakcja-unknown-kto-odpowiada-za-ostateczne-rozstrzygni-am-pr-1-r1.html?raw';
 import amAM20261029001Pl from '../content/articles/agenci-ai-i-ci-korzystaja-ze-wspolnego-budzetu-obliczen-co-am-20261029-001.html?raw';
 import featureFlags from '../content/articles/flagi-funkcji-kontrakt-operacyjny.html?raw';
 import businessAudit from '../content/articles/audyt-zdarzen-biznesowych.html?raw';
@@ -49,6 +50,7 @@ export interface Article {
   body: string;
 }
 export const articles: Article[] = [
+  { section:"podstawy-architektury", slug:"transakcja-unknown-kto-odpowiada-za-ostateczne-rozstrzygni-am-pr-1-r1", title:"Transakcja UNKNOWN: kto odpowiada za ostateczne rozstrzygnięcie operacji?", description:"W fikcyjnym systemie rozproszonym odpowiedź nie dociera, choć operacja mogła zostać wykonana. Jak wykrywać takie przypadki, ustalać wynik bez podwójnego wykonania i eskalować nierozstrzygnięte wyjątki? Łamigłówka z trzema wariantami,…", topic:"Podstawy architektury", published:"2026-10-30", authorId:'architectmentor', body:amAMPR1R1Pl },
   { section:"architektura-w-ruchu", slug:"agenci-ai-i-ci-korzystaja-ze-wspolnego-budzetu-obliczen-co-am-20261029-001", title:"Agenci AI i CI korzystają ze wspólnego budżetu obliczeń. Co to zmienia w architekturze?", description:"GitHub ogłosił 28 października 2026 r. połączenie puli rozliczeniowej dla części zasobów GitHub Actions i środowisk chmurowych agentów Copilot. Dla architektów to nie tylko zmiana cennika: agent eksperymentujący w chmurze może korzystać z…", topic:"Architektura w ruchu", published:"2026-10-29", authorId:'architectmentor', body:amAM20261029001Pl },
   { section:'podstawy-architektury', slug:'flagi-funkcji-kontrakt-operacyjny', title:'Feature flag to nie strategia wycofania zmiany', description:'Sześciopolowy kontrakt operacyjny feature flag: właściciel, zasięg, wartość awaryjna, próg wyłączenia, propagacja i termin usunięcia.', topic:'Wdrożenia i odporność operacyjna', published:'2026-10-24', authorId:'architectmentor', body:featureFlags },
   { section:'podstawy-architektury', slug:'audyt-zdarzen-biznesowych', title:'Log nie jest audytem. Jak zaprojektować wiarygodny ślad operacji?', description:'Log HTTP 200 nie dowodzi zmiany stanu. Trzy warianty, transactional outbox i pięć testów wiarygodności audytu.', topic:'Audyt, integralność i architektura danych', published:'2026-10-21', body:businessAudit },
