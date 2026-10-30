@@ -14,7 +14,10 @@ function verifyLocale(raw, locale, expectedCriteria) {
   const data = {};
   for(const name of ['title','difficulty','goal','scenario','question','analysis'])
     data[name] = text(raw[name], locale + '.' + name, name === 'analysis' ? 150 : 5);
-  assert(!/<\\s*\\/?\\s*[a-z][^>]*>/i.test(data.scenario+' '+data.analysis)\n    && !/\\b(?:javascript|data|vbscript):/i.test(data.scenario+' '+data.analysis),\n    'Unsafe HTML or URL in exercise prose: '+locale);\n  assert(/^(Fikcyjny scenariusz edukacyjny|Scenariusz edukacyjny inspirowany praktyką)/.test(data.scenario)
+  assert(!/<\s*\/?\s*[a-z][^>]*>/i.test(data.scenario+' '+data.analysis)
+    && !/\b(?:javascript|data|vbscript):/i.test(data.scenario+' '+data.analysis),
+    'Unsafe HTML or URL in exercise prose: '+locale);
+  assert(/^(Fikcyjny scenariusz edukacyjny|Scenariusz edukacyjny inspirowany praktyką)/.test(data.scenario)
     || (locale === 'en' && /^(Fictional educational scenario|Practice-inspired educational scenario)/.test(data.scenario)),
     'Missing educational scenario label: ' + locale);
   assert(Array.isArray(raw.hints) && raw.hints.length >= 2 && raw.hints.length <= 6,
