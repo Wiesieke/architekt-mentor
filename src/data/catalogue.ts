@@ -15,6 +15,7 @@ const areas = [
  {id:'decisions',pl:'Analiza i decyzje',en:'Analysis and decisions'},
 ];
 const assignments: Record<string,string> = {
+ '2026-10-30-unknown-odpowiedzialnosc':'integration',
  '2026-10-19-zielone-komponenty-zdrowa-usluga':'resilience',
  '2026-10-15-zielony-healthcheck-przerwany-proces':'resilience',
  '2026-10-11-saas-granice-odpowiedzialnosci':'decisions', '2026-10-11-saas-nas-nie-interesuje':'decisions',
