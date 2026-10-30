@@ -118,13 +118,102 @@ export function parseApprovedJob(job) {
   };
   const slugPl = secureSlug(texts.pl.title, h.candidate_id);
   const slugEn = secureSlug(texts.en.title, h.candidate_id);
+  const isPuzzle=h.editorial_hint?.format==='łamigłówka';
+  if(isPuzzle)assert.equal(h.approval?.exercise_confirmed,true,
+   'An exercise requires separate manual approval of both modes');
+  const exercise=isPuzzle?validatedExercise(h.exercise,h.candidate_id,{pl:slugPl,en:slugEn}):null;
   const branch = 'release/' + h.candidate_id.toLowerCase() + '-r' + h.approved_revision;
   const urls = {
     pl: 'https://ejsymont.com/' + sections[0] + '/' + slugPl + '/',
     en: 'https://ejsymont.com/en/' + sections[1] + '/' + slugEn + '/'
   };
-  return { h, texts, sections, category, learningGroup, slugPl, slugEn, branch, urls };
+  return { h, texts, sections, category, learningGroup, exercise, slugPl, slugEn, branch, urls };
 }
+const PRACTICE_AREAS = Object.freeze(['integration','data','resilience','security','decisions']);
+function validatedExercise(x, candidate, slugs) {
+ assert(x && typeof x==='object' && !Array.isArray(x), 'Dual-mode puzzle package missing');
+ assert(/^[a-z0-9][a-z0-9-]{6,79}$/.test(x.id??''), 'Invalid puzzle id');
+ assert(PRACTICE_AREAS.includes(x.practiceArea), 'Puzzle requires one curated practice area');
+ for(const locale of ['pl','en']){
+  const v=x[locale];
+  assert(v && typeof v==='object' && !Array.isArray(v), 'Missing '+locale+' puzzle');
+  for(const key of ['title','difficulty','goal','scenario','question','analysis','learnSlug'])
+   assert(typeof v[key]==='string' && v[key].trim().length>=4 && v[key].length<=30000,
+     'Invalid '+locale+' exercise '+key);
+  assert.equal(v.learnSlug,slugs[locale],'Puzzle must link to its exact approved learning article');
+  assert(Array.isArray(v.hints) && v.hints.length>=2 && v.hints.length<=5,
+    'Puzzle requires guiding hints');
+  assert(v.hints.every(x=>typeof x==='string' && x.trim().length>=8),'Invalid puzzle hint');
+  assert(v.quick && Array.isArray(v.quick.options) && v.quick.options.length===3,
+    'Quick decision requires exactly three options');
+  assert(typeof v.quick.question==='string' && v.quick.question.length>=12
+    &&typeof v.quick.hint==='string' && v.quick.hint.length>=8);
+  const ids=v.quick.options.map(o=>o.id);
+  assert(ids.every(id=>/^[a-z0-9_-]{1,20}$/.test(id??''))&&new Set(ids).size===3,
+    'Duplicate quick option ids');
+  assert(ids.includes(v.quick.correctId),'Quick answer must point to a real option');
+  for(const o of v.quick.options){
+   assert(typeof o.text==='string'&&o.text.trim().length>=20
+    &&typeof o.explanation==='string'&&o.explanation.trim().length>=35,
+    'Quick answer and explanation are mandatory');
+  }
+  assert(Array.isArray(v.criteria)&&v.criteria.length===3,
+    'Mentor must assess exactly three criteria');
+  const criteria=v.criteria.map(c=>c.id);
+  assert(criteria.every(id=>/^[a-z][a-z0-9_]{2,30}$/.test(id??''))&&new Set(criteria).size===3,
+    'Duplicate mentor criterion ids');
+  for(const c of v.criteria)assert(typeof c.label==='string'&&c.label.length>=5
+    &&typeof c.expected==='string'&&c.expected.trim().length>=25,
+    'Mentor criteria must be fully explained');
+  if(locale==='pl'){var baseOptionIds=ids;var baseCriteria=criteria;var baseCorrect=v.quick.correctId;}
+  else{assert.deepEqual(ids,baseOptionIds,'Option identity differs by language');
+   assert.deepEqual(criteria,baseCriteria,'Mentor criteria differ by language');
+   assert.equal(v.quick.correctId,baseCorrect,'Best answer differs by language');}
+ }
+ return x;
+}
+function withPuzzleFiles(root, parsed, date, files) {
+ const x=parsed.exercise;
+ if(!x)return files;
+ const pl=x.pl,en=x.en;
+ const dataRoot=path.join(root,'data');
+ const readJson=name=>JSON.parse(fs.readFileSync(path.join(dataRoot,name),'utf8'));
+ const starters=readJson('starter-exercises.json');
+ const puzzles=readJson('puzzles.json');
+ const coach=readJson('puzzle-coach-en.json');
+ assert(!starters.some(s=>s.id===x.id)&&!puzzles.some(p=>p.id===x.id)&&!coach[x.id],
+   'Puzzle already exists: '+x.id);
+ const starter={id:x.id,pl,en};
+ starters.unshift(starter);
+ puzzles.unshift({
+  id:x.id,week:'ArchitectMentor · '+date,date,title:pl.title,
+  difficulty:pl.difficulty,authorId:'architectmentor',goal:pl.goal,scenario:pl.scenario,
+  question:pl.question,hints:pl.hints,analysis:pl.analysis,quick:pl.quick,
+  coach:{criteria:pl.criteria},
+  related:[{type:'PODSTAWY',title:parsed.texts.pl.title,
+    description:'Wzorce i granice projektowe',href:parsed.urls.pl.replace('https://ejsymont.com','')}]
+ });
+ coach[x.id]={scenario:en.scenario,question:en.question,criteria:en.criteria};
+ for(const [name,contents] of [['starter-exercises.json',starters],['puzzles.json',puzzles],['puzzle-coach-en.json',coach]]){
+  files.push({path:path.join(dataRoot,name),content:JSON.stringify(contents,null,2)+'\n'});
+ }
+ const taxonomy=path.join(root,'src/data/catalogue.ts');
+ const currentTax=fs.readFileSync(taxonomy,'utf8');
+ const anchor='const assignments: Record<string,string> = {\n';
+ assert(currentTax.includes(anchor) && !currentTax.includes("'"+x.id+"':"),'Puzzle taxonomy source changed');
+ files.push({path:taxonomy,content:currentTax.replace(anchor,anchor+" '"+x.id+"':'"+x.practiceArea+"',\n")});
+ const editionsPath=path.join(root,'src/data/editions.ts');
+ const currentEd=fs.readFileSync(editionsPath,'utf8');
+ const edAnchor='export const editions = [';
+ assert(currentEd.includes(edAnchor) && !currentEd.includes('/lamiglowki/'+x.id+'/'),
+  'Exercise edition already registered');
+ const entry="  { kind:'ĆWICZENIE', title:"+JSON.stringify(pl.title)+
+  ", summary:"+JSON.stringify('Średni · szybka decyzja lub mentor · '+pl.goal.slice(0,90))+
+  ", href:"+JSON.stringify('/lamiglowki/'+x.id+'/')+", published:"+JSON.stringify(date)+" },";
+ files.push({path:editionsPath,content:currentEd.replace(edAnchor,edAnchor+'\n'+entry)});
+ return files;
+}
+
 function summary(text, length) {
   const normalized = text.replace(/\s+/g, ' ').trim();
   if (normalized.length <= length) return normalized;
@@ -211,6 +300,18 @@ export function makeReleaseFiles(root, parsed, date) {
     assert(next !== current, 'Learning group insertion failed');
     files.push({ path: learningPath, content: next });
   }
+  if(parsed.exercise){
+    // Link to the two-mode decision before revealing the explainer.
+    const lesson=files.find(f=>f.path===plHtmlPath);
+    const englishLesson=files.find(f=>f.path===enHtmlPath);
+    const linkPl='/lamiglowki/'+parsed.exercise.id+'/';
+    const linkEn='/en/practice/'+parsed.exercise.id+'/';
+    lesson.content='<p><strong>Ćwicz przed lekturą:</strong> <a href="'+
+      escapeHtml(linkPl)+'">2-minutowa decyzja lub warsztat z mentorem</a>.</p>\n'+lesson.content;
+    englishLesson.content='<p><strong>Practise before reading:</strong> <a href="'+
+      escapeHtml(linkEn)+'">2-minute decision or mentor workshop</a>.</p>\n'+englishLesson.content;
+    withPuzzleFiles(root,parsed,date,files);
+  }
   return files;
 }
 export function writeReleaseFiles(files) {
@@ -227,6 +328,14 @@ export function verifyBuiltRelease(root, parsed) {
   for (const item of paths) {
     assert(fs.existsSync(item), 'Missing article page: ' + item);
     assert(fs.readFileSync(item, 'utf8').length > 2000, 'Suspiciously short page');
+  }
+  if(parsed.exercise){
+    const id=parsed.exercise.id;
+    for(const article of [
+      path.join(root,'dist','lamiglowki',id,'index.html'),
+      path.join(root,'dist','en','practice',id,'index.html')
+    ])assert(fs.existsSync(article)&&fs.readFileSync(article,'utf8').length>1500,
+      'Missing interactive exercise route: '+article);
   }
   const rssPl = fs.readFileSync(path.join(root, 'dist/rss.xml'), 'utf8');
   const rssEn = fs.readFileSync(path.join(root, 'dist/en/rss.xml'), 'utf8');
