@@ -1,5 +1,117 @@
 [
   {
+    "id": "2026-10-30-unknown-reconciliation",
+    "editorialSourceCandidateId": "AM-PR-1-R1",
+    "pl": {
+      "title": "Nikt nie zgłosił błędu. Kto rozstrzygnie UNKNOWN?",
+      "difficulty": "Średni",
+      "goal": "Wskaż właściciela ustalania wyniku operacji, wykryj niewidoczne UNKNOWN i zapobiegaj duplikatom.",
+      "scenario": "Fikcyjny scenariusz edukacyjny\n\nUsługa A przyjmuje polecenia i wysyła je do usługi B. B może zatwierdzić skutek biznesowy, nawet jeśli odpowiedź nie dotrze do A przed timeoutem. A zapisuje wtedy UNKNOWN — nie stan B, lecz własną niepewność co do wyniku.\n\nW tym zadaniu B udostępnia sprawdzenie wyniku po trwałym identyfikatorze operacji, wymaga tego samego identyfikatora przy bezpiecznych ponowieniach i utrzymuje autorytatywny rejestr rezultatów. Zdarzenia z B mogą przychodzić wielokrotnie, późno lub nie dotrzeć. Nie każdy przypadek da się rozstrzygnąć automatycznie.\n\nNikt nie musi ponowić żądania ani złożyć reklamacji. Właściciel procesu wymaga jednak, by każda długo nierozstrzygnięta operacja została wykryta i miała przypisanego odpowiedzialnego.",
+      "question": "Jaki minimalny mechanizm i podział odpowiedzialności zaprojektujesz, żeby UNKNOWN nie znikało bez śladu, a ponowienia nie tworzyły drugiego skutku? Wskaż dowód skuteczności.",
+      "hints": [
+        "Czy brak odpowiedzi jest dowodem, że B nie zatwierdziła skutku?",
+        "Jaki identyfikator musi przetrwać między A, B, statusem i ponowieniem?",
+        "Co wykryje UNKNOWN, jeśli nikt nie otworzy ponownie aplikacji?",
+        "Kto przejmuje przypadek, którego nie można rozstrzygnąć w uzgodnionym czasie?"
+      ],
+      "analysis": "### Nieznany wynik to luka w wiedzy, nie potwierdzona porażka\n\nA nie powinna utożsamiać timeoutu z niepowodzeniem biznesowym. B może mieć już trwały wynik. Wariant poprawny wymaga dwóch niezależnych własności: **niedublowania skutku** oraz **wykrywania nierozstrzygniętych przypadków nawet bez reklamacji**.\n\n### Trzy rozsądne warianty — różny zakres gwarancji\n\n1. **A — sprawdzanie przy kolejnym wejściu.** Lookup po identyfikatorze jest pożyteczny i tani, lecz jeżeli nikt nie wróci do aplikacji, UNKNOWN może pozostać nierozstrzygnięte. To nie spełnia warunku proaktywnego wykrywania.\n2. **B — synchronizacja zdarzeniami.** Zdarzenie o wyniku skraca opóźnienie, ale samo nie gwarantuje, że A dowie się o wszystkich skutkach. Potrzebne są obsługa duplikatów, odporność na utratę oraz niezależne uzgodnienie ze źródłem prawdy.\n3. **C — trwały rejestr, rekoncyliacja i eskalacja.** Każda operacja ma stabilny identyfikator. B zapewnia idempotencję w uzgodnionym zakresie i autorytatywny wynik; A trwale zapisuje UNKNOWN i cyklicznie odpytuje B o nierozstrzygnięte identyfikatory. Wynik potwierdzony kończy sprawę, a wynik nierozstrzygnięty po ustalonym czasie trafia do właściciela wyjątku. Zdarzenia przyspieszają widoczność, ale nie zastępują kontroli.\n\n### Granice gwarancji i odpowiedzialności\n\n- **B odpowiada za wynik i semantykę idempotencji.** Jeśli wynik i zapis klucza są w jednej granicy transakcyjnej, należy je utrwalać atomowo; poza nią trzeba osobno zaprojektować obsługę awarii częściowych.\n- **A odpowiada za obserwację i rekoncyliację.** Lista UNKNOWN, wiek nierozstrzygniętej operacji, bezpieczny lookup i audyt prób ustalenia wyniku są trwałe. Puste lub opóźnione odczyty nie zawsze dowodzą niewykonania.\n- **Właściciel operacyjny odpowiada za wyjątek.** Ustalony próg eskalacji, decyzja o dalszej weryfikacji i komunikacja z użytkownikiem są jawne. Nie obiecuj, że każdy wynik da się automatycznie odzyskać.\n\n### Test rozstrzygający\n\nZasymuluj jednocześnie utratę odpowiedzi A–B oraz zgubienie zdarzenia z B. Nie dopuszczaj ponowienia przez użytkownika. Sprawdź, czy A wykrywa zaległe UNKNOWN w uzgodnionym oknie, ustala ostateczny wynik w B, nie wywołuje drugiego skutku oraz eskaluje przypadek, którego nie da się ustalić. To dowód procesu, nie tylko poprawnego endpointu.\n\n> To fikcyjny scenariusz edukacyjny; w prawdziwym projekcie uzgodnij retencję identyfikatorów, limity, semantykę lookup i właścicieli decyzji.",
+      "quick": {
+        "question": "Co najlepiej spełnia wymaganie, że UNKNOWN nie może pozostać niewidoczne bez zgłoszenia użytkownika?",
+        "hint": "Oddziel szybkie powiadomienie o wyniku od niezależnego wykrywania brakującego wyniku.",
+        "correctId": "c",
+        "options": [
+          {
+            "id": "a",
+            "text": "A sprawdza status w B po identyfikatorze dopiero przy powrocie użytkownika; nie ponawia biznesowego polecenia bez potwierdzenia.",
+            "explanation": "Lookup i unikanie niekontrolowanego retry są dobre, ale brak mechanizmu wykrycia spraw, do których użytkownik nigdy nie wróci. UNKNOWN może trwać bez właściciela."
+          },
+          {
+            "id": "b",
+            "text": "B emituje zdarzenia końcowe, a A na ich podstawie zamyka UNKNOWN; zdarzenia mają identyfikatory i obsługę duplikatów.",
+            "explanation": "Zdarzenia skracają czas rozstrzygania i deduplikacja jest potrzebna. Gdy zdarzenie nie dotrze, nie ma jednak niezależnego sposobu wykrycia luki i uzgodnienia wyniku."
+          },
+          {
+            "id": "c",
+            "text": "B utrzymuje autorytatywny wynik i idempotencję, A trwale śledzi UNKNOWN i cyklicznie uzgadnia status, a nierozstrzygnięte sprawy eskaluje.",
+            "explanation": "Zapewnia kontrolę bez udziału użytkownika, oddziela źródło prawdy od rekoncyliacji, zapobiega powtórzeniu skutku i określa drogę dla wyjątków. Zdarzenia mogą dodatkowo przyspieszać wynik."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "outcome",
+          "label": "Źródło prawdy i idempotencja",
+          "expected": "Rozpoznaje UNKNOWN jako brak wiedzy; wskazuje B jako autorytatywne źródło wyniku oraz stabilną tożsamość i semantykę idempotencji bez uniwersalnego exactly-once."
+        },
+        {
+          "id": "reconciliation",
+          "label": "Proaktywne wykrywanie i rekoncyliacja",
+          "expected": "A trwale rejestruje UNKNOWN i w sposób niezależny od działań użytkownika weryfikuje wynik w B, również przy zgubionych lub powtórzonych zdarzeniach."
+        },
+        {
+          "id": "ownership",
+          "label": "Właściciel wyjątku i dowód",
+          "expected": "Wskazuje próg i właściciela eskalacji przypadków nadal UNKNOWN oraz test utraty odpowiedzi i zdarzenia bez zgłoszenia użytkownika."
+        }
+      ],
+      "learnSlug": "transakcja-unknown-kto-odpowiada-za-ostateczne-rozstrzygni-am-pr-1-r1"
+    },
+    "en": {
+      "title": "No one complained. Who resolves UNKNOWN?",
+      "difficulty": "Intermediate",
+      "goal": "Assign ownership of an ambiguous result, detect unseen UNKNOWN outcomes and prevent duplicate effects.",
+      "scenario": "Fictional educational scenario\n\nService A accepts commands and sends them to Service B. B may commit a business effect even when its response does not reach A before the timeout. A then records UNKNOWN—not B's confirmed status, but A's uncertainty about the result.\n\nIn this exercise, B provides authoritative outcome lookup by a durable operation identifier, requires the same identifier for safe retries and retains an outcome register. Events from B may be repeated, delayed or lost. Not every case can be resolved automatically.\n\nNo one needs to retry or file a complaint. The process owner nonetheless requires every long-unresolved operation to be detected and given an accountable owner.",
+      "question": "What minimum mechanism and ownership model would you design so UNKNOWN outcomes cannot disappear silently and retries cannot create a second effect? Name a decisive test.",
+      "hints": [
+        "Does a missing response prove B never committed the effect?",
+        "Which operation identifier must persist across A, B, lookup and retries?",
+        "What detects UNKNOWN when no user returns?",
+        "Who takes ownership when the result cannot be established in the agreed time?"
+      ],
+      "analysis": "### Unknown is missing knowledge, not confirmed failure\n\nA must not interpret a timeout as proof of business failure. B may already hold a durable result. A sound design needs **duplicate-effect prevention** and **proactive detection without customer reports**.\n\n### Three plausible designs with different guarantees\n\n1. **A — lookup on user return.** Checking by operation ID is useful and inexpensive, but an operation never revisited by a user may remain UNKNOWN indefinitely. This fails the proactive-detection requirement.\n2. **B — event-driven outcomes.** An outcome event can shorten latency, but does not guarantee that A learns every result. Duplicates, lost delivery and reconciliation against the source of truth still require a design.\n3. **C — authoritative record, reconciliation and escalation.** Give each logical operation a stable ID. B enforces idempotency within a defined scope and exposes the authoritative result. A durably records UNKNOWN and periodically checks unresolved IDs. A confirmed outcome closes the case, while a case that remains unresolved beyond an agreed window is assigned to an exception owner. Events can improve timeliness without replacing reconciliation.\n\n### Guarantee boundaries and ownership\n\n- **B owns outcome truth and idempotency semantics.** When the business effect and deduplication record share a transactional boundary, commit them atomically; across independent resources, design for partial failures explicitly.\n- **A owns detection and reconciliation.** Keep durable UNKNOWN records, their age, safe lookups and an audit of resolution attempts. Missing or stale lookup results do not always prove non-execution.\n- **An operational owner handles exceptions.** Explicit thresholds, follow-up decisions and user communication are required. Do not promise every ambiguous outcome can be resolved automatically.\n\n### Decisive test\n\nLose both B's response and its outcome event. The user neither retries nor contacts support. Verify that A detects overdue UNKNOWN within the agreed window, obtains the authoritative outcome without producing a second business effect and escalates cases whose result remains unprovable. This tests the process rather than one endpoint.\n\n> This is a fictional teaching scenario. A real integration needs explicit contracts for ID retention, lookup semantics, time limits and decision ownership.",
+      "quick": {
+        "question": "Which design ensures UNKNOWN cannot remain invisible when nobody reports it?",
+        "hint": "Distinguish fast outcome notification from an independent way to detect missing outcomes.",
+        "correctId": "c",
+        "options": [
+          {
+            "id": "a",
+            "text": "A looks up the original operation in B only when the user returns; it avoids unconfirmed business retries.",
+            "explanation": "Lookup and avoiding blind retries are useful, but an operation never revisited by a user has no proactive resolution path. UNKNOWN can remain ownerless."
+          },
+          {
+            "id": "b",
+            "text": "B emits final outcome events and A closes UNKNOWN on receipt; event IDs and deduplication protect consumers.",
+            "explanation": "Outcome events and deduplication improve timeliness, but a lost event may still leave UNKNOWN unobserved. An independent reconciliation mechanism is missing."
+          },
+          {
+            "id": "c",
+            "text": "B keeps authoritative idempotent outcomes, A durably tracks UNKNOWN and periodically reconciles, and unresolved cases are escalated.",
+            "explanation": "Provides independent detection, clear truth and ownership, safe retry boundaries and escalation. Outcome events may additionally reduce delay."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "outcome",
+          "label": "Authoritative outcome and idempotency",
+          "expected": "Identifies UNKNOWN as missing knowledge; makes B authoritative and requires stable operation identity and scoped idempotency without claiming universal exactly-once."
+        },
+        {
+          "id": "reconciliation",
+          "label": "Proactive detection and reconciliation",
+          "expected": "A durably records UNKNOWN and independently verifies results at B, even if events are lost or duplicated and no user returns."
+        },
+        {
+          "id": "ownership",
+          "label": "Exception owner and test evidence",
+          "expected": "Assigns an escalation owner and deadline for unresolved cases and proposes a lost-response plus lost-event test without user reports."
+        }
+      ],
+      "learnSlug": "unknown-transaction-who-owns-the-final-outcome-am-pr-1-r1"
+    }
+  },
+  {
     "id": "2026-10-11-saas-granice-odpowiedzialnosci",
     "pl": {
       "title": "Dostawca daje SaaS. Czy musisz znać jego architekturę?",

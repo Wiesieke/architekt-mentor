@@ -73,3 +73,34 @@ test('older five-criterion workshop retains its ten-point score',async()=>{
   assert.ok(older);const item={id:older.id,pl:{criteria:older.coach.criteria},en:{criteria:english[older.id].criteria}};
   for(const locale of ['pl','en']){const result=await assess(item,locale,'score');assert.equal(result.res.code,200);assert.equal(result.res.data.maxScore,10);}
 });
+
+test('UNKNOWN practice puzzle offers two modes, three justified options, and an independent failure-detection test in both languages',()=>{
+ const id='2026-10-30-unknown-reconciliation';
+ const starter=starters.find(x=>x.id===id);
+ const puzzle=puzzles.find(x=>x.id===id);
+ assert.ok(starter,'Editorial bilingual exercise exists');
+ assert.ok(puzzle,'Public PL practice route is registered');
+ assert.ok(puzzle.coach && puzzle.quick,'Quick and mentor modes are both present');
+ assert.equal(puzzle.quick.options.length,3);
+ assert.equal(puzzle.coach.criteria.length,3);
+ assert.equal(puzzle.quick.correctId,'c');
+ assert.equal(english[id].criteria.length,3);
+ assert.deepEqual(english[id].criteria.map(x=>x.id),puzzle.coach.criteria.map(x=>x.id));
+ for(const locale of ['pl','en']){
+  const x=starter[locale];
+  assert.equal(x.quick.options.length,3);
+  assert.equal(x.criteria.length,3);
+  assert.equal(x.quick.correctId,'c');
+  assert.match(x.scenario,locale==='pl'?/Nikt nie musi ponowić/:/No one needs to retry/);
+  assert.match(x.analysis,locale==='pl'?/rekoncyliacj/i:/reconciliation/i);
+  assert.match(x.analysis,locale==='pl'?/escala|eskalac/i:/escalat/i);
+  assert.ok(x.quick.options.every(z=>z.explanation.length>=50),'Every choice has a meaningful explanation');
+  assert.ok(fs.existsSync('src/content/articles/'+(locale==='en'?'en/':'')+x.learnSlug+'.html'));
+ }
+ const old=puzzles.find(x=>x.id==='2026-10-01-nieznany-wynik-transakcji');
+ assert.ok(old && old.id!==id && old.coach);
+ const plArticle=fs.readFileSync('src/content/articles/'+starter.pl.learnSlug+'.html','utf8');
+ const enArticle=fs.readFileSync('src/content/articles/en/'+starter.en.learnSlug+'.html','utf8');
+ assert.match(plArticle,/lamiglowki\/2026-10-30-unknown-reconciliation/);
+ assert.match(enArticle,/en\/practice\/2026-10-30-unknown-reconciliation/);
+});

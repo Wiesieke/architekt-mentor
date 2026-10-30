@@ -3,6 +3,7 @@
 <p>A zapisuje UNKNOWN. To nie musi być stan operacji w B; jest to <strong>stan wiedzy usługi A</strong>. Jeśli A wyśle nową komendę, może podwoić skutek. Jeśli uzna timeout za błąd biznesowy, również może się pomylić.</p>
 <p><strong>Twoje zadanie:</strong> zaprojektuj system, który wykrywa niejednoznaczne wyniki, ustala rezultat tam, gdzie to możliwe, i kieruje przypadki nierozstrzygnięte do kontrolowanej eskalacji — także wtedy, gdy użytkownik nigdy nie zgłosi problemu.</p>
 <p>Ten scenariusz jest całkowicie fikcyjny i nie opisuje rzeczywistego przedsiębiorstwa.</p>
+<p><strong>Najpierw podejmij decyzję:</strong> <a href="/lamiglowki/2026-10-30-unknown-reconciliation/">przejdź do interaktywnej łamigłówki „Nikt nie zgłosił błędu. Kto rozstrzygnie UNKNOWN?”</a> — wybierz 2-minutową szybką decyzję albo 10-minutowy warsztat z mentorem. Potem wróć do porównania wariantów poniżej.</p>
 <h2>Trzy podejścia</h2>
 <h3>A. Odpytywanie o status</h3>
 <p>A nadaje stabilny identyfikator operacji i odpytuje B o jej wynik. B oferuje status API, które rozróżnia stany przejściowe i terminalne.</p>

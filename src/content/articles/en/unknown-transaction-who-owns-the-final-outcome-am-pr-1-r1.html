@@ -3,6 +3,7 @@
 <p>A records UNKNOWN. This need not be the operation&#39;s state in B; it describes <strong>what A knows</strong>. Sending a fresh command might duplicate the business effect. Calling the request a failure just because it timed out could be equally wrong.</p>
 <p><strong>Your task:</strong> design a system that detects ambiguous outcomes, determines the result where possible, and escalates unresolved cases with clear ownership — including cases nobody reports.</p>
 <p>This fictional teaching scenario is not a description of a real organization.</p>
+<p><strong>Decide before reading the solution:</strong> <a href="/en/practice/2026-10-30-unknown-reconciliation/">open the interactive puzzle “No one complained. Who resolves UNKNOWN?”</a> — choose the 2-minute quick decision or a 10-minute mentor workshop, then return to compare the designs below.</p>
 <h2>Three possible designs</h2>
 <h3>A. Status lookup</h3>
 <p>A assigns a stable operation identifier and queries B for the outcome. B exposes a status API distinguishing in-progress and terminal states.</p>
