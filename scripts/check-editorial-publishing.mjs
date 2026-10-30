@@ -18,9 +18,12 @@ for (const p of puzzles) {
 const recent=[...puzzles].filter(p=>p.coach).sort((a,b)=>b.date.localeCompare(a.date))[0];
 assert(recent,'Missing dated exercise with mentor criteria');
 const en=fs.readFileSync('src/data/puzzles-en.ts','utf8');
+const starters=JSON.parse(fs.readFileSync('data/starter-exercises.json','utf8'));
+const starterEn=starters.find(x=>x.id===recent.id)?.en;
 const coachEn=JSON.parse(fs.readFileSync('data/puzzle-coach-en.json','utf8'));
 const catalogue=fs.readFileSync('src/data/catalogue.ts','utf8');
-assert(en.includes("'"+recent.id+"':"), 'Missing EN exercise: '+recent.id);
+assert(en.includes("'"+recent.id+"':") || (starterEn && en.includes("starters.find(item=>item.id===puzzle.id)?.en")),
+  'Missing EN exercise: '+recent.id);
 assert(coachEn[recent.id], 'Missing EN mentor criteria: '+recent.id);
 assert(catalogue.includes("'"+recent.id+"':"), 'Missing practice catalogue group: '+recent.id);
 assert.deepEqual(recent.coach.criteria.map(c=>c.id),coachEn[recent.id].criteria.map(c=>c.id),'PL/EN mentor criteria mismatch');
@@ -38,7 +41,8 @@ const sitemap=fs.readFileSync('dist/sitemap.xml','utf8');
 assert(sitemap.includes(recent.id),'Latest puzzle absent from sitemap');
 for(const locale of ['lamiglowki','en/practice']){
  const html=fs.readFileSync(path.join('dist',locale,recent.id,'index.html'),'utf8');
- assert(html.includes(recent.title) || locale==='en/practice','Polish puzzle heading absent');
+ assert(html.includes(locale==='en/practice' && starterEn ? starterEn.title : recent.title),
+  'Bilingual puzzle heading absent: '+locale);
  assert(html.length>1500,'Suspiciously short puzzle HTML');
 }
 console.log('Editorial route smoke checks passed for '+recent.id);
