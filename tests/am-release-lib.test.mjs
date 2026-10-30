@@ -92,7 +92,7 @@ test('labels approved fictional practice scenarios as synthetic and cites patter
  const original=goodJob();
  const h=JSON.parse(original.handoff_json);
  h.candidate_id='AM-PR-1-R1';
- h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',
+ h.editorial_hint={category:'Podstawy architektury',format:'article',
   fictional_scenario:true,series:'Z praktyki architekta'};
  h.source.url='https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/';
  const handoff_json=JSON.stringify(h);
@@ -125,7 +125,7 @@ test('release adds newly approved learning article to exactly one curated taxono
  const job=goodJob();
  const handoff=JSON.parse(job.handoff_json);
  handoff.candidate_id='AM-PR-1-R1';
- handoff.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',fictional_scenario:true};
+ handoff.editorial_hint={category:'Podstawy architektury',format:'article',fictional_scenario:true};
  const raw=JSON.stringify(handoff);
  const parsed=parseApprovedJob({...job,handoff_json:raw,
   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});
@@ -153,7 +153,7 @@ test('new foundation articles require controlled editorial grouping',()=>{
  const job=goodJob();
  const h=JSON.parse(job.handoff_json);
  h.candidate_id='AM-PR-999999-R1';
- h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka'};
+ h.editorial_hint={category:'Podstawy architektury',format:'article'};
  const raw=JSON.stringify(h);
  assert.throws(()=>parseApprovedJob({...job,handoff_json:raw,
   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}),
@@ -162,4 +162,19 @@ test('new foundation articles require controlled editorial grouping',()=>{
  const valid=JSON.stringify(h);
  assert.equal(parseApprovedJob({...job,handoff_json:valid,
   content_sha256:crypto.createHash('sha256').update(valid).digest('hex')}).learningGroup,'integration');
+});
+
+
+test('does not silently publish a puzzle as a plain Foundations article',()=>{
+ const original=goodJob();
+ const h=JSON.parse(original.handoff_json);
+ h.candidate_id='AM-PR-1-R1';
+ h.editorial_hint={category:'Podstawy architektury',learning_group:'integration',format:'łamigłówka'};
+ const raw=JSON.stringify(h);
+ assert.throws(()=>parseApprovedJob({...original,handoff_json:raw,
+  content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}), /Interactive exercise format/);
+ h.editorial_hint.format='puzzle';
+ const enRaw=JSON.stringify(h);
+ assert.throws(()=>parseApprovedJob({...original,handoff_json:enRaw,
+  content_sha256:crypto.createHash('sha256').update(enRaw).digest('hex')}), /Interactive exercise format/);
 });
