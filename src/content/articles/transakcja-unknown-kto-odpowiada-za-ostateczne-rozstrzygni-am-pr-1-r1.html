@@ -1,0 +1,47 @@
+<h2>Łamigłówka: operacja bez odpowiedzi</h2>
+<p>W fikcyjnym systemie rozproszonym usługa A zleca usłudze B operację zmieniającą stan biznesowy. Odpowiedź nie dociera przed upływem limitu czasu. B mogła już zatwierdzić zmianę, nadal ją wykonywać albo w ogóle nie otrzymać żądania.</p>
+<p>A zapisuje UNKNOWN. To nie musi być stan operacji w B; jest to <strong>stan wiedzy usługi A</strong>. Jeśli A wyśle nową komendę, może podwoić skutek. Jeśli uzna timeout za błąd biznesowy, również może się pomylić.</p>
+<p><strong>Twoje zadanie:</strong> zaprojektuj system, który wykrywa niejednoznaczne wyniki, ustala rezultat tam, gdzie to możliwe, i kieruje przypadki nierozstrzygnięte do kontrolowanej eskalacji — także wtedy, gdy użytkownik nigdy nie zgłosi problemu.</p>
+<p>Ten scenariusz jest całkowicie fikcyjny i nie opisuje rzeczywistego przedsiębiorstwa.</p>
+<h2>Trzy podejścia</h2>
+<h3>A. Odpytywanie o status</h3>
+<p>A nadaje stabilny identyfikator operacji i odpytuje B o jej wynik. B oferuje status API, które rozróżnia stany przejściowe i terminalne.</p>
+<p><strong>Plusy:</strong> stosunkowo prosta implementacja, czytelna odpowiedzialność, łatwe audytowanie. <strong>Minusy:</strong> ruch odpytywania, zależność od dostępności B, limitów zapytań i opóźnionych aktualizacji. Samo HTTP 404 nie powinno oznaczać automatycznie, że operacja nie została wykonana, jeśli kontrakt takiej gwarancji nie zapewnia.</p>
+<h3>B. Zdarzenia i rekoncyliacja</h3>
+<p>B po trwałym zatwierdzeniu wyniku publikuje zdarzenie, a A aktualizuje swój widok. Spójność zapisu wyniku i zamiaru publikacji wymaga osobnego zabezpieczenia, np. transactional outbox. Osobny proces cyklicznie wykrywa operacje bez potwierdzenia, uzgadnia stany i odnajduje wiadomości utracone lub opóźnione.</p>
+<p><strong>Plusy:</strong> mniejsza zależność od synchronicznej odpowiedzi, lepsza skalowalność przy większej liczbie operacji. <strong>Minusy:</strong> dodatkowe komponenty, duplikaty i kolejność komunikatów, konieczność mechanizmu deduplikacji oraz trwałego zapisu zdarzeń. Sam event nie zastępuje źródła prawdy.</p>
+<h3>C. Kolejka wyjątków i odpowiedzialność operacyjna</h3>
+<p>Po ograniczonej liczbie prób nierozstrzygnięte przypadki trafiają do obsługi operacyjnej. Każdy otrzymuje właściciela, termin, historię działań i ścieżkę eskalacji.</p>
+<p><strong>Plusy:</strong> skrajne przypadki nie znikają. <strong>Minusy:</strong> czas i koszt ręcznej obsługi; bez technicznego mechanizmu odczytu stanu pracownik nadal nie będzie wiedział, co zaszło. Reklamacja użytkownika nie może stanowić jedynego wyzwalacza procesu.</p>
+<h2>Pułapka w pytaniu</h2>
+<p>Nie musisz wybrać dokładnie jednego wariantu. W praktyce uzasadnione bywa połączenie <strong>stabilnego identyfikatora i idempotentnego wykonania</strong> z odpytywaniem lub zdarzeniami, okresową rekoncyliacją i eskalacją wyjątków.</p>
+<p>Nie obiecuj uniwersalnego „exactly once” pomiędzy niezależnymi komponentami. Zapewnij raczej brak powtórzenia <strong>efektu biznesowego</strong> w systemie realizującym: ten sam klucz idempotencji musi oznaczać tę samą intencję, a historia kluczy musi być przechowywana wystarczająco długo. Identyczny zestaw pól może czasem oznaczać dwie różne, zamierzone operacje.</p>
+<p>Pamiętaj: jeśli zapis idempotency key i skutku biznesowego odbywa się we wspólnym magazynie transakcyjnym, powinien być atomowy. Przy odrębnych zasobach potrzebny jest jawny mechanizm przywracania spójności po częściowej awarii.</p>
+<h2>Kontrakt architektoniczny</h2>
+<ol>
+<li><strong>Źródło prawdy:</strong> B lub wskazany rejestr jest autorytatywnym źródłem wyniku. UNKNOWN w A oznacza niepewność, a nie brak realizacji.</li>
+<li><strong>Identyfikacja:</strong> trwały identyfikator operacji, klucz idempotencji i correlation ID; ponowienie nie może tworzyć nowej intencji.</li>
+<li><strong>Model stanów:</strong> np. RECEIVED, PROCESSING, SUCCEEDED, REJECTED, plus UNKNOWN jako stan wiedzy inicjatora. Przejścia i znaczenie stanów są zapisane w kontrakcie.</li>
+<li><strong>Czas i odpowiedzialność:</strong> osobno określony timeout odpowiedzi oraz docelowy czas ostatecznego rozstrzygnięcia, właściciel procesu i zasady eskalacji.</li>
+<li><strong>Wyszukiwanie braków:</strong> cykliczna identyfikacja rekordów bez końcowego potwierdzenia — również bez zgłoszenia użytkownika.</li>
+<li><strong>Ślad audytowy:</strong> kiedy zlecono, co potwierdzono, kto lub co rozstrzygnęło i na jakiej podstawie.</li>
+</ol>
+<h2>Antywzorzec: „timeout to błąd, resztą zajmie się reklamacja”</h2>
+<p>Timeout komunikacyjny nie oznacza odrzucenia operacji. Proces reklamacyjny jest potrzebny do obsługi użytkownika, ale <strong>nie zapewnia spójności danych</strong> i nie wyszukuje sam z siebie niezgłoszonych rozbieżności.</p>
+<p>Nie należy również uruchamiać kompensacji wyłącznie na podstawie braku odpowiedzi. Najpierw trzeba ustalić, jakie skutki rzeczywiście zaszły oraz czy ich odwrócenie jest dozwolone.</p>
+<h2>Mini-ADR: przykładowa decyzja</h2>
+<p><strong>Decyzja:</strong> B wykonuje komendy idempotentnie i utrzymuje autorytatywny rejestr wyniku. A przechowuje własny rejestr oczekujących operacji. Dostępne są status API i okresowy proces rekoncyliacji; zdarzenia mogą przyspieszać aktualizację. Przypadki przekraczające ustalony czas trafiają do kontrolowanej kolejki wyjątków.</p>
+<p><strong>Dlaczego:</strong> ważniejsze są weryfikowalny końcowy rezultat i wykluczenie podwójnych skutków niż pozorne natychmiastowe potwierdzenie.</p>
+<p><strong>Koszty:</strong> magazyn stanu idempotencji, API, cykliczne zadania, monitoring i obsługa wyjątków. Skala rozwiązania zależy od ryzyka i wolumenu.</p>
+<p><strong>Testy akceptacyjne:</strong> utrata odpowiedzi po zatwierdzeniu; kilkukrotne ponowienie komendy; duplikaty i opóźnienia zdarzeń; brak potwierdzenia; niedostępność status API; UNKNOWN bez reklamacji; wykrycie i eskalacja w terminie.</p>
+<h2>Twoja decyzja</h2>
+<p>Jak zaprojektujesz rozwiązanie minimalne, a jak rozwiązanie dla systemu krytycznego? Kto odpowiada za <strong>wynik</strong>, kto za <strong>rekoncyliację</strong>, a kto za <strong>wyjątek</strong>?</p>
+<h3>Źródła wzorców architektonicznych</h3>
+<ul>
+<li><a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/" rel="noopener noreferrer">AWS Builders&#39; Library — Making retries safe with idempotent APIs</a>.</li>
+<li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/asynchronous-request-reply" rel="noopener noreferrer">Microsoft Learn — Asynchronous Request-Reply</a>.</li>
+<li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction" rel="noopener noreferrer">Microsoft Learn — Compensating Transaction</a>.</li>
+</ul>
+<p>Źródła opisują <strong>wzorce techniczne</strong>, a nie przedstawiony fikcyjny przypadek. Scenariusz i mini-ADR są oryginalnym opracowaniem.</p>
+
+<div class="source"><strong>Scenariusz fikcyjny.</strong> Źródło wzorca architektonicznego: <a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/" rel="noopener noreferrer">https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/</a>. Link nie dokumentuje przedstawionego zdarzenia.</div>

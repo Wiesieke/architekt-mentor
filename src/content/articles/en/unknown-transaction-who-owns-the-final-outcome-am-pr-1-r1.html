@@ -1,0 +1,47 @@
+<h2>The puzzle: a missing response</h2>
+<p>In a fictional distributed system, Service A asks Service B to execute a state-changing business operation. No reply arrives before the timeout. B may have committed the change, may still be processing it, or may never have received the command.</p>
+<p>A records UNKNOWN. This need not be the operation&#39;s state in B; it describes <strong>what A knows</strong>. Sending a fresh command might duplicate the business effect. Calling the request a failure just because it timed out could be equally wrong.</p>
+<p><strong>Your task:</strong> design a system that detects ambiguous outcomes, determines the result where possible, and escalates unresolved cases with clear ownership — including cases nobody reports.</p>
+<p>This fictional teaching scenario is not a description of a real organization.</p>
+<h2>Three possible designs</h2>
+<h3>A. Status lookup</h3>
+<p>A assigns a stable operation identifier and queries B for the outcome. B exposes a status API distinguishing in-progress and terminal states.</p>
+<p><strong>Advantages:</strong> relatively simple implementation, clear accountability and easier auditing. <strong>Costs:</strong> polling traffic, dependence on B&#39;s availability, rate limits and delayed updates. Unless the contract makes that guarantee, HTTP 404 alone does not establish that an operation was never performed.</p>
+<h3>B. Events with reconciliation</h3>
+<p>After durably committing the result, B publishes an outcome event for A. Keeping the committed outcome and the intention to publish in sync may require a transactional outbox or an equivalent mechanism. A separate reconciliation process scans operations without terminal confirmation, aligns the two views and detects lost or delayed messages.</p>
+<p><strong>Advantages:</strong> reduced dependence on synchronous responses and improved scalability at higher volumes. <strong>Costs:</strong> extra components, event duplication and ordering, deduplication and durable event publication. An event must not become the only evidence of truth.</p>
+<h3>C. Exception queue with accountable operators</h3>
+<p>After bounded attempts, unresolved cases move to an operational exception queue. Each case has an owner, deadline, history and escalation policy.</p>
+<p><strong>Advantages:</strong> exceptional cases cannot silently disappear. <strong>Costs:</strong> manual effort, delay and a dependency on operational discipline. Without a technical way to establish the outcome, support teams are still unable to decide. A customer complaint must not be the only trigger.</p>
+<h2>The hidden catch</h2>
+<p>You need not choose exactly one. A sound design may combine <strong>stable identifiers and idempotent execution</strong> with polling or events, periodic reconciliation and exception escalation.</p>
+<p>Do not promise universal cross-service “exactly once.” Instead, prevent repeated <strong>business effects</strong> at the executing service: the same idempotency key must refer to the same intent, and its history must be retained long enough for delayed retries. Identical payloads can sometimes represent two distinct, legitimate requests.</p>
+<p>When an idempotency record and a business effect share a transactional store, they should be committed atomically. If they span independent resources, explicitly design recovery from partial failures.</p>
+<h2>Your architecture contract</h2>
+<ol>
+<li><strong>Source of truth:</strong> B or a named authoritative register determines whether the business effect occurred. UNKNOWN in A indicates uncertainty, not proof of non-execution.</li>
+<li><strong>Identity:</strong> a durable operation ID, idempotency key and correlation ID; a retry must preserve the original intent.</li>
+<li><strong>State model:</strong> for example RECEIVED, PROCESSING, SUCCEEDED and REJECTED, with UNKNOWN representing the caller&#39;s knowledge. Transitions and semantics belong in the contract.</li>
+<li><strong>Time and ownership:</strong> define response timeouts separately from final-resolution targets, a named owner and an escalation policy.</li>
+<li><strong>Missing outcomes:</strong> proactively scan records with no verified terminal result, regardless of customer complaints.</li>
+<li><strong>Audit trail:</strong> record when the operation was requested, what was confirmed, who resolved it and what evidence supported the conclusion.</li>
+</ol>
+<h2>Anti-pattern: “a timeout means failure; support will handle the rest”</h2>
+<p>A communication timeout does not prove a business rejection. Customer support is a user-facing process, <strong>not a data-consistency mechanism</strong>; it does not automatically discover cases nobody reports.</p>
+<p>Likewise, do not launch a compensating transaction solely because the reply is missing. First establish what actually happened and whether the effects can be safely reversed.</p>
+<h2>A sample mini-ADR</h2>
+<p><strong>Decision:</strong> B executes commands idempotently and maintains an authoritative outcome register. A retains its register of pending operations. A status API and periodic reconciliation detect unresolved outcomes; events may accelerate updates. Cases exceeding the resolution window enter an audited exception queue.</p>
+<p><strong>Rationale:</strong> verifiable outcomes and prevention of duplicate effects matter more than a superficial synchronous success response.</p>
+<p><strong>Consequences:</strong> idempotency-state storage, an API, scheduled reconciliation, monitoring and operational handling. Scale the solution to the risk and transaction volume.</p>
+<p><strong>Acceptance tests:</strong> a lost reply after successful execution; repeated delivery of the same command; delayed and duplicated events; a missing completion signal; status API downtime; UNKNOWN with no customer complaint; detection and escalation within the target window.</p>
+<h2>Your decision</h2>
+<p>What is the minimum viable architecture, and what would you add for a critical workload? Who owns the <strong>outcome</strong>, <strong>reconciliation</strong>, and <strong>exceptions</strong>?</p>
+<h3>Architecture pattern references</h3>
+<ul>
+<li><a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/" rel="noopener noreferrer">AWS Builders&#39; Library — Making retries safe with idempotent APIs</a>.</li>
+<li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/asynchronous-request-reply" rel="noopener noreferrer">Microsoft Learn — Asynchronous Request-Reply</a>.</li>
+<li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction" rel="noopener noreferrer">Microsoft Learn — Compensating Transaction</a>.</li>
+</ul>
+<p>These sources describe <strong>technical patterns</strong>, not the fictional case. The scenario and sample ADR are original editorial material.</p>
+
+<div class="source"><strong>Fictional teaching scenario.</strong> Architecture pattern reference: <a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/" rel="noopener noreferrer">https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/</a>. This link does not document the described events.</div>
