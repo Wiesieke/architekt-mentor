@@ -92,7 +92,7 @@ test('labels approved fictional practice scenarios as synthetic and cites patter
  const original=goodJob();
  const h=JSON.parse(original.handoff_json);
  h.candidate_id='AM-PR-1-R1';
- h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',
+ h.editorial_hint={category:'Podstawy architektury',format:'article',
   fictional_scenario:true,series:'Z praktyki architekta'};
  h.source.url='https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/';
  const handoff_json=JSON.stringify(h);
@@ -125,7 +125,7 @@ test('release adds newly approved learning article to exactly one curated taxono
  const job=goodJob();
  const handoff=JSON.parse(job.handoff_json);
  handoff.candidate_id='AM-PR-1-R1';
- handoff.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',fictional_scenario:true};
+ handoff.editorial_hint={category:'Podstawy architektury',format:'article',fictional_scenario:true};
  const raw=JSON.stringify(handoff);
  const parsed=parseApprovedJob({...job,handoff_json:raw,
   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});
@@ -153,7 +153,7 @@ test('new foundation articles require controlled editorial grouping',()=>{
  const job=goodJob();
  const h=JSON.parse(job.handoff_json);
  h.candidate_id='AM-PR-999999-R1';
- h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka'};
+ h.editorial_hint={category:'Podstawy architektury',format:'article'};
  const raw=JSON.stringify(h);
  assert.throws(()=>parseApprovedJob({...job,handoff_json:raw,
   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}),
@@ -162,4 +162,69 @@ test('new foundation articles require controlled editorial grouping',()=>{
  const valid=JSON.stringify(h);
  assert.equal(parseApprovedJob({...job,handoff_json:valid,
   content_sha256:crypto.createHash('sha256').update(valid).digest('hex')}).learningGroup,'integration');
+});
+
+test('puzzle-format release requires separate human review and generates both practice modes',()=>{
+ const job=goodJob();
+ const h=JSON.parse(job.handoff_json);
+ h.candidate_id='AM-PR-20261030-EX1';
+ h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',
+   fictional_scenario:true,learning_group:'integration'};
+ const makeJob=o=>{const handoff_json=JSON.stringify(o);return {...job,handoff_json,
+   content_sha256:crypto.createHash('sha256').update(handoff_json).digest('hex')};};
+ assert.throws(()=>parseApprovedJob(makeJob(h)),/exercise_confirmed|separate manual approval/);
+ h.approval.exercise_confirmed=true;
+ assert.throws(()=>parseApprovedJob(makeJob(h)),/Dual-mode puzzle package missing/);
+ const source=parseApprovedJob(makeJob({...h,editorial_hint:{...h.editorial_hint,format:'article'}}));
+ const quick={question:'Who owns the result and who reconciles it?',
+   hint:'Look for unknown outcomes even when nobody calls again.',correctId:'c',
+   options:[
+    {id:'a',text:'Look up the result when the customer returns.',
+     explanation:'Useful on demand, but never detects abandoned UNKNOWN operations.'},
+    {id:'b',text:'Consume events as the only final confirmation mechanism.',
+     explanation:'Events can be lost; without reconciliation the result may remain unknown.'},
+    {id:'c',text:'Persist UNKNOWN, reconcile against the authoritative outcome, escalate.',
+     explanation:'Detects unseen cases and gives unresolved outcomes an operational owner.'}
+   ]};
+ const criteria=[
+  {id:'outcome',label:'Outcome truth',expected:'Identify the authoritative result and stable operation identity.'},
+  {id:'reconciliation',label:'Reconciliation',expected:'Detect unknown cases without relying on user complaints.'},
+  {id:'ownership',label:'Exception ownership',expected:'Escalate unresolved outcomes to an accountable owner.'}
+ ];
+ const base={title:'UNKNOWN decision exercise',difficulty:'Intermediate',
+   goal:'Assign clear responsibilities for uncertain operations.',
+   scenario:'Fictional educational scenario with independent status reconciliation.',
+   question:'How can the team detect and resolve unknown outcomes safely?',
+   analysis:'## Analysis\n\nUse authoritative lookup, idempotency and durable reconciliation with an explicit escalation owner.',
+   hints:['What if nobody calls again?','Which system owns the final result?'],
+   quick,criteria};
+ h.exercise={id:'2026-10-30-approved-reconciliation',practiceArea:'integration',
+   pl:{...base,title:'Kto ustala nieznany wynik?',difficulty:'Średni',learnSlug:source.slugPl},
+   en:{...base,learnSlug:source.slugEn}};
+ const parsed=parseApprovedJob(makeJob(h));
+ assert.equal(parsed.exercise.id,h.exercise.id);
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'am-approved-exercise-'));
+ try{
+  fs.mkdirSync(path.join(temp,'src/data'),{recursive:true});
+  fs.mkdirSync(path.join(temp,'src/content/articles/en'),{recursive:true});
+  fs.mkdirSync(path.join(temp,'data'),{recursive:true});
+  for(const filename of ['articles.ts','articles-en.ts','learning.ts','catalogue.ts','editions.ts'])
+   fs.copyFileSync(path.join(process.cwd(),'src/data',filename),path.join(temp,'src/data',filename));
+  for(const filename of ['starter-exercises.json','puzzles.json','puzzle-coach-en.json'])
+   fs.copyFileSync(path.join(process.cwd(),'data',filename),path.join(temp,'data',filename));
+  const files=makeReleaseFiles(temp,parsed,'2026-10-30');
+  assert.equal(files.length,10);
+  assert(files.some(x=>x.path.endsWith('/learning.ts')));
+  const newPl=files.find(x=>x.path.endsWith(parsed.slugPl+'.html')).content;
+  assert(newPl.includes('/lamiglowki/'+parsed.exercise.id+'/'));
+  writeReleaseFiles(files);
+  const published=JSON.parse(fs.readFileSync(path.join(temp,'data','puzzles.json'),'utf8'));
+  assert.equal(published[0].quick.options.length,3);
+  assert.equal(published[0].coach.criteria.length,3);
+  const english=JSON.parse(fs.readFileSync(path.join(temp,'data','puzzle-coach-en.json'),'utf8'));
+  assert.equal(english[parsed.exercise.id].criteria.length,3);
+  const taxonomy=fs.readFileSync(path.join(temp,'src/data/catalogue.ts'),'utf8');
+  assert(taxonomy.includes("'"+parsed.exercise.id+"':'integration'"));
+  assert.throws(()=>makeReleaseFiles(temp,parsed,'2026-10-30'));
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });
