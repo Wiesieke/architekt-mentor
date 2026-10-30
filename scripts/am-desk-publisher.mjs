@@ -111,7 +111,10 @@ function createPR(parsed,auto) {
     '- Zatwierdzona rewizja: '+parsed.h.approved_revision,
     '- Zatwierdził: '+parsed.h.approval.by+' · '+parsed.h.approval.at_utc+' UTC',
     '- Wyraźne zlecenie: '+parsed.h.release.requested_by+' · '+parsed.h.release.requested_at_utc+' UTC',
-    '- Źródło pierwotne: '+parsed.h.source.url,
+    (parsed.h.editorial_hint?.fictional_scenario === true ||
+      /^AM-PR-[A-Za-z0-9_-]+$/.test(parsed.h.candidate_id)
+      ? '- Scenariusz fikcyjny; źródło wzorca technicznego: '
+      : '- Źródło pierwotne: ') + parsed.h.source.url,
     '- Sekcja: '+parsed.category,
     '',
     '## Warunki wydania',
