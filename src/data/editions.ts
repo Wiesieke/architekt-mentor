@@ -1,6 +1,7 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  { kind:'ĆWICZENIE', title:"Transakcja UNKNOWN: kto ma doprowadzić sprawę do końca?", summary:'Średni · 2 minuty lub warsztat z mentorem · wynik, rekoncyliacja, wyjątki', href:'/lamiglowki/2026-10-30-unknown-odpowiedzialnosc/', published:'2026-10-30' },
   { kind:'PODSTAWY', title:'Flaga funkcji to nie plan wycofania zmiany', summary:'Feature flags · sześć pól kontraktu · pięć testów · plan wyłączenia', href:'/podstawy-architektury/flagi-funkcji-kontrakt-operacyjny/', published:'2026-10-24' },
   { kind:'PODSTAWY', title:'Log nie jest audytem. Jak zaprojektować wiarygodny ślad operacji?', summary:'Ślad biznesowy · integralność · transactional outbox · pięć testów', href:'/podstawy-architektury/audyt-zdarzen-biznesowych/', published:'2026-10-21' },
   { kind:'PODSTAWY', title:'Dostępność procesu: od zielonych komponentów do wyniku użytkownika', summary:'Liveness · readiness · postęp · wynik · test negatywny', href:'/podstawy-architektury/dostepnosc-procesu-biznesowego/', published:'2026-10-19' },
