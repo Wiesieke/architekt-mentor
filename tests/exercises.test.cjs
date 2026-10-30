@@ -73,3 +73,22 @@ test('older five-criterion workshop retains its ten-point score',async()=>{
   assert.ok(older);const item={id:older.id,pl:{criteria:older.coach.criteria},en:{criteria:english[older.id].criteria}};
   for(const locale of ['pl','en']){const result=await assess(item,locale,'score');assert.equal(result.res.code,200);assert.equal(result.res.data.maxScore,10);}
 });
+
+
+test('UNKNOWN accountability puzzle is distinct from booking lookup and linked in PL/EN',()=>{
+ const id="2026-10-30-unknown-odpowiedzialnosc";
+ const starter=starters.find(p=>p.id===id);
+ const puzzle=puzzles.find(p=>p.id===id);
+ assert.ok(starter && puzzle?.coach && english[id]);
+ assert.notEqual(id,'2026-10-01-nieznany-wynik-transakcji');
+ assert.equal(starter.pl.quick.correctId,'c');
+ assert.equal(starter.en.quick.correctId,'c');
+ assert.deepEqual(puzzle.quick,starter.pl.quick);
+ assert.deepEqual(puzzle.coach.criteria,starter.pl.criteria);
+ assert.deepEqual(english[id].criteria,starter.en.criteria);
+ assert.equal(puzzle.related[0].href,'/podstawy-architektury/'+starter.pl.learnSlug+'/');
+ assert.match(starter.pl.scenario,/autorytatywnym źródłem wyniku/);
+ assert.match(starter.en.scenario,/authoritative source/);
+ assert.match(starter.pl.analysis,/rekoncyliacj/i);
+ assert.match(starter.en.analysis,/reconciliation/i);
+});
