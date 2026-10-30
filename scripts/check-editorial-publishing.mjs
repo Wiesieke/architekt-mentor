@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const puzzles=JSON.parse(fs.readFileSync('data/puzzles.json','utf8'));
+const starters=JSON.parse(fs.readFileSync('data/starter-exercises.json','utf8'));
 const ids=new Set();
 for (const p of puzzles) {
   assert(p.id && !ids.has(p.id), 'Duplicate or missing puzzle id: '+p.id);
@@ -20,7 +21,7 @@ assert(recent,'Missing dated exercise with mentor criteria');
 const en=fs.readFileSync('src/data/puzzles-en.ts','utf8');
 const coachEn=JSON.parse(fs.readFileSync('data/puzzle-coach-en.json','utf8'));
 const catalogue=fs.readFileSync('src/data/catalogue.ts','utf8');
-assert(en.includes("'"+recent.id+"':"), 'Missing EN exercise: '+recent.id);
+assert(en.includes("'"+recent.id+"':") || starters.some(item=>item.id===recent.id && item.en?.title && item.en?.quick && item.en?.criteria), 'Missing EN exercise: '+recent.id);
 assert(coachEn[recent.id], 'Missing EN mentor criteria: '+recent.id);
 assert(catalogue.includes("'"+recent.id+"':"), 'Missing practice catalogue group: '+recent.id);
 assert.deepEqual(recent.coach.criteria.map(c=>c.id),coachEn[recent.id].criteria.map(c=>c.id),'PL/EN mentor criteria mismatch');
