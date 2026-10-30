@@ -54,3 +54,9 @@ Add the related articles in `src/content/articles/` and `src/content/articles/en
 | New tablets with the same application | Easy | Change-impact analysis and C4 boundaries |
 | A reservation with an unknown outcome | Intermediate | Idempotency, outcome lookup and conditional compensation |
 | A usable result when optional saving fails | Easy | Graceful degradation |
+
+## Format-routing safety rule (30 October 2026)
+
+A Desk publication marked `format: łamigłówka` (or `puzzle` / `exercise`) **must never** enter the plain-article generator. The article-only Desk release worker now rejects it explicitly. This is a safety gate, not yet a complete Desk exercise generator: the Desk handoff must provide an approved, structured PL/EN exercise record before an automated dual-mode release can be implemented. Until then, a puzzle requires a dedicated reviewed change to the four registrations above plus catalogue grouping and publication checks.
+
+The first recovery case is `2026-10-30-unknown-odpowiedzialnosc`: it has both modes, PL/EN mentor criteria, permanent practice routes, and a cross-link to the previously published deep-dive article. Do not submit a second edition of the same article just to create its exercise; keep immutable article snapshots unchanged.
