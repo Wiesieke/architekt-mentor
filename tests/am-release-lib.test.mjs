@@ -233,6 +233,6 @@ test('an exercise requires approved matching PL/EN options and three mentor crit
  h.exercise.pl.quick.options.pop();
  assert.throws(parse,/Three options required/);
  h.exercise.pl.quick.options=starter.pl.quick.options;
- h.exercise.en.analysis='<script>attack()</script>';
+ h.exercise.en.analysis+='\n<script>attack()</script>';
  assert.throws(parse,/Unsafe HTML/);
 });
