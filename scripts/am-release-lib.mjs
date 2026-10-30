@@ -96,7 +96,7 @@ export function parseApprovedJob(job) {
   // A puzzle cannot be published as a plain article. Require the separate
   // structured, dual-mode exercise workflow instead of silently losing modes.
   const format = String(h.editorial_hint?.format ?? '').trim().toLocaleLowerCase('pl');
-  assert(!['łamigłówka','lamiglowka','puzzle','exercise','ćwiczenie','cwiczenie'].includes(format),
+  assert(!['łamigłówka','lamiglowka','puzzle','exercise','ćwiczenie','cwiczenie'].some(tag=>format.includes(tag)),
     'Interactive exercise format requires PL/EN quick decision and mentor registration; article-only publication is forbidden');
   const category = requireText(h.editorial_hint?.category, 'category', 5, 120);
   const sections = SECTIONS[category];
