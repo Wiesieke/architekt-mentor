@@ -92,6 +92,7 @@ function prepareBranch(parsed) {
   run('git',['checkout','-b',parsed.branch]);
   writeReleaseFiles(files);
   run('npm',['run','test:comments']);
+  run('node',['--test','tests/exercises.test.cjs']);
   run('node',['--test','tests/am-release-lib.test.mjs']);
   run('npm',['run','build']);
   run('node',['scripts/check-editorial-publishing.mjs']);
