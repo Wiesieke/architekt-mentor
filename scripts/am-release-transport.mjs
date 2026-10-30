@@ -39,7 +39,8 @@ async function claim() {
     return;
   }
   const result = await workerPost('claim', {
-    allow_pr_ready: process.env.AM_RELEASE_AUTO_MERGE === '1'
+    allow_pr_ready: process.env.AM_RELEASE_AUTO_MERGE === '1',
+    allow_failed_retry: process.env.GITHUB_EVENT_NAME === 'workflow_dispatch'
   });
   const job = result.job;
   if (!job) {

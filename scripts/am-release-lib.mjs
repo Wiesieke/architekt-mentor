@@ -4,6 +4,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { marked, Renderer } from 'marked';
 
+// Curated exceptions for already approved immutable Desk snapshots without a
+// learning_group hint. Do not infer taxonomy from the free-text article title.
+const CURATED_FOUNDATION_GROUPS = Object.freeze({
+  'AM-PR-1-R1': 'integration'
+});
+const FOUNDATION_GROUP_IDS = Object.freeze([
+  'integration', 'analysis', 'resilience', 'security', 'quality', 'description'
+]);
+
 const SECTIONS = Object.freeze({
   'Architektura w ruchu': ['architektura-w-ruchu', 'architecture-in-motion'],
   'Podstawy architektury': ['podstawy-architektury', 'foundations'],
@@ -87,6 +96,13 @@ export function parseApprovedJob(job) {
   const category = requireText(h.editorial_hint?.category, 'category', 5, 120);
   const sections = SECTIONS[category];
   assert(sections, 'Unsupported ArchitectMentor section');
+  const learningGroup = sections[0] === 'podstawy-architektury'
+    ? (h.editorial_hint?.learning_group ?? CURATED_FOUNDATION_GROUPS[h.candidate_id])
+    : null;
+  if(sections[0] === 'podstawy-architektury') {
+    assert(FOUNDATION_GROUP_IDS.includes(learningGroup),
+      'Foundation article requires exactly one curated learning_group: ' + h.candidate_id);
+  }
   const pl = h.content?.pl, en = h.content?.en;
   const texts = {
     pl: {
@@ -107,7 +123,7 @@ export function parseApprovedJob(job) {
     pl: 'https://ejsymont.com/' + sections[0] + '/' + slugPl + '/',
     en: 'https://ejsymont.com/en/' + sections[1] + '/' + slugEn + '/'
   };
-  return { h, texts, sections, category, slugPl, slugEn, branch, urls };
+  return { h, texts, sections, category, learningGroup, slugPl, slugEn, branch, urls };
 }
 function summary(text, length) {
   const normalized = text.replace(/\s+/g, ' ').trim();
@@ -174,12 +190,28 @@ export function makeReleaseFiles(root, parsed, date) {
       'This link does not document the described events.</div>'
     : '<div class="source"><strong>Primary source:</strong> <a href="' +
       source + '" rel="noopener noreferrer">' + source + '</a>. ArchitectMentor analysis.</div>';
-  return [
+  const files = [
     { path: plIndexPath, content: nextPl },
     { path: enIndexPath, content: nextEn },
     { path: plHtmlPath, content: safeMarkdown(parsed.texts.pl.body) + '\n' + sourcePl + '\n' },
     { path: enHtmlPath, content: safeMarkdown(parsed.texts.en.body) + '\n' + sourceEn + '\n' }
   ];
+  if (parsed.sections[0] === 'podstawy-architektury') {
+    const learningPath = path.join(root, 'src/data/learning.ts');
+    const current = fs.readFileSync(learningPath, 'utf8');
+    assert(!current.includes("'" + parsed.slugPl + "'"),
+      'Foundation slug already classified; do not write twice');
+    const group = parsed.learningGroup;
+    assert(FOUNDATION_GROUP_IDS.includes(group), 'Unapproved learning group');
+    const pattern = new RegExp("({ id: '" + group + "'[^\\n]*slugs: \\[)([^\\]]*)(\\])");
+    const matches = [...current.matchAll(new RegExp(pattern.source, 'g'))];
+    assert.equal(matches.length, 1, 'Learning taxonomy shape changed: ' + group);
+    const next = current.replace(pattern, (_match, before, slugs, after) =>
+      before + slugs + ", '" + parsed.slugPl + "'" + after);
+    assert(next !== current, 'Learning group insertion failed');
+    files.push({ path: learningPath, content: next });
+  }
+  return files;
 }
 export function writeReleaseFiles(files) {
   for (const item of files) {

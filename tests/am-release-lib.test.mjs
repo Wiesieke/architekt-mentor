@@ -105,7 +105,7 @@ test('labels approved fictional practice scenarios as synthetic and cites patter
   const dataDir=path.join(temp,'src/data');
   fs.mkdirSync(dataDir,{recursive:true});
   fs.mkdirSync(path.join(temp,'src/content/articles/en'),{recursive:true});
-  for(const name of ['articles.ts','articles-en.ts'])
+  for(const name of ['articles.ts','articles-en.ts','learning.ts'])
    fs.copyFileSync(path.join(process.cwd(),'src/data',name),path.join(dataDir,name));
   const files=makeReleaseFiles(temp,parsed,'2026-10-30');
   const pl=files.find(f=>f.path.endsWith(parsed.slugPl+'.html')).content;
@@ -119,4 +119,47 @@ test('labels approved fictional practice scenarios as synthetic and cites patter
  } finally {
   fs.rmSync(temp,{recursive:true,force:true});
  }
+});
+
+test('release adds newly approved learning article to exactly one curated taxonomy group',()=>{
+ const job=goodJob();
+ const handoff=JSON.parse(job.handoff_json);
+ handoff.candidate_id='AM-PR-1-R1';
+ handoff.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',fictional_scenario:true};
+ const raw=JSON.stringify(handoff);
+ const parsed=parseApprovedJob({...job,handoff_json:raw,
+  content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});
+ assert.equal(parsed.learningGroup,'integration');
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'am-release-group-'));
+ try{
+  const dataDir=path.join(temp,'src/data');
+  fs.mkdirSync(dataDir,{recursive:true});
+  fs.mkdirSync(path.join(temp,'src/content/articles/en'),{recursive:true});
+  for(const file of ['articles.ts','articles-en.ts','learning.ts'])
+   fs.copyFileSync(path.join(process.cwd(),'src/data',file),path.join(dataDir,file));
+  const files=makeReleaseFiles(temp,parsed,'2026-10-30');
+  assert.equal(files.length,5);
+  const tax=files.find(x=>x.path.endsWith('/learning.ts')).content;
+  const slug=parsed.slugPl;
+  assert(tax.includes("'"+slug+"'"));
+  const sets=[...tax.matchAll(/slugs:\s*\[([^\]]*)\]/g)];
+  assert.equal(sets.filter(x=>x[1].includes("'"+slug+"'")).length,1);
+  writeReleaseFiles(files);
+  assert.throws(()=>makeReleaseFiles(temp,parsed,'2026-10-30'),
+   'Previously classified article cannot be repeated');
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
+});
+test('new foundation articles require controlled editorial grouping',()=>{
+ const job=goodJob();
+ const h=JSON.parse(job.handoff_json);
+ h.candidate_id='AM-PR-999999-R1';
+ h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka'};
+ const raw=JSON.stringify(h);
+ assert.throws(()=>parseApprovedJob({...job,handoff_json:raw,
+  content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}),
+  /curated learning_group/);
+ h.editorial_hint.learning_group='integration';
+ const valid=JSON.stringify(h);
+ assert.equal(parseApprovedJob({...job,handoff_json:valid,
+  content_sha256:crypto.createHash('sha256').update(valid).digest('hex')}).learningGroup,'integration');
 });
