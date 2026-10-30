@@ -173,7 +173,7 @@ test('does not silently publish a puzzle as a plain Foundations article',()=>{
  const raw=JSON.stringify(h);
  assert.throws(()=>parseApprovedJob({...original,handoff_json:raw,
   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}), /Interactive exercise format/);
- h.editorial_hint.format='puzzle';
+ h.editorial_hint.format='practice puzzle';
  const enRaw=JSON.stringify(h);
  assert.throws(()=>parseApprovedJob({...original,handoff_json:enRaw,
   content_sha256:crypto.createHash('sha256').update(enRaw).digest('hex')}), /Interactive exercise format/);
