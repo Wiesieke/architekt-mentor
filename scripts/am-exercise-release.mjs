@@ -41,7 +41,7 @@ function verifyLocale(raw, locale, expectedCriteria) {
   const ids=data.criteria.map(x=>x.id);
   assert(new Set(ids).size===3,'Duplicate criteria: ' + locale);
   if(expectedCriteria) {
-    assert.deepEqual(ids,expectedCriteria, 'PL/EN criteria IDs differ');
+    assert.deepEqual(ids,expectedCriteria.ids, 'PL/EN criteria IDs differ');
     assert.deepEqual(options.map(x=>x.id),expectedCriteria.options, 'PL/EN option IDs differ');
     assert.equal(correctId,expectedCriteria.correctId,'PL/EN best-choice IDs differ');
   }
@@ -54,9 +54,8 @@ export function validateExercisePayload(raw) {
   assert(/^20\d\d-\d\d-\d\d-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id),
     'Invalid exercise permalink ID');
   const pl=verifyLocale(raw.pl,'pl');
-  const expectedCriteria=pl.criteria.map(x=>x.id);
-  expectedCriteria.options=pl.quick.options.map(o=>o.id);
-  expectedCriteria.correctId=pl.quick.correctId;
+  const expectedCriteria={ids:pl.criteria.map(x=>x.id),
+    options:pl.quick.options.map(o=>o.id),correctId:pl.quick.correctId};
   const en=verifyLocale(raw.en,'en',expectedCriteria);
   return {id,pl,en};
 }
