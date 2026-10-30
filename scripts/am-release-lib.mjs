@@ -93,6 +93,11 @@ export function parseApprovedJob(job) {
   requireText(h.release?.requested_at_utc, 'release date', 16, 40);
   assert(validHttps(h.source?.url), 'Invalid primary source');
   assert(/^[a-f0-9]{40}$/.test(h.source?.source_blob_sha ?? ''), 'Invalid source Git SHA');
+  // A puzzle cannot be published as a plain article. Require the separate
+  // structured, dual-mode exercise workflow instead of silently losing modes.
+  const format = String(h.editorial_hint?.format ?? '').trim().toLocaleLowerCase('pl');
+  assert(!['łamigłówka','lamiglowka','puzzle','exercise','ćwiczenie','cwiczenie'].includes(format),
+    'Interactive exercise format requires PL/EN quick decision and mentor registration; article-only publication is forbidden');
   const category = requireText(h.editorial_hint?.category, 'category', 5, 120);
   const sections = SECTIONS[category];
   assert(sections, 'Unsupported ArchitectMentor section');
