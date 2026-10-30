@@ -300,5 +300,26 @@
         "expected": "Proposes an isolated end-to-end probe and deliberately interrupted consumer followed by reconciliation without duplicate business results."
       }
     ]
+  },
+  "2026-10-30-unknown-reconciliation": {
+    "scenario": "Fictional educational scenario\n\nService A accepts commands and sends them to Service B. B may commit a business effect even when its response does not reach A before the timeout. A then records UNKNOWN—not B's confirmed status, but A's uncertainty about the result.\n\nIn this exercise, B provides authoritative outcome lookup by a durable operation identifier, requires the same identifier for safe retries and retains an outcome register. Events from B may be repeated, delayed or lost. Not every case can be resolved automatically.\n\nNo one needs to retry or file a complaint. The process owner nonetheless requires every long-unresolved operation to be detected and given an accountable owner.",
+    "question": "What minimum mechanism and ownership model would you design so UNKNOWN outcomes cannot disappear silently and retries cannot create a second effect? Name a decisive test.",
+    "criteria": [
+      {
+        "id": "outcome",
+        "label": "Authoritative outcome and idempotency",
+        "expected": "Identifies UNKNOWN as missing knowledge; makes B authoritative and requires stable operation identity and scoped idempotency without claiming universal exactly-once."
+      },
+      {
+        "id": "reconciliation",
+        "label": "Proactive detection and reconciliation",
+        "expected": "A durably records UNKNOWN and independently verifies results at B, even if events are lost or duplicated and no user returns."
+      },
+      {
+        "id": "ownership",
+        "label": "Exception owner and test evidence",
+        "expected": "Assigns an escalation owner and deadline for unresolved cases and proposes a lost-response plus lost-event test without user reports."
+      }
+    ]
   }
 }
