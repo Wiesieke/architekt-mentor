@@ -1,3 +1,4 @@
+import { validateExercisePayload, makeExerciseReleaseFiles } from './am-exercise-release.mjs';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -96,7 +97,8 @@ export function parseApprovedJob(job) {
   // A puzzle cannot be published as a plain article. Require the separate
   // structured, dual-mode exercise workflow instead of silently losing modes.
   const format = String(h.editorial_hint?.format ?? '').trim().toLocaleLowerCase('pl');
-  assert(!['łamigłówka','lamiglowka','puzzle','exercise','ćwiczenie','cwiczenie'].some(tag=>format.includes(tag)),
+  const exerciseRequested=['łamigłówka','lamiglowka','puzzle','exercise','ćwiczenie','cwiczenie'].some(tag=>format.includes(tag));
+  assert(!exerciseRequested || h.exercise,
     'Interactive exercise format requires PL/EN quick decision and mentor registration; article-only publication is forbidden');
   const category = requireText(h.editorial_hint?.category, 'category', 5, 120);
   const sections = SECTIONS[category];
@@ -123,12 +125,19 @@ export function parseApprovedJob(job) {
   };
   const slugPl = secureSlug(texts.pl.title, h.candidate_id);
   const slugEn = secureSlug(texts.en.title, h.candidate_id);
+  const exercise = exerciseRequested ? validateExercisePayload(h.exercise) : null;
+  assert(!exercise || sections[0]==='podstawy-architektury',
+    'Interactive exercise requires a linked Foundations learning article');
   const branch = 'release/' + h.candidate_id.toLowerCase() + '-r' + h.approved_revision;
-  const urls = {
+  const articleUrls = {
     pl: 'https://ejsymont.com/' + sections[0] + '/' + slugPl + '/',
     en: 'https://ejsymont.com/en/' + sections[1] + '/' + slugEn + '/'
   };
-  return { h, texts, sections, category, learningGroup, slugPl, slugEn, branch, urls };
+  const urls = exercise ? {
+    pl: 'https://ejsymont.com/lamiglowki/' + exercise.id + '/',
+    en: 'https://ejsymont.com/en/practice/' + exercise.id + '/'
+  } : articleUrls;
+  return { h, texts, sections, category, learningGroup, slugPl, slugEn, branch, urls, articleUrls, exercise };
 }
 function summary(text, length) {
   const normalized = text.replace(/\s+/g, ' ').trim();
@@ -216,6 +225,14 @@ export function makeReleaseFiles(root, parsed, date) {
     assert(next !== current, 'Learning group insertion failed');
     files.push({ path: learningPath, content: next });
   }
+  if (parsed.exercise) {
+    files.push(...makeExerciseReleaseFiles(root, parsed, date));
+    const id = parsed.exercise.id;
+    files.find(f=>f.path===plHtmlPath).content +=
+      '<p><a href="/lamiglowki/' + id + '/">Przećwicz decyzję: szybki wybór lub mentor →</a></p>\\n';
+    files.find(f=>f.path===enHtmlPath).content +=
+      '<p><a href="/en/practice/' + id + '/">Practice this decision: quick choice or mentor →</a></p>\\n';
+  }
   return files;
 }
 export function writeReleaseFiles(files) {
@@ -239,4 +256,13 @@ export function verifyBuiltRelease(root, parsed) {
   assert(rssPl.includes(parsed.slugPl), 'PL RSS missing release');
   assert(rssEn.includes(parsed.slugEn), 'EN RSS missing release');
   assert(sitemap.includes(parsed.slugPl) && sitemap.includes(parsed.slugEn), 'Sitemap missing release');
+  if(parsed.exercise) {
+    const id=parsed.exercise.id;
+    for(const p of ['lamiglowki/'+id+'/index.html','en/practice/'+id+'/index.html']){
+      const content=fs.readFileSync(path.join(root,'dist',p),'utf8');
+      assert(content.length>1500,'Suspiciously short exercise page: '+p);
+    }
+    assert(rssPl.includes(id)&&rssEn.includes(id),'Exercise missing from PL/EN RSS');
+    assert(sitemap.includes(id),'Exercise missing from sitemap');
+  }
 }
