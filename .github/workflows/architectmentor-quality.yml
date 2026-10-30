@@ -27,6 +27,8 @@ jobs:
         run: npm run build
       - name: Run comment tests
         run: npm run test:comments
+      - name: Test both interactive exercise modes and mentor contracts
+        run: node --test tests/exercises.test.cjs
       - name: Test Desk release input validation and HTML safety
         run: node --test tests/am-release-lib.test.mjs
 

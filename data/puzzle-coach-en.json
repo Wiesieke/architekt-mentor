@@ -1,4 +1,25 @@
 {
+  "2026-10-30-unknown-odpowiedzialnosc": {
+    "scenario": "Fictional educational scenario\n\nSystem A receives a client's state-changing request and sends a command to system B. The response is lost before the timeout. B may have committed the operation, may still be processing it, or may never have received it. A records UNKNOWN: this is A's knowledge state, not proof that the operation failed in B.\n\nUnder the agreed contract, B is the authoritative source of the business outcome. A owns the customer journey from request to resolution. A stable ID identifies the same intent, and B provides idempotent execution within the defined contract. B exposes an outcome lookup API with terminal statuses, although the API may occasionally be unavailable. Some discrepancies will never be reported by customers. Ownership of reconciliation, the final-resolution deadline, and exception handling are not yet defined.",
+    "question": "Who determines the actual outcome, who discovers and reconciles UNKNOWN cases, and who owns unresolved exceptions? In two or three sentences, propose clear responsibilities and one acceptance test.",
+    "criteria": [
+      {
+        "id": "authoritative_outcome",
+        "label": "Authoritative outcome",
+        "expected": "Names B as the authoritative source, distinguishes A's UNKNOWN knowledge state from the operation's real state, and preserves stable idempotent identity."
+      },
+      {
+        "id": "reconciliation_owner",
+        "label": "Reconciliation ownership",
+        "expected": "Assigns A a durable pending register and proactive scan for unreported UNKNOWN cases; reconciles using lookup or reliable outcome events."
+      },
+      {
+        "id": "operational_closure",
+        "label": "Exceptions and evidence",
+        "expected": "Defines a named exception owner, deadline, audit evidence and escalation; verifies lost reply and lookup API outage."
+      }
+    ]
+  },
   "2026-10-03-opcjonalne-pole-api": {
     "scenario": "Fictional educational scenario. An orders API adds an optional `deliveryWindow` response field. A still-supported mobile app uses strict deserialization and rejects unknown properties; it cannot be updated before the server rollout. The contract never stated whether clients must ignore unknown fields.",
     "question": "Would you expose the field to every client? In 2–3 sentences, state your decision, how you would limit risk and what evidence you need before broader rollout.",

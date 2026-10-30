@@ -92,7 +92,7 @@ test('labels approved fictional practice scenarios as synthetic and cites patter
  const original=goodJob();
  const h=JSON.parse(original.handoff_json);
  h.candidate_id='AM-PR-1-R1';
- h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',
+ h.editorial_hint={category:'Podstawy architektury',format:'article',
   fictional_scenario:true,series:'Z praktyki architekta'};
  h.source.url='https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/';
  const handoff_json=JSON.stringify(h);
@@ -125,7 +125,7 @@ test('release adds newly approved learning article to exactly one curated taxono
  const job=goodJob();
  const handoff=JSON.parse(job.handoff_json);
  handoff.candidate_id='AM-PR-1-R1';
- handoff.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',fictional_scenario:true};
+ handoff.editorial_hint={category:'Podstawy architektury',format:'article',fictional_scenario:true};
  const raw=JSON.stringify(handoff);
  const parsed=parseApprovedJob({...job,handoff_json:raw,
   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});
@@ -153,7 +153,7 @@ test('new foundation articles require controlled editorial grouping',()=>{
  const job=goodJob();
  const h=JSON.parse(job.handoff_json);
  h.candidate_id='AM-PR-999999-R1';
- h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka'};
+ h.editorial_hint={category:'Podstawy architektury',format:'article'};
  const raw=JSON.stringify(h);
  assert.throws(()=>parseApprovedJob({...job,handoff_json:raw,
   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}),
@@ -162,4 +162,77 @@ test('new foundation articles require controlled editorial grouping',()=>{
  const valid=JSON.stringify(h);
  assert.equal(parseApprovedJob({...job,handoff_json:valid,
   content_sha256:crypto.createHash('sha256').update(valid).digest('hex')}).learningGroup,'integration');
+});
+
+
+test('does not silently publish a puzzle as a plain Foundations article',()=>{
+ const original=goodJob();
+ const h=JSON.parse(original.handoff_json);
+ h.candidate_id='AM-PR-1-R1';
+ h.editorial_hint={category:'Podstawy architektury',learning_group:'integration',format:'łamigłówka'};
+ const raw=JSON.stringify(h);
+ assert.throws(()=>parseApprovedJob({...original,handoff_json:raw,
+  content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}), /Interactive exercise format/);
+ h.editorial_hint.format='practice puzzle';
+ const enRaw=JSON.stringify(h);
+ assert.throws(()=>parseApprovedJob({...original,handoff_json:enRaw,
+  content_sha256:crypto.createHash('sha256').update(enRaw).digest('hex')}), /Interactive exercise format/);
+});
+
+test('complete exercise snapshot creates both practice modes, registrations and a linked learning article',()=>{
+ const job=goodJob(),h=JSON.parse(job.handoff_json);
+ const starter=JSON.parse(fs.readFileSync('data/starter-exercises.json','utf8'))[0];
+ h.candidate_id='AM-EX-20261101';
+ h.editorial_hint={category:'Podstawy architektury',format:'łamigłówka',learning_group:'integration',fictional_scenario:true};
+ h.exercise={id:'2026-11-01-odpowiedzialnosc-test',pl:starter.pl,en:starter.en};
+ const raw=JSON.stringify(h);
+ const parsed=parseApprovedJob({...job,handoff_json:raw,
+   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});
+ assert.equal(parsed.exercise.id,h.exercise.id);
+ assert(parsed.urls.pl.endsWith('/lamiglowki/'+h.exercise.id+'/'));
+ assert(parsed.urls.en.endsWith('/en/practice/'+h.exercise.id+'/'));
+ const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'am-exercise-release-'));
+ try{
+   fs.mkdirSync(path.join(tmp,'src/content/articles/en'),{recursive:true});
+   fs.mkdirSync(path.join(tmp,'src/data'),{recursive:true});
+   fs.mkdirSync(path.join(tmp,'data'),{recursive:true});
+   for(const file of ['articles.ts','articles-en.ts','learning.ts','catalogue.ts','editions.ts'])
+     fs.copyFileSync(path.join('src/data',file),path.join(tmp,'src/data',file));
+   for(const file of ['starter-exercises.json','puzzles.json','puzzle-coach-en.json'])
+     fs.copyFileSync(path.join('data',file),path.join(tmp,'data',file));
+   const files=makeReleaseFiles(tmp,parsed,'2026-11-01');
+   assert.equal(files.length,10);
+   writeReleaseFiles(files);
+   const puzzles=JSON.parse(fs.readFileSync(path.join(tmp,'data/puzzles.json'),'utf8'));
+   const starters=JSON.parse(fs.readFileSync(path.join(tmp,'data/starter-exercises.json'),'utf8'));
+   const coach=JSON.parse(fs.readFileSync(path.join(tmp,'data/puzzle-coach-en.json'),'utf8'));
+   assert.deepEqual(puzzles[0].quick,starters[0].pl.quick);
+   assert.deepEqual(puzzles[0].coach.criteria,starters[0].pl.criteria);
+   assert.deepEqual(coach[h.exercise.id].criteria,starters[0].en.criteria);
+   assert.equal(starters[0].pl.learnSlug,parsed.slugPl);
+   assert.equal(starters[0].en.learnSlug,parsed.slugEn);
+   assert(fs.readFileSync(path.join(tmp,'src/data/catalogue.ts'),'utf8').includes("'"+h.exercise.id+"':'integration'"));
+   assert(fs.readFileSync(path.join(tmp,'src/data/editions.ts'),'utf8').includes('/lamiglowki/'+h.exercise.id+'/'));
+   assert(fs.readFileSync(path.join(tmp,'src/content/articles',parsed.slugPl+'.html'),'utf8').includes('/lamiglowki/'+h.exercise.id+'/'));
+   assert.throws(()=>makeReleaseFiles(tmp,parsed,'2026-11-01'),/already exists|Duplicate/);
+ }finally{fs.rmSync(tmp,{recursive:true,force:true});}
+});
+test('an exercise requires approved matching PL/EN options and three mentor criteria',()=>{
+ const job=goodJob(),h=JSON.parse(job.handoff_json);
+ h.candidate_id='AM-EX-20261101';
+ h.editorial_hint={category:'Podstawy architektury',format:'practice puzzle',learning_group:'integration'};
+ const parse=()=>{const raw=JSON.stringify(h);return parseApprovedJob({...job,handoff_json:raw,
+   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});};
+ assert.throws(parse,/requires PL\/EN quick decision/);
+ const starter=JSON.parse(fs.readFileSync('data/starter-exercises.json','utf8'))[0];
+ h.exercise={id:'2026-11-01-odpowiedzialnosc-test',pl:structuredClone(starter.pl),en:structuredClone(starter.en)};
+ assert.ok(parse().exercise);
+ h.exercise.en.quick.correctId='a';
+ assert.throws(parse,/best-choice IDs differ/);
+ h.exercise.en.quick.correctId=h.exercise.pl.quick.correctId;
+ h.exercise.pl.quick.options.pop();
+ assert.throws(parse,/Three options required/);
+ h.exercise.pl.quick.options=starter.pl.quick.options;
+ h.exercise.en.analysis+='\n<script>attack()</script>';
+ assert.throws(parse,/Unsafe HTML/);
 });

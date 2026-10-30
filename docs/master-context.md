@@ -225,3 +225,9 @@ Do PL przeniesiono kierunek UX z PR #37: główne działanie prowadzi do ćwicze
 ## Upoważnienie publikacyjne — 9 października 2026
 
 Zmiana obowiązuje dla ArchitectMentor; nie przenosi uprawnień między projektami. Zapis poprzedniej reguły stanowi historię decyzji, nie aktualną bramkę. Nie zmieniamy historycznych dowodów przeglądu ani nie przypisujemy Wiesławowi review nowych tekstów.
+
+## Zmiana D026 — łamigłówka UNKNOWN i routing formatu (PR #84, 30.10.2026)
+
+Stan: PR przygotowany do kontroli; nie oznacza wdrożenia produkcyjnego. Materiał AM-PR-1-R1 zachowuje pierwotny artykuł z 30.10 jako analizę „Ucz się”. Powiązana łamigłówka pod odrębnym ID `2026-10-30-unknown-odpowiedzialnosc` ćwiczy rozróżnienie źródła prawdy (B), właściciela rekoncyliacji i procesu klienta (A) oraz przypisanej obsługi wyjątków. Obie wersje językowe mają trzy odpowiedzi z wyjaśnieniami, ścieżkę mentora 0–6 punktów i stałe adresy.
+
+Publikator Desk rozpoznaje `editorial_hint.format`: łamigłówka wymaga kompletnego, zatwierdzonego w niezmiennym snapshotcie `exercise.id`, `exercise.pl` i `exercise.en`. Dopiero taki pakiet generuje skojarzone artykuły, wpisy ćwiczenia, dane mentora, przypisanie do „Ćwicz” i linki. Snapshot mający jedynie artykuł przy `format: łamigłówka` kończy się błędem — bez udawania, że opublikowano interaktywny wariant. Dostosowanie wejścia w ArchitectMentor Desk do przekazywania pełnych danych nadal jest zadaniem integracyjnym przed automatycznym publikowaniem przyszłych łamigłówek. Zmiana dokumentacji nie jest dowodem publikacji.

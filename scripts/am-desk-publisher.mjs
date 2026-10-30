@@ -73,8 +73,15 @@ async function feedHas(url,slug) {
 async function waitProduction(parsed) {
   for(let i=0;i<72;i++){
     const results=await Promise.all([
-      pageMatches(parsed.urls.pl,parsed.texts.pl.title),
-      pageMatches(parsed.urls.en,parsed.texts.en.title),
+      pageMatches(parsed.urls.pl,parsed.exercise?.pl.title ?? parsed.texts.pl.title),
+      pageMatches(parsed.urls.en,parsed.exercise?.en.title ?? parsed.texts.en.title),
+      ...(parsed.exercise ? [
+        pageMatches(parsed.articleUrls.pl,parsed.texts.pl.title),
+        pageMatches(parsed.articleUrls.en,parsed.texts.en.title),
+        feedHas('https://ejsymont.com/rss.xml',parsed.exercise.id),
+        feedHas('https://ejsymont.com/en/rss.xml',parsed.exercise.id),
+        feedHas('https://ejsymont.com/sitemap.xml',parsed.exercise.id)
+      ] : []),
       feedHas('https://ejsymont.com/rss.xml',parsed.slugPl),
       feedHas('https://ejsymont.com/en/rss.xml',parsed.slugEn),
       feedHas('https://ejsymont.com/sitemap.xml',parsed.slugPl),
@@ -92,6 +99,7 @@ function prepareBranch(parsed) {
   run('git',['checkout','-b',parsed.branch]);
   writeReleaseFiles(files);
   run('npm',['run','test:comments']);
+  run('node',['--test','tests/exercises.test.cjs']);
   run('node',['--test','tests/am-release-lib.test.mjs']);
   run('npm',['run','build']);
   run('node',['scripts/check-editorial-publishing.mjs']);
@@ -116,6 +124,7 @@ function createPR(parsed,auto) {
       ? '- Scenariusz fikcyjny; źródło wzorca technicznego: '
       : '- Źródło pierwotne: ') + parsed.h.source.url,
     '- Sekcja: '+parsed.category,
+    '- Format: '+(parsed.exercise ? 'interaktywne ćwiczenie PL/EN + powiązany artykuł' : 'artykuł'),
     '',
     '## Warunki wydania',
     '- Zlecenie jest niezmiennym snapshotem; brak zgody na zmianę treści po akceptacji.',

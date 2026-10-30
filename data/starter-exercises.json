@@ -1,5 +1,116 @@
 [
   {
+    "id": "2026-10-30-unknown-odpowiedzialnosc",
+    "pl": {
+      "title": "Transakcja UNKNOWN: kto ma doprowadzić sprawę do końca?",
+      "difficulty": "Średni",
+      "goal": "Rozdzielić odpowiedzialność za autorytatywny wynik operacji, rekoncyliację oraz obsługę nierozstrzygniętych wyjątków.",
+      "scenario": "Fikcyjny scenariusz edukacyjny\n\nSystem A przyjmuje od klienta zlecenie zmieniające stan biznesowy i wysyła komendę do systemu B. Odpowiedź nie dociera przed timeoutem. B może już mieć zatwierdzony wynik, być w trakcie operacji albo nie otrzymać komendy. A zapisuje stan UNKNOWN — to stan wiedzy A, a nie dowód, że operacja w B się nie udała.\n\nW przyjętym kontrakcie B jest autorytatywnym źródłem wyniku. A zarządza procesem klienta od zgłoszenia do rozstrzygnięcia. Ta sama intencja ma trwały identyfikator, a B gwarantuje idempotentne wykonanie w uzgodnionym zakresie. B udostępnia status API ze stanami terminalnymi, lecz może być czasowo niedostępne. Część rozbieżności nie zostanie zgłoszona przez klientów. Nie określono jeszcze właściciela rekoncyliacji, terminu rozstrzygnięcia ani procedury obsługi wyjątków.",
+      "question": "Kto powinien ustalić faktyczny wynik, kto wykrywać i uzgadniać przypadki UNKNOWN, a kto odpowiadać za zamknięcie nierozstrzygniętego wyjątku? W 2–3 zdaniach zaproponuj podział odpowiedzialności i jeden test.",
+      "hints": [
+        "Czy właściciel prawdy o skutku biznesowym musi być jednocześnie właścicielem całej ścieżki klienta?",
+        "Co wykryje UNKNOWN, jeśli nikt nie złoży reklamacji?",
+        "Czy sam status HTTP 404 dowodzi braku operacji?",
+        "Co zrobisz, gdy B nie potwierdza wyniku w uzgodnionym czasie?"
+      ],
+      "analysis": "### Trzy różne odpowiedzialności\n\n**B jest źródłem prawdy o skutku operacji.** Wystawia stabilną tożsamość zlecenia, idempotentną obsługę zgodnie z kontraktem i wiarygodne zapytanie o wynik. Stany `SUCCEEDED` i `REJECTED` mają jednoznaczną semantykę; timeout A i samotne HTTP 404 nie są stanami terminalnymi bez odrębnej gwarancji kontraktowej.\n\n**A odpowiada za domknięcie procesu z perspektywy klienta.** Utrzymuje rejestr zleceń bez wyniku terminalnego, sprawdza status w B, cyklicznie wykrywa nierozstrzygnięte przypadki bez reklamacji, koreluje odpowiedzi i zdarzenia oraz zapewnia komunikację z użytkownikiem. Właściciel biznesowy procesu ustala akceptowalny czas rozstrzygnięcia i reguły decyzji.\n\n**Obsługa operacyjna ma jawnie przypisane wyjątki.** Gdy automatyczna rekoncyliacja nie rozstrzyga sprawy w terminie, przypadek dostaje właściciela, priorytet, ślad ustaleń i ścieżkę eskalacji. Człowiek nie powinien zgadywać wyniku bez dowodów; w razie potrzeby uzgadnia go z właścicielem systemu B i właścicielem procesu biznesowego.\n\n### Minimum i wariant dla systemu krytycznego\n\nW minimum: trwały identyfikator zlecenia, bezpieczny retry wyłącznie w ramach kontraktu, autorytatywny status w B, rejestr UNKNOWN w A, planowa rekoncyliacja i kolejka wyjątków. W systemie krytycznym dodaj zdarzenia wynikowe z odporną publikacją, monitoring wieku nierozstrzygniętych spraw, SLO rozstrzygnięcia, deduplikację, alarmy i audyt dowodów. Zdarzenia przyspieszają uzgodnienie, ale nie zastępują mechanizmu wykrywania luk.\n\n### Co sprawdzić\n\nZasymuluj utratę odpowiedzi po zatwierdzeniu operacji w B. A musi odnaleźć ten sam wynik bez ponownego skutku biznesowego i zamknąć sprawę na podstawie dowodu. Następnie zasymuluj niedostępność status API oraz przypadek bez reklamacji: sprawa powinna zostać automatycznie wykryta i przekazana do właściciela wyjątku w uzgodnionym terminie. Nie uruchamiaj kompensacji, dopóki nie zostały potwierdzone jej przesłanki.\n\n> B rozstrzyga, co naprawdę zaszło. A odpowiada za doprowadzenie procesu do końca. Zespół operacyjny obsługuje wyjątek na podstawie dowodów — według jawnie przyjętej odpowiedzialności.\n\n[Pełne omówienie scenariusza UNKNOWN](/podstawy-architektury/transakcja-unknown-kto-odpowiada-za-ostateczne-rozstrzygni-am-pr-1-r1/).",
+      "quick": {
+        "question": "Który model odpowiedzialności jest najbezpieczniejszy przy podanych założeniach?",
+        "hint": "Oddziel źródło prawdy o operacji od właściciela procesu klienta i procesu obsługi wyjątków.",
+        "correctId": "c",
+        "options": [
+          {
+            "id": "a",
+            "text": "B ma wynik, więc B powinien sam znaleźć wszystkie UNKNOWN i informować klienta; A może zakończyć sprawę po timeoutcie.",
+            "explanation": "B zna rzeczywisty wynik, ale niekoniecznie widzi pełny rejestr zleceń A ani zobowiązanie wobec użytkownika. Zamknięcie w A na podstawie timeoutu może ukryć rozbieżność."
+          },
+          {
+            "id": "b",
+            "text": "A może polegać na zdarzeniach sukcesu i przekazywać do wsparcia tylko reklamacje; brak zdarzenia po terminie oznacza niepowodzenie.",
+            "explanation": "Brak zdarzenia nie dowodzi niepowodzenia. Zdarzenie może się opóźnić lub zaginąć, a niezgłoszone przez klientów operacje pozostaną bez rozstrzygnięcia."
+          },
+          {
+            "id": "c",
+            "text": "B potwierdza autorytatywny wynik; A prowadzi rejestr, rekoncyliację i komunikację; nierozstrzygnięte sprawy trafiają do wskazanego właściciela wyjątku.",
+            "explanation": "Ten podział obejmuje zarówno prawdę o skutku, jak i odpowiedzialność za zamknięcie procesu. Zakłada proaktywne wykrywanie, limit czasu i udokumentowaną eskalację."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "authoritative_outcome",
+          "label": "Źródło prawdy",
+          "expected": "Wskazuje B jako autorytatywne źródło wyniku; rozróżnia stan UNKNOWN w A od faktycznego stanu operacji oraz zachowuje idempotentną tożsamość."
+        },
+        {
+          "id": "reconciliation_owner",
+          "label": "Właściciel rekoncyliacji",
+          "expected": "Przypisuje A odpowiedzialność za rejestr otwartych operacji, cykliczne wykrywanie niezgłoszonych UNKNOWN i uzgadnianie wyniku przez status API lub wiarygodne zdarzenia."
+        },
+        {
+          "id": "operational_closure",
+          "label": "Obsługa wyjątków i dowód",
+          "expected": "Przewiduje właściciela, termin, ślad audytowy i eskalację nierozstrzygniętych przypadków oraz test utraty odpowiedzi i niedostępności status API."
+        }
+      ],
+      "learnSlug": "transakcja-unknown-kto-odpowiada-za-ostateczne-rozstrzygni-am-pr-1-r1"
+    },
+    "en": {
+      "title": "UNKNOWN transaction: who is responsible for closing the case?",
+      "difficulty": "Intermediate",
+      "goal": "Separate ownership of the authoritative outcome, reconciliation, and unresolved operational exceptions.",
+      "scenario": "Fictional educational scenario\n\nSystem A receives a client's state-changing request and sends a command to system B. The response is lost before the timeout. B may have committed the operation, may still be processing it, or may never have received it. A records UNKNOWN: this is A's knowledge state, not proof that the operation failed in B.\n\nUnder the agreed contract, B is the authoritative source of the business outcome. A owns the customer journey from request to resolution. A stable ID identifies the same intent, and B provides idempotent execution within the defined contract. B exposes an outcome lookup API with terminal statuses, although the API may occasionally be unavailable. Some discrepancies will never be reported by customers. Ownership of reconciliation, the final-resolution deadline, and exception handling are not yet defined.",
+      "question": "Who determines the actual outcome, who discovers and reconciles UNKNOWN cases, and who owns unresolved exceptions? In two or three sentences, propose clear responsibilities and one acceptance test.",
+      "hints": [
+        "Does the source of truth for a business effect also have to own the entire customer journey?",
+        "How will you find UNKNOWN cases when no one complains?",
+        "Does an HTTP 404 on its own prove non-execution?",
+        "What happens if B cannot confirm the outcome within the agreed period?"
+      ],
+      "analysis": "### Three distinct responsibilities\n\n**B owns the authoritative outcome.** It exposes stable operation identity, idempotent processing within the contract, and a reliable status lookup. `SUCCEEDED` and `REJECTED` need precise meanings; A's timeout and an isolated HTTP 404 are not terminal outcomes unless the contract explicitly makes them so.\n\n**A owns closure of the customer process.** A maintains pending operations, queries B for results, proactively scans unresolved cases regardless of complaints, correlates responses and events, and communicates the status to the customer. The business process owner defines the acceptable resolution window and decision rules.\n\n**Operations owns explicitly assigned exceptions.** If automated reconciliation cannot settle a case by its deadline, it gets an owner, priority, evidence trail and escalation route. An operator must not guess the result without evidence; the team may need the B service owner and the business process owner to resolve it.\n\n### Minimum design and critical-workload extension\n\nStart with stable IDs, contractually safe retries, B's authoritative lookup, A's durable UNKNOWN register, a scheduled reconciliation scan, and an exception queue. A critical workload may add reliably published outcome events, age-based alerting, a resolution SLO, deduplication and auditable evidence. Events can reduce delay, but they do not replace gap detection.\n\n### Prove it\n\nDrop B's successful response after its commit. A must discover the original result, avoid any duplicate business effect, and close the case using evidence. Then make the lookup API unavailable and run an UNKNOWN case with no customer complaint: scheduled detection and assigned escalation must happen within the agreed window. Never launch compensation solely because a response was lost.\n\n> B establishes what happened. A is accountable for closing the customer process. Operations resolves evidence-backed exceptions under explicit ownership.\n\n[Full analysis of the UNKNOWN scenario](/en/foundations/unknown-transaction-who-owns-the-final-outcome-am-pr-1-r1/).",
+      "quick": {
+        "question": "Which ownership model is best under these assumptions?",
+        "hint": "Separate who knows the true outcome from who closes the customer journey and operational exceptions.",
+        "correctId": "c",
+        "options": [
+          {
+            "id": "a",
+            "text": "B knows the outcome, so B alone must find every UNKNOWN and notify customers; A can close its case on timeout.",
+            "explanation": "B knows the business effect but may not see A's complete request register or customer commitment. Closing A's case on timeout can conceal discrepancies."
+          },
+          {
+            "id": "b",
+            "text": "A should rely on success events and pass only customer complaints to support; no event by the deadline means failure.",
+            "explanation": "No event does not establish failure. It can be delayed or lost, and unreported UNKNOWN transactions may remain unresolved."
+          },
+          {
+            "id": "c",
+            "text": "B confirms the authoritative outcome; A owns the open-case register, reconciliation and communication; named operators handle unresolved exceptions.",
+            "explanation": "This separates evidence of the effect from accountable process closure, including proactive detection, deadlines and recorded escalation."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "authoritative_outcome",
+          "label": "Authoritative outcome",
+          "expected": "Names B as the authoritative source, distinguishes A's UNKNOWN knowledge state from the operation's real state, and preserves stable idempotent identity."
+        },
+        {
+          "id": "reconciliation_owner",
+          "label": "Reconciliation ownership",
+          "expected": "Assigns A a durable pending register and proactive scan for unreported UNKNOWN cases; reconciles using lookup or reliable outcome events."
+        },
+        {
+          "id": "operational_closure",
+          "label": "Exceptions and evidence",
+          "expected": "Defines a named exception owner, deadline, audit evidence and escalation; verifies lost reply and lookup API outage."
+        }
+      ],
+      "learnSlug": "unknown-transaction-who-owns-the-final-outcome-am-pr-1-r1"
+    }
+  },
+  {
     "id": "2026-10-11-saas-granice-odpowiedzialnosci",
     "pl": {
       "title": "Dostawca daje SaaS. Czy musisz znać jego architekturę?",

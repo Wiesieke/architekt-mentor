@@ -26,6 +26,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:comments
+      - name: Verify PL/EN exercise content and mentor contracts
+        run: node --test tests/exercises.test.cjs
       - name: Build public PL/EN pages
         run: PUBLIC_SITE_INDEXABLE=true npm run build
       - name: Verify latest bilingual practice, routes, RSS and sitemap
