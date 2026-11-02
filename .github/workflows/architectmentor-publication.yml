@@ -38,6 +38,8 @@ jobs:
         run: node --check scripts/am-desk-publisher.mjs
       - name: Test release correction safety guards
         run: node --test tests/am-release-correction.test.mjs
+      - name: Test required CI-before-ready release order
+        run: node --test tests/am-release-ci-order.test.mjs
       - run: npm run test:comments
       - name: Verify PL/EN exercise content and mentor contracts
         run: node --test tests/exercises.test.cjs
