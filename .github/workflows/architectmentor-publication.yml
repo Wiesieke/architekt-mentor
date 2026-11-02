@@ -20,11 +20,24 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Check editorial quality of new PL/EN articles
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: node scripts/am-editorial-gate.mjs --changed
+      - name: Test editorial preflight rules
+        run: node --test tests/am-editorial-gate.test.mjs
+      - name: Validate publishing workflow syntax
+        run: node --check scripts/am-desk-publisher.mjs
+      - name: Test release correction safety guards
+        run: node --test tests/am-release-correction.test.mjs
       - run: npm run test:comments
       - name: Verify PL/EN exercise content and mentor contracts
         run: node --test tests/exercises.test.cjs

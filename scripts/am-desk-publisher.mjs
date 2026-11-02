@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { escapeHtml, makeReleaseFiles, parseApprovedJob, verifyBuiltRelease, writeReleaseFiles } from './am-release-lib.mjs';
 import { assertTrustedRunner, jobFile, workerPost } from './am-release-transport.mjs';
+import {assertCorrectionCandidate,assertCorrectionCompleted} from './am-release-correction.mjs';
 
 const REPOSITORY='Wiesieke/architekt-mentor';
 const root=process.cwd();
@@ -148,6 +149,27 @@ async function main() {
   let pr=null,parsed=null,publishedSha=null,stage='validate';
   try {
     parsed=parseApprovedJob(job);
+    // Reverse an unmerged release safely. Only the exact existing approved
+    // release branch and PR may be withdrawn, never a merged publication.
+    if(job.correction_mode===true){
+      stage='withdraw_draft_pr';
+      pr=findExistingPR(parsed.branch);
+      assert(pr&&urlOk(pr.url,'https://github.com','/Wiesieke/architekt-mentor/pull/'),
+        'Original PR missing or untrusted');
+      const state=JSON.parse(gh('pr','view',String(pr.number),
+       '--json','state,mergedAt,headRefName,baseRefName,url'));
+      assertCorrectionCandidate(parsed,state);
+      assert(state.url===pr.url,'Correction PR reference changed');
+      if(state.state==='OPEN')gh('pr','close',String(pr.number),
+        '--comment','Withdrawn at the editor\'s explicit correction request. A NEW approved revision is required.');
+      const after=JSON.parse(gh('pr','view',String(pr.number),
+        '--json','state,mergedAt'));
+      assertCorrectionCompleted(after);
+      await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
+        status:'CORRECTION_ALLOWED',pr_url:pr.url});
+      console.log('Old draft PR closed. Desk may now reopen content as a new revision.');
+      return;
+    }
     const auto=process.env.AM_RELEASE_AUTO_MERGE==='1';
     stage='existing_pr_lookup';
     pr=findExistingPR(parsed.branch);
@@ -202,6 +224,12 @@ async function main() {
       published_url_pl:parsed.urls.pl,published_url_en:parsed.urls.en});
     console.log('Release completed; both public language routes and feeds verified.');
   } catch(error) {
+    if(job.correction_mode===true) {
+      // Fail closed: never declare correction complete when the exact PR
+      // state or Desk acknowledgment cannot be confirmed. Lease retry is safe.
+      console.error('Release correction could not be verified; job will retry.');
+      throw error;
+    }
     const errorCode=stage.replace(/[^a-z0-9_]/g,'_').slice(0,100)+'_failed';
     console.error('ArchitectMentor release stopped at stage: '+stage);
     try{
