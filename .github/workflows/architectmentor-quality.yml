@@ -29,6 +29,8 @@ jobs:
         run: node --test tests/am-editorial-gate.test.mjs
       - name: Validate publisher transport syntax
         run: node --check scripts/am-desk-publisher.mjs
+      - name: Test release correction safety guards
+        run: node --test tests/am-release-correction.test.mjs
       - name: Run comment tests
         run: npm run test:comments
       - name: Test both interactive exercise modes and mentor contracts
