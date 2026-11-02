@@ -1,0 +1,68 @@
+<ol>
+<li>What was actually announced?</li>
+</ol>
+<p>Facts arising from the parties&#39; announcements</p>
+<p>On October 23, 2026, OpenAI and NASK - the National Research Institute - announced the signing of an agreement on research cooperation in the field of artificial intelligence, cybersecurity and technical issues.</p>
+<p>On the NASK side, the Center for Research on the Security of Artificial Intelligence was indicated, acting as the Polish AI Safety Institute (AISI). The announced course of action involves examining the capabilities of advanced AI systems, identifying potential vulnerabilities and developing security.</p>
+<p>Messages also include issues of detecting synthetic content, harmful applications of AI and language-dependent threats.</p>
+<p>However, the full schedule, budget, detailed test methodology or the catalog of the final products of the Agreement were not presented.</p>
+<p>Architectmentor interpretation</p>
+<p>This is an important distinction. The signing of the agreement means a formally communicated intention of cooperation, but it does not in itself prove that a common test system, an independent model evaluation mechanism or a new safety standard have already been created.</p>
+<p>The importance of this initiative should therefore be assessed primarily by the results that can be presented and subjected to critical analysis.</p>
+<ol start="2">
+<li>From model security to the security of the entire system</li>
+</ol>
+<p>In a traditional approach to cybersecurity, we analyze the user&#39;s identity, permissions, interfaces, data, infrastructure and the way of responding to incidents.</p>
+<p>In AI systems, this directory does not disappear. It is added to new risk areas: manipulating model instructions (Prompt Injection), uncontrolled tool calling, data disclosure through context, and performing actions based on incorrect or manipulated responses.</p>
+<p>Agent architecture is particularly important. A model that only proposes an answer has a different risk profile than an agent with the ability to read documents, perform operations by an API or modify business data.</p>
+<p>architectural assessment</p>
+<p>Security cannot be reduced to the LLM test itself. The entire system should be tested: model, system instructions, context search mechanisms, tools, technical identities, scope of powers, action approval mechanisms and an audit path.</p>
+<p>Responsibility for the operation of the system remains with the organization that designs and operates it - even when it uses an external model supplier.</p>
+<ol start="3">
+<li>CERT Polska shows what the controlled application of AI can look like</li>
+</ol>
+<p>documented example</p>
+<p>An important context of the partnership is the previous work of CERT Polska on vulnerability in MikroTik RouterOS.</p>
+<p>In September 2026, CERT Polska described six identified vulnerabilities as well as the use of OpenAI models in a security-supporting environment. The documentation presents, among other things, the use of agents to automate experiments, analyze software versions and test protocol behavior.</p>
+<p>The isolated laboratory played a key role. The hypotheses generated with the participation of models were subject to experimental confirmation, control tests and evaluation conducted by researchers.</p>
+<p>This does not mean that AI has detected and confirmed all vulnerabilities on its own. The description of CERT Polska indicates a process that combines automation with expertise, controlled environment and repetitive validation.</p>
+<p>Architectmentor application</p>
+<p>This case illustrates a useful pattern: AI can increase the scale of exploration and the rate of hypothesis formulating, while the credibility of the result is due to the independent process of its verification.</p>
+<p>For an architect, more important than the use of an advanced model is the design of the control system that surrounds it.</p>
+<ol start="4">
+<li>What should a corporate architect expect from AI Assurance?</li>
+</ol>
+<p>The concept of AI assurance can be understood as a set of actions to justify that the AI system meets specific quality, security and compliance requirements in a specific context of use.</p>
+<p>In architectural practice, we propose to base this approach on five elements.</p>
+<p>The first is the defined application context. The assessment must take into account system tasks, data, users, tools and the effects of potential errors.</p>
+<p>The second is the threat model. It should include not only attacks on the model, but also abuse of agent&#39;s permissions, integration errors, manipulation of information sources, and loss of control over the process.</p>
+<p>The third is repetitive tests. Evaluation scenarios should have acceptance criteria, test data sets, specific model versions and the ability to compare results after changes.</p>
+<p>The fourth is the evidence. Architecture should be able to recreate what the system received, what actions it took, what tools it used and what result it obtained - in compliance with data protection requirements.</p>
+<p>The fifth is the life cycle surveillance. Changing a model, instruction, knowledge source or scope of permissions can change the risk profile. Therefore, the safety assessment should not end at the time of implementation.</p>
+<p>This is the proposed model of the Architectmentor, and not the confirmed result of OpenAI-NASK cooperation.</p>
+<ol start="5">
+<li>The most difficult question: who is assessing the AI supplier?</li>
+</ol>
+<p>The cooperation of the model&#39;s creator with the public research institution may expand access to competences, test scenarios and knowledge about country-specific threats.</p>
+<p>At the same time, the question arises about the independence of the assessment.</p>
+<p>Can the researcher check the system without limiting himself to the tests proposed by the supplier? Can the negative results be revealed? Will the methodology and scope of the research make it possible to compare the different models? Who is responsible for taking action after detecting significant vulnerability?</p>
+<p>Public partnership communications do not yet provide a sufficient basis for answering these questions.</p>
+<p>Architectmentor&#39;s position</p>
+<p>The maturity of AI Governance should be measured not by the number of declarations of responsible AI, but by the ability to provide verifiable evidence.</p>
+<p>The appropriate result of such initiatives could be comparable evaluation methods, well-described hazard scenarios, agent testing practices and procedures for responding to unwanted model behavior.</p>
+<p>However, these are the expected directions of development, not announced partnership products.</p>
+<ol start="6">
+<li>What does this change for corporate architecture?</li>
+</ol>
+<p>From the company&#39;s perspective, the most important lesson is practical.</p>
+<p>Before allowing the AI system for business processes, the architect should be able to answer three questions:</p>
+<p>What can the system do? It is about the real limits of permissions, access to data, interfaces and the ability to perform actions.</p>
+<p>How do we check if it works properly and safely? Measurable evaluation scenarios and evidence of their implementation are needed.</p>
+<p>What will we do when the system exceeds the permissible limits? The architecture must anticipate an action constraint, access cancellation, incident handling, and recreation of the event.</p>
+<p>The cooperation of OpenAI and NASK may provide valuable material for the improvement of such practices in the future. At the present stage, however, the announcement of cooperation with the ready-made certification mechanism, the security of OpenAI products or the change of the responsibilities of the AI-based organizations should not be equated.</p>
+<p>Bottom line: Trust needs evidence</p>
+<p>The OpenAI and NASK Agreement is an interesting signal of the development of cooperation between suppliers of advanced models and public security institutions.</p>
+<p>However, the most important problem for corporate architecture remains: how to translate AI security tests into design requirements, technical inspections and decisions made throughout the life cycle of the system?</p>
+<p>Safe AI is not a feature that can be attributed to the model once and for all. It is a property of the system that must be constantly justified and checked.</p>
+
+<div class="source"><strong>Primary source:</strong> <a href="https://openai.com/index/openai-nask-ai-safety-security-partnership" rel="noopener noreferrer">https://openai.com/index/openai-nask-ai-safety-security-partnership</a>. ArchitectMentor analysis.</div>
