@@ -36,6 +36,8 @@ jobs:
         run: node --test tests/am-editorial-gate.test.mjs
       - name: Validate publishing workflow syntax
         run: node --check scripts/am-desk-publisher.mjs
+      - name: Test release correction safety guards
+        run: node --test tests/am-release-correction.test.mjs
       - run: npm run test:comments
       - name: Verify PL/EN exercise content and mentor contracts
         run: node --test tests/exercises.test.cjs
