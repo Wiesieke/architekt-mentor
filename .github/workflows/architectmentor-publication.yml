@@ -34,6 +34,8 @@ jobs:
         run: node scripts/am-editorial-gate.mjs --changed
       - name: Test editorial preflight rules
         run: node --test tests/am-editorial-gate.test.mjs
+      - name: Validate publishing workflow syntax
+        run: node --check scripts/am-desk-publisher.mjs
       - run: npm run test:comments
       - name: Verify PL/EN exercise content and mentor contracts
         run: node --test tests/exercises.test.cjs
