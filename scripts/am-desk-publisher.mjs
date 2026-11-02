@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { escapeHtml, makeReleaseFiles, parseApprovedJob, verifyBuiltRelease, writeReleaseFiles } from './am-release-lib.mjs';
 import { assertTrustedRunner, jobFile, workerPost } from './am-release-transport.mjs';
+import {assertCorrectionCandidate,assertCorrectionCompleted} from './am-release-correction.mjs';
 
 const REPOSITORY='Wiesieke/architekt-mentor';
 const root=process.cwd();
@@ -157,16 +158,13 @@ async function main() {
         'Original PR missing or untrusted');
       const state=JSON.parse(gh('pr','view',String(pr.number),
        '--json','state,mergedAt,headRefName,baseRefName,url'));
-      assert(state.headRefName===parsed.branch && state.baseRefName==='main'
-        && state.url===pr.url,'Correction PR does not match signed release');
-      assert(state.mergedAt===null,'Merged release cannot be revised');
-      assert(['OPEN','CLOSED'].includes(state.state),'Unexpected PR state');
+      assertCorrectionCandidate(parsed,state);
+      assert(state.url===pr.url,'Correction PR reference changed');
       if(state.state==='OPEN')gh('pr','close',String(pr.number),
         '--comment','Withdrawn at the editor\'s explicit correction request. A NEW approved revision is required.');
       const after=JSON.parse(gh('pr','view',String(pr.number),
         '--json','state,mergedAt'));
-      assert(after.state==='CLOSED'&&after.mergedAt===null,
-        'Old PR was not safely withdrawn');
+      assertCorrectionCompleted(after);
       await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
         status:'CORRECTION_ALLOWED',pr_url:pr.url});
       console.log('Old draft PR closed. Desk may now reopen content as a new revision.');
