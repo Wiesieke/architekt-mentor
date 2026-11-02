@@ -197,18 +197,22 @@ async function main() {
       console.log('Already-merged approved release verified and reported.');
       return;
     }
-    if(!auto){
-      await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
-        status:'PR_READY',pr_url:pr.url});
-      console.log('Approved article PR created; automatic merge is OFF.');
-      return;
-    }
-    if(pr.isDraft)gh('pr','ready',String(pr.number));
+    // A PR is not READY merely because it was created. Both manual and
+    // delegated releases must pass the same CI, editorial and Vercel Preview
+    // gates, and then recheck the exact approved Desk revision.
+    if(auto && pr.isDraft)gh('pr','ready',String(pr.number));
     stage='ci_and_preview';
     await waitChecks(pr.number);
     stage='approval_recheck';
     const approval=await workerPost('check',{job_id:job.job_id,content_sha256:job.content_sha256});
     if(approval.valid!==true)throw new Error('Approved revision or job state changed');
+    if(!auto){
+      stage='report_ready';
+      await workerPost('result',{job_id:job.job_id,content_sha256:job.content_sha256,
+        status:'PR_READY',pr_url:pr.url});
+      console.log('Approved article PR passed quality and Preview gates; automatic merge is OFF.');
+      return;
+    }
     stage='merge';
     gh('pr','merge',String(pr.number),'--squash');
     const merged=prView(pr.number);
