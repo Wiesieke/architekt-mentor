@@ -40,7 +40,9 @@ export function inspectHtml(relativePath, html) {
    issues.push(code('LONG_ARTICLE_WITHOUT_SECTION_HEADINGS',file,
       'Long article needs semantic headings (## / ###), not numbered one-line lists'));
  }
- if (/(?:^|>)\s*(?:Interpretacja ArchitectMentor|Ocena architektoniczna|Stanowisko ArchitectMentor|Architectmentor interpretation|Architectmentor application|architectural assessment|documented example|Architectmentor's position)\s*(?:<|$)/im.test(html)) {
+ // A standalone editorial label is invalid ONLY as a paragraph.
+ // A semantic H2/H3 heading satisfies the editorial requirement.
+ if (/<p(?:\s[^>]*)?>\s*(?:<strong>\s*)?(?:Interpretacja ArchitectMentor|Ocena architektoniczna|Stanowisko ArchitectMentor|Architectmentor interpretation|Architectmentor application|architectural assessment|documented example|Architectmentor's position)\s*(?:<\/strong>\s*)?<\/p>/im.test(html)) {
    issues.push(code('EDITORIAL_LABEL_AS_PARAGRAPH',file,
       'Editorial section label must be a meaningful Markdown heading, not an unformatted paragraph'));
  }
