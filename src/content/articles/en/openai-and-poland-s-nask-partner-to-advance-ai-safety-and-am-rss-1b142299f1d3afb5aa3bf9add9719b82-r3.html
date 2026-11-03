@@ -1,24 +1,24 @@
 <h2>What was actually announced?</h2>
-<p><strong>Facts established by the parties' announcements</strong></p>
+<h3>Facts established by the parties' announcements</h3>
 <p>On 23 October 2026, OpenAI and Poland's NASK National Research Institute announced an agreement to explore cooperation on artificial intelligence safety, cybersecurity and technical research. NASK's AI Safety Research Center, which serves as the Polish AI Safety Institute (AISI), is involved in the planned collaboration.</p>
 <p>The organizations intend to study the capabilities and risks of increasingly advanced AI systems, identify potential vulnerabilities and strengthen safeguards. NASK also highlighted research into synthetic content, malicious uses of AI and threats that vary across languages.</p>
 <p>The public statements do not provide a complete timetable, budget, detailed testing methodology or a defined set of final deliverables.</p>
-<p><strong>ArchitectMentor interpretation</strong></p>
+<h3>ArchitectMentor interpretation</h3>
 <p>Announcing a research partnership is not the same as delivering a joint testing platform, an independently validated model-evaluation process or a new security standard. Its significance should ultimately be judged by the evidence, methods and results that become available for scrutiny.</p>
 
 <h2>From model security to system security</h2>
 <p>Traditional cybersecurity already requires us to consider identity, permissions, interfaces, data, infrastructure and incident response. These concerns do not disappear when an organization adopts AI. New risks arise from prompt injection, misuse of tools, unintended disclosure of information through model context, and actions based on unreliable or manipulated responses.</p>
 <p>The distinction becomes especially important in agent-based architectures. An AI model that merely suggests an answer presents a different risk profile from an agent authorized to read internal documents, invoke APIs or change business records.</p>
-<p><strong>Architectural assessment</strong></p>
+<h3>Architectural assessment</h3>
 <p>Security evaluation should therefore cover the complete system: the model, system instructions, retrieval mechanisms, connected tools, service identities, permissions, action-approval controls and audit trail. It should not stop at a benchmark score for the underlying language model.</p>
 <p>The organization designing and operating the application remains accountable for its security boundaries, even when the model is provided by a third party.</p>
 
 <h2>What CERT Polska's RouterOS research shows</h2>
-<p><strong>A documented example</strong></p>
+<h3>A documented example</h3>
 <p>A relevant precedent is CERT Polska's research into six vulnerabilities in MikroTik RouterOS, described in September 2026. The research team used AI models within a controlled environment to support vulnerability investigation.</p>
 <p>CERT Polska's technical account describes an isolated laboratory in which an agent helped automate experiments, create and restore test environments, compare software versions, analyze protocols and develop verification scripts. Researchers selected the areas to investigate and supervised the work.</p>
 <p>Hypotheses were tested against real RouterOS systems, including negative controls, repeated experiments on clean systems and human assessment of their impact. The published account does not establish that an AI system independently discovered and validated every vulnerability without expert oversight.</p>
-<p><strong>ArchitectMentor takeaway</strong></p>
+<h3>ArchitectMentor takeaway</h3>
 <p>AI can expand the number of hypotheses a research team can explore and reduce the effort involved in experimentation. Credibility, however, comes from a reproducible verification process. For architects, the safeguards and evidence surrounding an AI system may matter more than the choice of model itself.</p>
 
 <h2>What should enterprise architects expect from AI assurance?</h2>
@@ -35,7 +35,7 @@
 <p>Collaboration between a model developer and a public research institute can bring together advanced technical capabilities, independent expertise and knowledge of country-specific threats. It also raises legitimate questions about the independence and transparency of evaluations.</p>
 <p>Will researchers be able to test scenarios beyond those suggested by the provider? Can unfavourable results be disclosed? Will the methods allow different models to be compared? Who is responsible for acting when a significant weakness is identified?</p>
 <p>The announcements do not yet provide sufficient detail to answer those questions.</p>
-<p><strong>ArchitectMentor position</strong></p>
+<h3>ArchitectMentor position</h3>
 <p>AI governance maturity should be measured by the quality of verifiable evidence, not by the number of public statements about responsible AI. Valuable future outcomes might include comparable evaluation methods, well-defined threat scenarios, techniques for testing agents and procedures for responding to unsafe behaviour. These are potential directions, not products already promised or delivered by the partnership.</p>
 
 <h2>What does this mean for enterprise architecture?</h2>
