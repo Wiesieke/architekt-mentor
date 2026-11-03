@@ -39,3 +39,16 @@ test('ignores unrelated changes, checks only changed new article files',()=>{
  const fixture={'src/content/articles/new-article.html':goodPL,'src/content/articles/en/new-article.html':goodEN};
  assert.deepEqual(scan(files,file=>fixture[file],'+ {title:"Bezpieczeństwo sztucznej inteligencji"}'),[]);
 });
+
+test('editorial section names are rejected as paragraphs but accepted as H3 headings',()=>{
+ const body='<p>'+('Every release needs a documented control boundary. '.repeat(20))+'</p>';
+ const invalid='<h2>Security</h2><p><strong>Architectmentor interpretation</strong></p>'+body;
+ const correct='<h2>Security</h2><h3>Architectmentor interpretation</h3>'+body;
+ assert(inspectHtml('src/content/articles/en/nask.html',invalid)
+   .some(x=>x.kind==='EDITORIAL_LABEL_AS_PARAGRAPH'));
+ assert(!inspectHtml('src/content/articles/en/nask.html',correct)
+   .some(x=>x.kind==='EDITORIAL_LABEL_AS_PARAGRAPH'));
+ const pl='<h2>Współpraca</h2><h3>Interpretacja ArchitectMentor</h3>'+body;
+ assert(!inspectHtml('src/content/articles/nask.html',pl)
+   .some(x=>x.kind==='EDITORIAL_LABEL_AS_PARAGRAPH'));
+});
