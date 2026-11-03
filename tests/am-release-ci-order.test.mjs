@@ -43,3 +43,13 @@ test('merge is restricted to the immutable head commit that passed required gate
   'Squash merge must fail closed if PR head changes after CI');
  assert(!src.includes("'--admin'"),'Publisher must never bypass branch policies');
 });
+
+test('publisher wakes immediately on trusted maintenance push and retains direct Desk dispatch',()=>{
+ const yaml=fs.readFileSync(new URL('../.github/workflows/am-desk-release.yml',import.meta.url),'utf8');
+ assert(yaml.includes('workflow_dispatch:'),'Approved Desk queue requires immediate GitHub dispatch');
+ assert(yaml.includes('push:\n    branches: [main]'),'Trusted main push performs a recoverability smoke test');
+ assert(yaml.includes("cron: '7,22,37,52 * * * *'"),'Staggered backup cron is required');
+ assert(yaml.includes("github.ref == 'refs/heads/main'"),'No worker execution on other refs');
+ assert(!yaml.includes('pull_request:'),'Publisher secrets must never run for untrusted pull requests');
+ assert(yaml.includes('AUTOMATIC MERGE ENABLED'),'Live logs must show the effective auto-merge setting');
+});
