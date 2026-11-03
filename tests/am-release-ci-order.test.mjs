@@ -25,3 +25,21 @@ test('PR_READY is never reported before CI + protected Preview + approval rechec
  }
  assert(!src.includes("if(!auto){\n      await workerPost('result'"), 'Unsafe early ready status');
 });
+
+test('automatic rollout never imports historical PR_READY releases',()=>{
+ const transport=fs.readFileSync(new URL('../scripts/am-release-transport.mjs',import.meta.url),'utf8');
+ assert(transport.includes('allow_pr_ready: false'),
+  'Switching on auto-merge must not sweep old PR_READY jobs');
+ assert(!transport.includes("allow_pr_ready: process.env.AM_RELEASE_AUTO_MERGE"),
+  'Do not regress to historical queue sweep');
+});
+
+test('merge is restricted to the immutable head commit that passed required gates',()=>{
+ const src=fs.readFileSync(new URL('../scripts/am-desk-publisher.mjs',import.meta.url),'utf8');
+ assert(src.includes('headRefOid'),'Release must fetch PR head SHA');
+ assert(src.includes('const verifiedHead=await waitChecks(pr.number)'),
+  'Quality and Preview gates must return the verified PR head SHA');
+ assert(src.includes("gh('pr','merge',String(pr.number),'--squash','--match-head-commit',verifiedHead)"),
+  'Squash merge must fail closed if PR head changes after CI');
+ assert(!src.includes("'--admin'"),'Publisher must never bypass branch policies');
+});
