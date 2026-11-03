@@ -123,6 +123,15 @@ export function parseApprovedJob(job) {
       body: requireText(en?.body_markdown, 'EN body', 150)
     }
   };
+  const declaredCredit=h.editorial_credit??{type:'organisation',person_id:null};
+  assert(declaredCredit && typeof declaredCredit==='object' &&
+    ['organisation','editorial','author'].includes(declaredCredit.type),'Invalid editorial credit type');
+  const personal=declaredCredit.type!=='organisation';
+  assert(personal ? declaredCredit.person_id==='wieslaw-ejsymont' :
+    declaredCredit.person_id==null, 'Untrusted personal attribution');
+  if(personal)assert.equal(String(h.approval.by).toLowerCase(),'lh:wiesieke',
+    'Personal credit requires same editor who approved the snapshot');
+  const creditType=declaredCredit.type;
   const slugPl = secureSlug(texts.pl.title, h.candidate_id);
   const slugEn = secureSlug(texts.en.title, h.candidate_id);
   const exercise = exerciseRequested ? validateExercisePayload(h.exercise) : null;
@@ -137,7 +146,7 @@ export function parseApprovedJob(job) {
     pl: 'https://ejsymont.com/lamiglowki/' + exercise.id + '/',
     en: 'https://ejsymont.com/en/practice/' + exercise.id + '/'
   } : articleUrls;
-  return { h, texts, sections, category, learningGroup, slugPl, slugEn, branch, urls, articleUrls, exercise };
+  return { h, texts, sections, category, learningGroup, slugPl, slugEn, branch, urls, articleUrls, exercise, creditType };
 }
 function summary(text, length) {
   const normalized = text.replace(/\s+/g, ' ').trim();
@@ -166,13 +175,18 @@ export function makeReleaseFiles(root, parsed, date) {
   const enVariable = authorImportVar(parsed.h.candidate_id, 'en');
   const plImport = "import " + plVariable + " from '../content/articles/" + parsed.slugPl + ".html?raw';\n";
   const enImport = "import " + enVariable + " from '../content/articles/en/" + parsed.slugEn + ".html?raw';\n";
+  const personalAuthor=parsed.creditType==='author';
+  const editorCredit=parsed.creditType==='editorial';
+  const authorId=personalAuthor?'wieslaw-ejsymont':'architectmentor';
+  const creditEntry=editorCredit?", editorId:'wieslaw-ejsymont', creditRole:'editorial'":
+    personalAuthor?", creditRole:'author'":"";
   const plEntry = '{ section:' + JSON.stringify(parsed.sections[0]) +
     ', slug:' + JSON.stringify(parsed.slugPl) +
     ', title:' + JSON.stringify(parsed.texts.pl.title) +
     ', description:' + JSON.stringify(summary(parsed.texts.pl.lead, 240)) +
     ', topic:' + JSON.stringify(parsed.category) +
     ', published:' + JSON.stringify(date) +
-    ", authorId:'architectmentor', body:" + plVariable + ' }';
+    ", authorId:" + JSON.stringify(authorId) + creditEntry + ", body:" + plVariable + ' }';
   const enEntry = '{ section:' + JSON.stringify(parsed.sections[1]) +
     ', slug:' + JSON.stringify(parsed.slugEn) +
     ', plSlug:' + JSON.stringify(parsed.slugPl) +
@@ -180,7 +194,7 @@ export function makeReleaseFiles(root, parsed, date) {
     ', description:' + JSON.stringify(summary(parsed.texts.en.lead, 240)) +
     ', topic:' + JSON.stringify(parsed.category) +
     ', published:' + JSON.stringify(date) +
-    ", authorId:'architectmentor', body:" + enVariable + ' }';
+    ", authorId:" + JSON.stringify(authorId) + creditEntry + ", body:" + enVariable + ' }';
   const srcPl = fs.readFileSync(plIndexPath, 'utf8');
   const srcEn = fs.readFileSync(enIndexPath, 'utf8');
   const nextPl = injectIndex(srcPl, plImport, 'export const articles: Article[] = [', plEntry, parsed.slugPl);
