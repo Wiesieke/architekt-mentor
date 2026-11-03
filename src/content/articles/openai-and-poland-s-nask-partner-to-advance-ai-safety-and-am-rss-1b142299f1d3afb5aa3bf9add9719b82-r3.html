@@ -1,26 +1,26 @@
 <h2>Co rzeczywiście ogłoszono?</h2>
-<p><strong>Fakty wynikające z komunikatów stron</strong></p>
+<h3>Fakty wynikające z komunikatów stron</h3>
 <p>23 października 2026 r. OpenAI i NASK – Państwowy Instytut Badawczy – poinformowały o podpisaniu porozumienia dotyczącego współpracy badawczej w zakresie bezpieczeństwa sztucznej inteligencji, cyberbezpieczeństwa i zagadnień technicznych.</p>
 <p>Po stronie NASK wskazano Ośrodek Badań nad Bezpieczeństwem Sztucznej Inteligencji, pełniący funkcję polskiego AI Safety Institute (AISI). Zapowiedziany kierunek działań obejmuje badanie możliwości zaawansowanych systemów AI, identyfikowanie potencjalnych podatności oraz rozwijanie zabezpieczeń.</p>
 <p>W komunikatach pojawiają się również zagadnienia wykrywania treści syntetycznych, szkodliwych zastosowań AI i zagrożeń zależnych od języka.</p>
 <p>Publiczne komunikaty nie przedstawiają pełnego harmonogramu, budżetu, szczegółowej metodologii badań ani katalogu produktów końcowych porozumienia.</p>
-<p><strong>Interpretacja ArchitectMentor</strong></p>
+<h3>Interpretacja ArchitectMentor</h3>
 <p>To istotne rozróżnienie. Podpisanie porozumienia oznacza formalnie zakomunikowaną intencję współpracy, ale samo w sobie nie dowodzi, że powstał już wspólny system testów, niezależny mechanizm oceny modeli czy nowy standard bezpieczeństwa.</p>
 <p>Znaczenie tej inicjatywy należy zatem oceniać przede wszystkim przez rezultaty, które będzie można przedstawić i poddać krytycznej analizie.</p>
 <h2>Od bezpieczeństwa modelu do bezpieczeństwa całego systemu</h2>
 <p>W tradycyjnym podejściu do cyberbezpieczeństwa analizujemy tożsamość użytkownika, uprawnienia, interfejsy, dane, infrastrukturę i sposób reagowania na incydenty.</p>
 <p>W systemach AI ten katalog nie znika. Dochodzą do niego nowe obszary ryzyka: manipulowanie instrukcjami modelu (prompt injection), niekontrolowane wywoływanie narzędzi, ujawnianie danych poprzez kontekst oraz wykonywanie działań na podstawie błędnych lub zmanipulowanych odpowiedzi.</p>
 <p>Szczególnie istotna jest architektura agentowa. Model, który wyłącznie proponuje odpowiedź, ma inny profil ryzyka niż agent mający możliwość odczytywania dokumentów, wykonywania operacji przez API albo modyfikowania danych biznesowych.</p>
-<p><strong>Ocena architektoniczna</strong></p>
+<h3>Ocena architektoniczna</h3>
 <p>Bezpieczeństwa nie można sprowadzić do testu samego LLM. Należy badać cały układ: model, instrukcje systemowe, mechanizmy wyszukiwania kontekstu, narzędzia, tożsamości techniczne, zakres uprawnień, mechanizmy zatwierdzania działań i ścieżkę audytową.</p>
 <p>Odpowiedzialność za granice działania systemu pozostaje po stronie organizacji, która go projektuje i eksploatuje — również wtedy, gdy korzysta z zewnętrznego dostawcy modeli.</p>
 <h2>CERT Polska pokazuje, jak może wyglądać kontrolowane zastosowanie AI</h2>
-<p><strong>Udokumentowany przykład</strong></p>
+<h3>Udokumentowany przykład</h3>
 <p>Istotnym kontekstem partnerstwa są wcześniejsze prace CERT Polska dotyczące podatności w MikroTik RouterOS.</p>
 <p>We wrześniu 2026 r. CERT Polska opisał sześć podatności w MikroTik RouterOS oraz wykorzystanie modeli AI w kontrolowanym środowisku badawczym. Opis techniczny CERT Polska przedstawia między innymi wykorzystanie agentów do automatyzacji eksperymentów, analizy wersji oprogramowania i testowania zachowania protokołów.</p>
 <p>Kluczową rolę odgrywało izolowane laboratorium. Hipotezy generowane z udziałem modeli podlegały eksperymentalnemu potwierdzeniu, testom kontrolnym i ocenie prowadzonej przez badaczy.</p>
 <p>Nie oznacza to, że AI samodzielnie wykryła i potwierdziła wszystkie podatności. Opis CERT Polska wskazuje na proces łączący automatyzację z wiedzą ekspercką, kontrolowanym środowiskiem i powtarzalną walidacją.</p>
-<p><strong>Wniosek ArchitectMentor</strong></p>
+<h3>Wniosek ArchitectMentor</h3>
 <p>Ten przypadek ilustruje użyteczny wzorzec: AI może zwiększać skalę eksploracji i tempo formułowania hipotez, podczas gdy wiarygodność wyniku wynika z niezależnego procesu jego sprawdzania.</p>
 <p>Dla architekta ważniejsza od samego wykorzystania zaawansowanego modelu jest więc konstrukcja otaczającego go systemu kontroli.</p>
 <h2>Czego architekt korporacyjny powinien oczekiwać od AI Assurance?</h2>
@@ -37,7 +37,7 @@
 <p>Jednocześnie powstaje pytanie o niezależność oceny.</p>
 <p>Czy badacz może sprawdzić system bez ograniczania się do testów zaproponowanych przez dostawcę? Czy wyniki negatywne mogą zostać ujawnione? Czy metodologia i zakres badań umożliwią porównanie różnych modeli? Kto odpowiada za podjęcie działań po wykryciu istotnej podatności?</p>
 <p>Publiczne komunikaty o partnerstwie nie dają jeszcze wystarczającej podstawy do odpowiedzi na te pytania.</p>
-<p><strong>Stanowisko ArchitectMentor</strong></p>
+<h3>Stanowisko ArchitectMentor</h3>
 <p>Dojrzałość AI governance należy mierzyć nie liczbą deklaracji o odpowiedzialnej AI, ale zdolnością do dostarczenia weryfikowalnych dowodów.</p>
 <p>Właściwym rezultatem takich inicjatyw mogłyby być porównywalne metody oceny, dobrze opisane scenariusze zagrożeń, praktyki testowania systemów agentowych i procedury reagowania na niepożądane zachowania modeli.</p>
 <p>To jednak oczekiwane kierunki rozwoju, nie ogłoszone produkty partnerstwa.</p>
