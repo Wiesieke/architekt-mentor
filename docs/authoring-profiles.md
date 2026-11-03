@@ -10,3 +10,13 @@
 - Daily index links to canonical publications: authorship belongs to articles, puzzles and anti-patterns, not a duplicated issue manifest.
 - Do not imply specific personal approval of AI-generated content without evidence. Follow the public editorial policy.
 - Collaboration form uses existing SMTP/API workflow; four new categories are recognised alongside prior selections.
+
+## Verified Desk bylines (2026-11-03)
+- Publishing metadata accepts `editorial_credit` inside the immutable, approved publication snapshot. Allowed types: `organisation`, `editorial`, `author`.
+- `organisation` (default, including legacy snapshots) maps to `Article.author = ArchitectMentor`; no individual credit is inferred.
+- `editorial` maps to `Article.author = ArchitectMentor` and `Article.editor = Wiesław Ejsymont`. UI: “Opracowanie i redakcja: Wiesław Ejsymont” / “Research and editing: Wiesław Ejsymont”.
+- `author` maps to `Article.author = Wiesław Ejsymont`. UI: “Autor: Wiesław Ejsymont” / “Author: Wiesław Ejsymont”.
+- Personal credit requires a specific signed-in Desk editor, affirmative byline consent before approval, matching approved revision, and publisher-side verification of `approval.by == 'lh:wiesieke'`. Unknown person IDs or arbitrary personal credits fail closed.
+- No retroactive reattribution of past articles. Existing public author profiles and URL schema remain unchanged.
+- `Article.author` and `Article.editor` in JSON-LD reflect distinct authorship vs substantive editing roles.
+- Public site changes are backward-compatible with existing release job snapshots that lack `editorial_credit`, defaulting to organisation credit.
