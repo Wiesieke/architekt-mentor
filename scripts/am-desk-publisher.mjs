@@ -20,7 +20,7 @@ function gh(...args) {
 }
 function prView(number) {
   return JSON.parse(gh('pr','view',String(number),
-    '--json','number,url,state,mergedAt,mergeCommit,baseRefName,isDraft,statusCheckRollup'));
+    '--json','number,url,state,mergedAt,mergeCommit,baseRefName,isDraft,headRefOid,statusCheckRollup'));
 }
 function findExistingPR(branch) {
   const list=JSON.parse(gh('pr','list','--head',branch,'--state','all',
@@ -51,7 +51,8 @@ async function waitChecks(number) {
       String(c.conclusion??c.state??'').toUpperCase()));
     if(passed){
       if(pr.state!=='OPEN'||pr.baseRefName!=='main')throw new Error('Release PR target changed');
-      return;
+      assert(/^[a-f0-9]{40}$/.test(pr.headRefOid??''),'PR head SHA missing');
+      return pr.headRefOid;
     }
     await pause(15000);
   }
@@ -202,7 +203,7 @@ async function main() {
     // gates, and then recheck the exact approved Desk revision.
     if(auto && pr.isDraft)gh('pr','ready',String(pr.number));
     stage='ci_and_preview';
-    await waitChecks(pr.number);
+    const verifiedHead=await waitChecks(pr.number);
     stage='approval_recheck';
     const approval=await workerPost('check',{job_id:job.job_id,content_sha256:job.content_sha256});
     if(approval.valid!==true)throw new Error('Approved revision or job state changed');
@@ -214,7 +215,7 @@ async function main() {
       return;
     }
     stage='merge';
-    gh('pr','merge',String(pr.number),'--squash');
+    gh('pr','merge',String(pr.number),'--squash','--match-head-commit',verifiedHead);
     const merged=prView(pr.number);
     assert(merged.state==='MERGED','PR not merged');
     const sha=merged.mergeCommit?.oid;
