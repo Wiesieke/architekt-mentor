@@ -47,6 +47,8 @@ export interface Article {
   published?: string; // On-site date, never substitute the technology event date.
   eventDate?: string;
   authorId: AuthorId;
+  editorId?: AuthorId; // Human editor, where source article remains credited to the publisher.
+  creditRole?: 'author' | 'editorial';
   body: string;
 }
 export const articles: Article[] = [
