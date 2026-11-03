@@ -1,9 +1,19 @@
-name: ArchitectMentor Desk one-click publication (off by default)
+name: ArchitectMentor approved Desk publisher
 
 on:
+  # The Desk workflow_dispatch is the primary trigger.
+  # GitHub cron is best-effort; do not rely on it for a 15-minute SLA.
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
+  # Wake the queue after publisher maintenance changes. This also runs a
+  # production connectivity smoke test without creating unapproved content.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/am-desk-release.yml'
+      - 'scripts/am-release-transport.mjs'
+      - 'scripts/am-desk-publisher.mjs'
 
 permissions:
   contents: read
@@ -18,6 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
+      - name: Report publishing mode without exposing credentials
+        env:
+          AM_RELEASE_AUTO_MERGE: ${{ vars.AM_RELEASE_AUTO_MERGE }}
+        shell: bash
+        run: |
+          echo "Trigger: $GITHUB_EVENT_NAME"
+          if [[ "$AM_RELEASE_AUTO_MERGE" == "1" ]]; then
+            echo "Approved Desk publication: AUTOMATIC MERGE ENABLED"
+          else
+            echo "Approved Desk publication: manual PR review mode"
+          fi
       - name: Require dedicated publishing credential before claiming a job
         env:
           GH_TOKEN: ${{ secrets.AM_RELEASE_GITHUB_TOKEN }}
@@ -58,9 +79,11 @@ jobs:
         run: node scripts/am-desk-publisher.mjs
 
 # Secrets and flags are intentionally NOT set in code.
-# AM_RELEASE_ENABLED must remain '0' until LH.pl queue and callbacks pass a dry run.
+# AM_RELEASE_ENABLED is managed in GitHub Variables (currently enabled by operator).
 # Switch vars.AM_RELEASE_AUTO_MERGE to '1' only after CI + Vercel Preview pass.
 # Old PR_READY releases remain in manual mode; new QUEUED releases may auto-merge
 # only after CI, immutable revision approval recheck and exact-head verification.
 # Keep AM_RELEASE_ENABLED=1; repository variable is the source of truth.
 # No pull_request trigger: secrets never run for untrusted PR code.
+# A separate LH.pl CLI cron watchdog (when installed) wakes this workflow on
+# stuck QUEUED jobs if the initial dispatch or GitHub schedule was dropped.
