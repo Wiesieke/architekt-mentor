@@ -1,6 +1,7 @@
 import { articles, articleUrl } from './articles';
 import { englishArticles, englishArticleUrl, polishArticleUrl } from './articles-en';
-import { editions, latestEditionDate } from './editions';
+import { editions } from './editions';
+import { assembleLatestEdition } from './homepage-latest.mjs';
 import { englishPuzzles } from './puzzles-en';
 import { englishAntipatterns } from './antipatterns-en';
 import puzzles from '../../data/puzzles.json';
@@ -10,7 +11,11 @@ import translations from './homepage-copy.json';
 export function homepageData(locale: 'pl' | 'en') {
   const en = locale === 'en';
   const copy = translations[locale];
-  const edition = editions.filter(item => item.published === latestEditionDate).map(item => {
+  // Includes releases approved in Desk even if the curated issue list was not
+  // manually updated. New entries must have a matching English translation.
+  const { date: latestPublishedDate, entries: latestEntries } =
+    assembleLatestEdition(editions, articles, articleUrl);
+  const edition = latestEntries.map(item => {
     if (!en) return {kind:item.kind,href:item.href,title:item.title,summary:item.summary};
     if (item.kind === 'ĆWICZENIE') {
       const source = puzzles.find(p => p.title === item.title && p.date === item.published);
@@ -34,8 +39,8 @@ export function homepageData(locale: 'pl' | 'en') {
   const url = (article: typeof source | typeof featured) => en ? englishArticleUrl(article as typeof englishArticles[number]) : articleUrl(article as typeof articles[number]);
   const kind = source.section === 'architektura-it-ai' ? 'ARCHITEKT I AI' : source.section === 'podstawy-architektury' ? 'PODSTAWY' : 'W RUCHU';
   return {
-    edition, date:latestEditionDate,
-    dateLabel:new Intl.DateTimeFormat(en?'en-GB':'pl-PL',{dateStyle:'long',timeZone:'UTC'}).format(new Date(`${latestEditionDate}T12:00:00Z`)),
+    edition, date:latestPublishedDate,
+    dateLabel:new Intl.DateTimeFormat(en?'en-GB':'pl-PL',{dateStyle:'long',timeZone:'UTC'}).format(new Date(`${latestPublishedDate}T12:00:00Z`)),
     featured:{title:featured.title,description:featured.description,href:url(featured),kind:copy.kinds[kind]},
     foundation:{title:foundation.title,description:foundation.description,href:url(foundation)},
     // Hero starts the newest exercise; the navigation path exposes the whole Practice library.
