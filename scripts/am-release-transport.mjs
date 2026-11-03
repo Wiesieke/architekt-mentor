@@ -39,7 +39,10 @@ async function claim() {
     return;
   }
   const result = await workerPost('claim', {
-    allow_pr_ready: process.env.AM_RELEASE_AUTO_MERGE === '1',
+    // Enabling automatic publication must not retroactively merge historical
+    // PR_READY releases that were explicitly left for manual review.
+    // Only fresh QUEUED releases (and safe retries) are eligible.
+    allow_pr_ready: false,
     allow_failed_retry: process.env.GITHUB_EVENT_NAME === 'workflow_dispatch'
   });
   const job = result.job;

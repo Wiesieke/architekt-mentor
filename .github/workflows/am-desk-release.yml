@@ -59,6 +59,8 @@ jobs:
 
 # Secrets and flags are intentionally NOT set in code.
 # AM_RELEASE_ENABLED must remain '0' until LH.pl queue and callbacks pass a dry run.
-# AM_RELEASE_AUTO_MERGE must remain '0' until PR checks, branch rules,
-# bilingual preview and production verification have been tested.
+# Switch vars.AM_RELEASE_AUTO_MERGE to '1' only after CI + Vercel Preview pass.
+# Old PR_READY releases remain in manual mode; new QUEUED releases may auto-merge
+# only after CI, immutable revision approval recheck and exact-head verification.
+# Keep AM_RELEASE_ENABLED=1; repository variable is the source of truth.
 # No pull_request trigger: secrets never run for untrusted PR code.
