@@ -236,3 +236,64 @@ test('an exercise requires approved matching PL/EN options and three mentor crit
  h.exercise.en.analysis+='\n<script>attack()</script>';
  assert.throws(parse,/Unsafe HTML/);
 });
+
+function jobWithCredit(type, personId='wieslaw-ejsymont', approvalBy='lh:wiesieke'){
+ const original=goodJob();
+ const handoff=JSON.parse(original.handoff_json);
+ handoff.approval.by=approvalBy;
+ handoff.editorial_credit={type,person_id:type==='organisation'?null:personId};
+ const raw=JSON.stringify(handoff);
+ return {...original,handoff_json:raw,
+  content_sha256:crypto.createHash('sha256').update(raw).digest('hex')};
+}
+
+test('only an explicitly signed, authenticated approved snapshot may use a personal byline',()=>{
+ const editorial=parseApprovedJob(jobWithCredit('editorial'));
+ const author=parseApprovedJob(jobWithCredit('author'));
+ const publisher=parseApprovedJob(jobWithCredit('organisation'));
+ assert.equal(editorial.creditType,'editorial');
+ assert.equal(author.creditType,'author');
+ assert.equal(publisher.creditType,'organisation');
+ assert.equal(parseApprovedJob(goodJob()).creditType,'organisation',
+  'Legacy release snapshots retain organisation attribution');
+
+ assert.throws(()=>parseApprovedJob(jobWithCredit('editorial','external-person')),/Untrusted personal attribution/);
+ assert.throws(()=>parseApprovedJob(jobWithCredit('author','wieslaw-ejsymont','lh:other-editor')),/Personal credit requires/);
+ const invalid=goodJob(), data=JSON.parse(invalid.handoff_json);
+ data.editorial_credit={type:'unexpected',person_id:null};
+ const raw=JSON.stringify(data);
+ assert.throws(()=>parseApprovedJob({...invalid,handoff_json:raw,
+  content_sha256:crypto.createHash('sha256').update(raw).digest('hex')}),/Invalid editorial credit type/);
+});
+
+test('new bilingual articles distinguish a named author from a credited editor',()=>{
+ for(const creditType of ['editorial','author','organisation']){
+  const parsed=parseApprovedJob(jobWithCredit(creditType));
+  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'am-byline-'));
+  try{
+   const dataDir=path.join(temp,'src/data');
+   fs.mkdirSync(dataDir,{recursive:true});
+   fs.mkdirSync(path.join(temp,'src/content/articles/en'),{recursive:true});
+   for(const name of ['articles.ts','articles-en.ts'])
+    fs.copyFileSync(path.join(process.cwd(),'src/data',name),path.join(dataDir,name));
+   const files=makeReleaseFiles(temp,parsed,'2026-11-03');
+   const pl=files.find(x=>x.path.endsWith('/src/data/articles.ts')).content;
+   const en=files.find(x=>x.path.endsWith('/src/data/articles-en.ts')).content;
+   for(const index of [pl,en]){
+    const inserted=index.split('export const ')[1].slice(0,900);
+    if(creditType==='editorial'){
+     assert(inserted.includes("authorId:\"architectmentor\""));
+     assert(inserted.includes("editorId:'wieslaw-ejsymont'"));
+     assert(inserted.includes("creditRole:'editorial'"));
+    }else if(creditType==='author'){
+     assert(inserted.includes("authorId:\"wieslaw-ejsymont\""));
+     assert(!inserted.includes("editorId:'wieslaw-ejsymont'"));
+     assert(inserted.includes("creditRole:'author'"));
+    }else{
+     assert(inserted.includes("authorId:\"architectmentor\""));
+     assert(!inserted.includes("editorId:'wieslaw-ejsymont'"));
+    }
+   }
+  }finally{fs.rmSync(temp,{recursive:true,force:true});}
+ }
+});
