@@ -8,7 +8,9 @@ import { marked, Renderer } from 'marked';
 // Curated exceptions for already approved immutable Desk snapshots without a
 // learning_group hint. Do not infer taxonomy from the free-text article title.
 const CURATED_FOUNDATION_GROUPS = Object.freeze({
-  'AM-PR-1-R1': 'integration'
+  'AM-PR-1-R1': 'integration',
+  // Approved immutable Desk snapshot 682/r2: CI database isolation is a quality pattern.
+  'AM-20261103-001': 'quality'
 });
 const FOUNDATION_GROUP_IDS = Object.freeze([
   'integration', 'analysis', 'resilience', 'security', 'quality', 'description'
