@@ -69,16 +69,17 @@ function jsonFile(root,relative,fn) {
 }
 export function makeExerciseReleaseFiles(root, parsed, date) {
   const item=parsed.exercise;
-  assert(item && parsed.sections[0]==='podstawy-architektury',
-    'Exercise requires a linked Foundations article');
+  assert(item && ['podstawy-architektury', 'architektura-it-ai'].includes(parsed.sections[0]),
+    'Exercise requires a linked Foundations or AI architecture article');
   const id=item.id;
   const startersFile=jsonFile(root,'data/starter-exercises.json',items=>{
     assert(Array.isArray(items)&&!items.some(p=>p.id===id),'Duplicate starter exercise: '+id);
-    return [{id,pl:{...item.pl,learnSlug:parsed.slugPl},en:{...item.en,learnSlug:parsed.slugEn}},...items];
+    return [{id,pl:{...item.pl,learnSlug:parsed.slugPl,learnSection:parsed.sections[0]},en:{...item.en,learnSlug:parsed.slugEn,learnSection:parsed.sections[1]}},...items];
   });
-  const related=[{type:'PODSTAWY',title:parsed.texts.pl.title,
+  const isAi=parsed.sections[0]==='architektura-it-ai';
+  const related=[{type:isAi?'AI':'PODSTAWY',title:parsed.texts.pl.title,
     description:'Przeczytaj pełne omówienie i granice rozwiązania',
-    href:'/podstawy-architektury/'+parsed.slugPl+'/'}];
+    href:'/'+parsed.sections[0]+'/'+parsed.slugPl+'/'}];
   const puzzle={
     id,week:'Z PRAKTYKI ARCHITEKTA · 2 TRYBY',date,
     title:item.pl.title,difficulty:item.pl.difficulty,goal:item.pl.goal,
@@ -97,9 +98,9 @@ export function makeExerciseReleaseFiles(root, parsed, date) {
   const catalogue=fs.readFileSync(cataloguePath,'utf8');
   const marker='const assignments: Record<string,string> = {\n';
   assert(catalogue.includes(marker) && !catalogue.includes("'"+id+"':"),'Cannot register exercise catalogue');
-  const group={integration:'integration',resilience:'resilience',security:'security',
+  const group=isAi?'data':{integration:'integration',resilience:'resilience',security:'security',
     analysis:'decisions',quality:'decisions',description:'decisions'}[parsed.learningGroup];
-  assert(group,'Cannot map Foundations group to exercise area');
+  assert(group,'Cannot map article category to exercise area');
   const catalogueFile={path:cataloguePath,content:catalogue.replace(marker,marker+
     " '"+id+"':'"+group+"',\n")};
   const editionsPath=path.join(root,'src/data/editions.ts');
