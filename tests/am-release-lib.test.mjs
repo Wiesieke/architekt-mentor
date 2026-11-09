@@ -217,6 +217,44 @@ test('complete exercise snapshot creates both practice modes, registrations and 
    assert.throws(()=>makeReleaseFiles(tmp,parsed,'2026-11-01'),/already exists|Duplicate/);
  }finally{fs.rmSync(tmp,{recursive:true,force:true});}
 });
+test('AI architecture puzzle publishes both learning article and Quick/Mentor exercise without practice claim',()=>{
+ const job=goodJob(),h=JSON.parse(job.handoff_json);
+ const fixture=JSON.parse(fs.readFileSync('data/starter-exercises.json','utf8'))[0];
+ h.candidate_id='AM-EX-20261109';
+ h.editorial_hint={category:'Architektura IT w dobie AI',format:'łamigłówka',fictional_scenario:true};
+ h.exercise={id:'2026-11-09-agent-postgresql-test',pl:structuredClone(fixture.pl),en:structuredClone(fixture.en)};
+ const raw=JSON.stringify(h);
+ const parsed=parseApprovedJob({...job,handoff_json:raw,
+   content_sha256:crypto.createHash('sha256').update(raw).digest('hex')});
+ assert.equal(parsed.sections[0],'architektura-it-ai');
+ assert.equal(parsed.sections[1],'architecture-with-ai');
+ assert(parsed.urls.pl.includes('/lamiglowki/'));
+ const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'am-ai-exercise-'));
+ try{
+   fs.mkdirSync(path.join(tmp,'src/content/articles/en'),{recursive:true});
+   fs.mkdirSync(path.join(tmp,'src/data'),{recursive:true});
+   fs.mkdirSync(path.join(tmp,'data'),{recursive:true});
+   for(const file of ['articles.ts','articles-en.ts','learning.ts','catalogue.ts','editions.ts'])
+     fs.copyFileSync(path.join('src/data',file),path.join(tmp,'src/data',file));
+   for(const file of ['starter-exercises.json','puzzles.json','puzzle-coach-en.json'])
+     fs.copyFileSync(path.join('data',file),path.join(tmp,'data',file));
+   const files=makeReleaseFiles(tmp,parsed,'2026-11-09');
+   assert.equal(files.length,9, 'AI article does not use Foundations learning taxonomy');
+   writeReleaseFiles(files);
+   const starters=JSON.parse(fs.readFileSync(path.join(tmp,'data/starter-exercises.json'),'utf8'));
+   const puzzles=JSON.parse(fs.readFileSync(path.join(tmp,'data/puzzles.json'),'utf8'));
+   const coach=JSON.parse(fs.readFileSync(path.join(tmp,'data/puzzle-coach-en.json'),'utf8'));
+   const id=h.exercise.id;
+   assert.equal(starters[0].pl.learnSection,'architektura-it-ai');
+   assert.equal(starters[0].en.learnSection,'architecture-with-ai');
+   assert.equal(puzzles[0].week,'ĆWICZENIE ARCHITEKTONICZNE · 2 TRYBY');
+   assert.deepEqual(puzzles[0].quick,starters[0].pl.quick);
+   assert.deepEqual(coach[id].criteria,starters[0].en.criteria);
+   assert(fs.readFileSync(path.join(tmp,'src/data/catalogue.ts'),'utf8').includes("'"+id+"':'data'"));
+   assert(fs.readFileSync(path.join(tmp,'src/content/articles',parsed.slugPl+'.html'),'utf8').includes('/lamiglowki/'+id+'/'));
+ }finally{fs.rmSync(tmp,{recursive:true,force:true});}
+});
+
 test('an exercise requires approved matching PL/EN options and three mentor criteria',()=>{
  const job=goodJob(),h=JSON.parse(job.handoff_json);
  h.candidate_id='AM-EX-20261101';

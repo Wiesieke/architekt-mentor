@@ -137,8 +137,8 @@ export function parseApprovedJob(job) {
   const slugPl = secureSlug(texts.pl.title, h.candidate_id);
   const slugEn = secureSlug(texts.en.title, h.candidate_id);
   const exercise = exerciseRequested ? validateExercisePayload(h.exercise) : null;
-  assert(!exercise || sections[0]==='podstawy-architektury',
-    'Interactive exercise requires a linked Foundations learning article');
+  assert(!exercise || ['podstawy-architektury', 'architektura-it-ai'].includes(sections[0]),
+    'Interactive exercise requires a linked Foundations or AI architecture article');
   const branch = 'release/' + h.candidate_id.toLowerCase() + '-r' + h.approved_revision;
   const articleUrls = {
     pl: 'https://ejsymont.com/' + sections[0] + '/' + slugPl + '/',
