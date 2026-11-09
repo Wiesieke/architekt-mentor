@@ -81,7 +81,7 @@ export function makeExerciseReleaseFiles(root, parsed, date) {
     description:'Przeczytaj pełne omówienie i granice rozwiązania',
     href:'/'+parsed.sections[0]+'/'+parsed.slugPl+'/'}];
   const puzzle={
-    id,week:'Z PRAKTYKI ARCHITEKTA · 2 TRYBY',date,
+    id,week:isAi?'ĆWICZENIE ARCHITEKTONICZNE · 2 TRYBY':'Z PRAKTYKI ARCHITEKTA · 2 TRYBY',date,
     title:item.pl.title,difficulty:item.pl.difficulty,goal:item.pl.goal,
     scenario:item.pl.scenario,question:item.pl.question,hints:item.pl.hints,
     analysis:item.pl.analysis,quick:item.pl.quick,coach:{criteria:item.pl.criteria},related
