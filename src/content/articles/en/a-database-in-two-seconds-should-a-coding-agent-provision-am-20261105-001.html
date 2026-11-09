@@ -1,0 +1,18 @@
+<h2>What launched—and what did not</h2>
+<p>On 4 November 2026, Google Cloud introduced AlloyDB Express in <strong>Preview</strong>, not general availability. Its documentation positions this PostgreSQL 18 configuration for prototypes, testing and AI coding agents. Google reports provisioning in roughly two seconds over public DNS and about 20 seconds with Private Service Connect; waking a paused instance can take around 20 seconds. These are vendor-reported characteristics, not workload-independent guarantees.</p>
+<h2>The architectural dilemma</h2>
+<p>A coding agent may provision databases faster than a platform team can track them. Provisioning speed says little about identity, test-data classification, retention, resource quotas or orphan cleanup. Scale-to-zero reduces idle compute charges; it does not eliminate storage costs or resume latency.</p>
+<h2>Three credible options</h2>
+<p><strong>A. Shared staging database.</strong> Low operational overhead, but concurrent migrations and test fixtures collide. A poor fit for autonomous agents that can change schemas.</p>
+<p><strong>B. A standard managed PostgreSQL database per task.</strong> A familiar operational model with production-aligned controls, at the expense of provisioning time, cost and cleanup complexity.</p>
+<p><strong>C. AlloyDB Express per task.</strong> Vendor-reported fast provisioning and idle suspension, balanced against Preview status, a 20 GB storage ceiling, small compute configurations, service dependency and wake-up delay. The documentation also states that customer-managed encryption keys are not supported. Data eligibility and platform constraints require explicit review.</p>
+<h2>A conditional ADR</h2>
+<p><strong>Context:</strong> the team needs short-lived, isolated databases for agent-driven tests. <strong>Decision:</strong> pilot option C with synthetic data only, enforce TTL, per-team quotas, ownership labels and cost budgets. <strong>Rejected approach:</strong> giving an agent broad permissions to create databases without policy controls. <strong>Consequences:</strong> faster experimentation, but additional platform governance and Preview dependency. <strong>Exit criteria:</strong> measured security, compatibility and cost benefits over option B.</p>
+<h2>Validation workshop</h2>
+<p>Measure p50/p95 provisioning over public DNS and PSC, p95 resume latency, cleanup time after a pull request closes, orphan rates, and both storage and active-compute costs. Test IAM and PostgreSQL roles, network boundaries, agent audit logs and behavior at the 20 GB limit. Exercise the upgrade path to full AlloyDB and plan for Preview limitations. A one-click upgrade claim is not a substitute for a migration test.</p>
+<h2>Practical takeaway</h2>
+<p>A database that appears in two seconds still needs an owner, a data policy and a deletion mechanism. Judge this pattern by lifecycle control, not provisioning speed alone.</p>
+<p><strong>Primary sources:</strong> Google Cloud Blog (4 Nov 2026), AlloyDB Express documentation (Preview), AlloyDB release notes (4 Nov 2026).</p>
+
+<div class="source"><strong>Primary source:</strong> <a href="https://cloud.google.com/blog/products/databases/introducing-alloydb-express-for-rapid-testing-and-prototyping" rel="noopener noreferrer">https://cloud.google.com/blog/products/databases/introducing-alloydb-express-for-rapid-testing-and-prototyping</a>. ArchitectMentor analysis.</div>
+<p><a href="/en/practice/2026-11-09-agent-postgresql-kontrola/">Practice this decision: quick choice or mentor →</a></p>
