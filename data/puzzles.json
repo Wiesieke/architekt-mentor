@@ -1,5 +1,71 @@
 [
   {
+    "id": "2026-11-09-agent-postgresql-kontrola",
+    "week": "ĆWICZENIE ARCHITEKTONICZNE · 2 TRYBY",
+    "date": "2026-11-09",
+    "title": "Baza w dwie sekundy: kto pozwala agentowi tworzyć PostgreSQL?",
+    "difficulty": "Średni",
+    "goal": "Wybrać model izolacji krótkotrwałych baz testowych oraz warunki, pod którymi agent może zlecać ich utworzenie bez obejścia kontroli platformowej.",
+    "scenario": "Fikcyjny scenariusz edukacyjny\n\nZespół tworzy automatyczne testy dla agentów kodujących. Na każde zadanie lub pull request potrzebuje odrębnej bazy zgodnej z PostgreSQL, pozwalającej uruchomić migracje i testy integracyjne. Bazy mają żyć krótko, a dane są wyłącznie syntetyczne; do środowiska nie wolno kopiować danych produkcyjnych. W zespole istnieje centralna platforma z mechanizmami IAM, limitami kosztów i rejestrem zasobów.\n\nRozważane są trzy warianty: współdzielony staging, zarządzany PostgreSQL tworzony dla każdego zadania oraz AlloyDB Express tworzony dla każdego zadania. Dostawca ogłosił AlloyDB Express 4 listopada 2026 roku jako usługę Preview. Deklarowane czasy tworzenia to około dwóch sekund dla public DNS i około 20 sekund dla Private Service Connect; wznowienie po uśpieniu też może wymagać około 20 sekund. W Preview występują ograniczenia, w tym 20 GB danych, brak CMEK, brak SLA i kopii zapasowych.\n\nZespół nie wie jeszcze, czy pomiary we własnej sieci i pipeline potwierdzą korzyści. Architekt musi wybrać wariant do ograniczonego PoC oraz określić granice autonomii agenta. To nie jest opis rzeczywistego wdrożenia ani rekomendacja korzystania z Preview dla danych wrażliwych.",
+    "question": "Jaką decyzję architektoniczną podejmiesz dla krótkotrwałego PoC i jakie warunki nałożysz na autonomię agenta? Uzasadnij wybór w kontekście izolacji, bezpieczeństwa, kosztów i możliwości wyjścia z Preview.",
+    "hints": [
+      "Czy szybkość utworzenia bazy oznacza, że agent powinien mieć szeroką rolę administracyjną?",
+      "Co dzieje się z bazą po zamknięciu pull requesta lub przerwaniu wykonania zadania?",
+      "Jakie ograniczenia Preview mogłyby wykluczyć tę usługę w innym typie danych lub zastosowaniu?",
+      "Które metryki potwierdzą, że nowy wariant jest lepszy od zarządzanego PostgreSQL?"
+    ],
+    "analysis": "### Porównanie trzech wariantów\n\n**A — wspólny staging.** Najprostszy kosztowo i operacyjnie, ale równoległe migracje, dane testowe oraz uprawnienia agentów mogą sobie przeszkadzać. Wymaga ścisłej serializacji albo odizolowania schematów, co osłabia wartość testu równoległego.\n\n**B — zarządzany PostgreSQL per zadanie.** Daje osobną granicę zasobu i dojrzałe mechanizmy zarządzania, lecz czas provisioningu, sprzątanie oraz stały koszt instancji mogą ograniczyć liczbę testów. Jest mocnym wariantem porównawczym i rozsądną drogą dla przypadków wymagających większej stabilności operacyjnej.\n\n**C — AlloyDB Express per zadanie.** W ograniczonym PoC z danymi syntetycznymi można sprawdzić deklarowany szybki start i scale-to-zero. Jednocześnie jest to Preview bez SLA, backupów i CMEK, z limitem 20 GB. Szybki start z public DNS nie zastępuje oceny sieciowej, a wznowienie po uśpieniu wpływa na p95 opóźnień.\n\n### ADR — decyzja warunkowa\n\n**Kontekst:** krótkotrwałe, izolowane testy migracji na danych syntetycznych. **Decyzja:** wybrać C wyłącznie jako kontrolowany eksperyment, a B zachować jako punkt odniesienia i drogę wyjścia. Agent nie dostaje uprawnienia do dowolnego tworzenia zasobów: wywołuje pośrednika platformowego, który sprawdza tożsamość zadania, dozwolony projekt i region, politykę sieci, limity liczby baz, czas życia (TTL), etykiety właściciela oraz budżet.\n\n**Konsekwencje:** odrębna baza na zadanie zwiększa izolację, lecz wprowadza zależność od Preview i obowiązek automatycznego usuwania. **Odrzucony skrót:** szeroka rola administracyjna agenta i dowolny provisioning bez rejestru. **Warunek wyjścia:** gdy nie przejdą testy uprawnień, dostępności, kosztów lub migracji, wracamy do B; dla danych niekwalifikujących się do Preview nie uruchamiamy C.\n\n### Testy akceptacyjne\n\nZmierz p50/p95 utworzenia instancji przez obie ścieżki sieciowe i p95 wznowienia, koszty storage oraz aktywnego compute, liczbę osieroconych baz i czas automatycznego usunięcia po zamknięciu PR. Spróbuj wymusić utworzenie zasobu poza dozwolonym projektem — polityka musi odmówić i pozostawić ślad audytowy. Zweryfikuj ograniczenie 20 GB, brak wymaganych backupów oraz procedurę przejścia do standardowego wariantu.\n\n**Wniosek:** nie delegujemy agentowi polityki infrastrukturalnej; delegujemy mu jedynie żądanie utworzenia zasobu w ustalonych granicach.",
+    "quick": {
+      "question": "Która decyzja jest najbardziej uzasadniona dla opisanego PoC na danych syntetycznych?",
+      "hint": "Wskaż rozwiązanie do eksperymentu, ale oddziel autonomię agenta od uprawnień platformy i zachowaj wariant wyjścia.",
+      "correctId": "c",
+      "options": [
+        {
+          "id": "a",
+          "text": "Pozostawić wspólną bazę staging, ograniczyć agentom uprawnienia do osobnych schematów i kolejkować migracje, aby uniknąć kolizji.",
+          "explanation": "To niski koszt i mniejsza liczba zasobów, lecz kolejka i współdzielone zależności ograniczają równoległość. Rozwiązanie nie sprawdzi hipotezy o niezależnych bazach per zadanie."
+        },
+        {
+          "id": "b",
+          "text": "Od razu używać wyłącznie standardowego zarządzanego PostgreSQL per zadanie, bez eksperymentu z Preview, utrzymując te same limity i automatyczne sprzątanie.",
+          "explanation": "To uzasadniony wybór dla bardziej restrykcyjnych wymagań, lecz w opisanym PoC nie pozwala sprawdzić, czy szybki provisioning i scale-to-zero dają istotną poprawę. Zachowujemy go jako wariant odniesienia."
+        },
+        {
+          "id": "c",
+          "text": "Przetestować AlloyDB Express per zadanie wyłącznie na syntetycznych danych, za kontrolowanym pośrednikiem platformowym, z TTL, limitami, audytem i porównaniem do standardowego PostgreSQL.",
+          "explanation": "To decyzja warunkowa, zgodna z celem PoC: sprawdza hipotezę wydajnościową, nie oddaje agentowi kontroli nad polityką, uwzględnia ograniczenia Preview i definiuje możliwość odwrotu."
+        }
+      ]
+    },
+    "coach": {
+      "criteria": [
+        {
+          "id": "isolation_lifecycle",
+          "label": "Izolacja i cykl życia",
+          "expected": "Wskazuje izolację per zadanie, TTL i automatyczne usuwanie po PR; identyfikuje ryzyko osieroconych zasobów oraz koszt storage i aktywnego compute."
+        },
+        {
+          "id": "agent_authorization",
+          "label": "Granice uprawnień agenta",
+          "expected": "Wymaga pośrednika platformowego z najmniejszymi uprawnieniami, polityką projektu i sieci, limitami, właścicielem i śladem audytowym; odrzuca szeroką rolę administratora agenta."
+        },
+        {
+          "id": "preview_exit",
+          "label": "Preview, pomiary i droga wyjścia",
+          "expected": "Rozpoznaje Preview, brak SLA, backupów i CMEK oraz limit 20 GB; wymaga pomiaru p50/p95, testów bezpieczeństwa i porównania do zarządzanego PostgreSQL jako wariantu wyjścia."
+        }
+      ]
+    },
+    "related": [
+      {
+        "type": "AI",
+        "title": "Baza w dwie sekundy: czy agent kodujący powinien sam tworzyć PostgreSQL?",
+        "description": "Przeczytaj pełne omówienie i granice rozwiązania",
+        "href": "/architektura-it-ai/baza-w-dwie-sekundy-czy-agent-kodujacy-powinien-sam-tworzy-am-20261105-001/"
+      }
+    ]
+  },
+  {
     "id": "2026-10-30-unknown-odpowiedzialnosc",
     "week": "Z PRAKTYKI ARCHITEKTA · 2 TRYBY",
     "date": "2026-10-30",

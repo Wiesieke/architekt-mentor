@@ -1,0 +1,18 @@
+<h2>Fakt i status wydania</h2>
+<p>4 listopada 2026 r. Google Cloud ogłosił AlloyDB Express w statusie <strong>Preview</strong>, a nie GA. Dokumentacja opisuje konfigurację PostgreSQL 18 przeznaczoną do prototypów, testów i pracy agentów kodujących. Według dostawcy uruchomienie przez public DNS trwa około dwóch sekund, a przez Private Service Connect około 20 sekund; wznowienie uśpionej instancji może potrwać około 20 sekund. Są to parametry deklarowane, wymagające pomiaru w docelowym środowisku.</p>
+<h2>Dylemat architekta</h2>
+<p>Agent kodujący może tworzyć kolejne bazy szybciej niż zespół potrafi je inwentaryzować. Krótki czas provisioningu nie odpowiada na pytania o uprawnienia, dane testowe, retencję, limit zasobów ani o to, kto usuwa osierocone instancje. Skalowanie do zera obniża koszt bezczynnego compute, lecz nie oznacza zerowego kosztu storage ani natychmiastowego wznowienia.</p>
+<h2>Trzy warianty</h2>
+<p><strong>A. Wspólna baza staging.</strong> Mały narzut operacyjny, lecz konflikty migracji i testów równoległych; niewłaściwa dla niezależnych agentów z prawem modyfikacji schematu.</p>
+<p><strong>B. Baza per zadanie w standardowym zarządzanym PostgreSQL.</strong> Przewidywalny model produkcyjny i możliwość ujednolicenia polityk, ale provisioning, koszty i sprzątanie mogą ograniczać przepustowość CI.</p>
+<p><strong>C. AlloyDB Express per zadanie.</strong> Krótszy deklarowany czas tworzenia i scale-to-zero, lecz Preview, ograniczenie do 20 GB, ograniczona konfiguracja compute, zależność od usługi oraz czas wybudzania. Dokumentacja wskazuje brak CMEK. Wariant wymaga osobnej oceny dopuszczalności danych i ograniczeń środowiska.</p>
+<h2>ADR — decyzja warunkowa</h2>
+<p><strong>Kontekst:</strong> zespół potrzebuje izolowanych baz dla krótkotrwałych testów agentowych. <strong>Decyzja:</strong> dopuścić wariant C wyłącznie w kontrolowanym PoC na danych syntetycznych, z TTL, limitami liczby instancji, etykietami właściciela i budżetem. <strong>Odrzucamy</strong> bezwarunkowe tworzenie instancji przez agenta z szerokimi uprawnieniami. <strong>Konsekwencje:</strong> szybsza iteracja kosztem nowych obowiązków platformowych i zależności od Preview. <strong>Warunek rozszerzenia:</strong> test bezpieczeństwa, zgodności i opłacalności względem B.</p>
+<h2>Warsztat weryfikacyjny</h2>
+<p>Zmierz p50/p95 tworzenia przez public DNS i PSC, p95 wznowienia po uśpieniu, czas zamknięcia po PR, odsetek osieroconych instancji oraz koszt storage i aktywnego compute. Zweryfikuj IAM, role PostgreSQL, segmentację sieci, logowanie działań agenta i limity 20 GB. Sprawdź migrację do pełnego AlloyDB oraz plan wyjścia z Preview. Nie zakładaj, że deklarowany „one-click upgrade” zastępuje test migracyjny.</p>
+<h2>Praktyczny wniosek</h2>
+<p>Baza tworzona w dwie sekundy nadal wymaga właściciela, polityki danych i automatycznego usuwania. Miarą dojrzałości wzorca nie jest sam czas provisioningu, ale kontrola całego cyklu życia.</p>
+<p><strong>Źródła pierwotne:</strong> Google Cloud Blog (4.11.2026), dokumentacja AlloyDB Express (Preview), release notes AlloyDB (4.11.2026).</p>
+
+<div class="source"><strong>Źródło pierwotne:</strong> <a href="https://cloud.google.com/blog/products/databases/introducing-alloydb-express-for-rapid-testing-and-prototyping" rel="noopener noreferrer">https://cloud.google.com/blog/products/databases/introducing-alloydb-express-for-rapid-testing-and-prototyping</a>. Analiza ArchitectMentor.</div>
+<p><a href="/lamiglowki/2026-11-09-agent-postgresql-kontrola/">Przećwicz decyzję: szybki wybór lub mentor →</a></p>

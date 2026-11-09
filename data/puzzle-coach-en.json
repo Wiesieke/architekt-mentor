@@ -1,4 +1,25 @@
 {
+  "2026-11-09-agent-postgresql-kontrola": {
+    "scenario": "Fictional educational scenario\n\nA software team uses coding agents and needs a separate PostgreSQL-compatible database for every task or pull request, so migrations and integration tests can run in parallel. Instances are short-lived and contain synthetic data only. Production data must never be copied into them. A central platform already enforces IAM, spending limits and resource inventory.\n\nThe team is considering three designs: a shared staging database, standard managed PostgreSQL per task, and AlloyDB Express per task. Google announced AlloyDB Express on 4 November 2026 as Preview, not GA. The vendor reports provisioning in approximately two seconds through public DNS and 20 seconds through Private Service Connect; resuming an idle instance may take roughly 20 seconds. Preview limitations include a 20 GB data limit, no CMEK, no SLA and no backups.\n\nThe team has not established whether those claims hold in its own network and CI pipeline. The architect must choose a limited proof-of-concept design and define the agent's authority. This is not an account of a real deployment or an endorsement of Preview for sensitive data.",
+    "question": "What architecture decision would you make for this short-lived PoC, and what constraints would you place on agent autonomy? Explain your choice in terms of isolation, security, cost and exit strategy.",
+    "criteria": [
+      {
+        "id": "isolation_lifecycle",
+        "label": "Isolation and lifecycle",
+        "expected": "Calls for per-task isolation, time-to-live and automatic cleanup when a PR closes; identifies orphaned resources and both storage and compute cost exposure."
+      },
+      {
+        "id": "agent_authorization",
+        "label": "Agent permission boundaries",
+        "expected": "Requires a least-privilege platform broker with project and network policy, quotas, accountable ownership and audit evidence; rejects unrestricted agent administration."
+      },
+      {
+        "id": "preview_exit",
+        "label": "Preview, measurements and exit",
+        "expected": "Recognizes Preview, lack of SLA, backups and CMEK, and the 20 GB ceiling; asks for p50/p95 measurements and compares managed PostgreSQL as an exit option."
+      }
+    ]
+  },
   "2026-10-30-unknown-odpowiedzialnosc": {
     "scenario": "Fictional educational scenario\n\nSystem A receives a client's state-changing request and sends a command to system B. The response is lost before the timeout. B may have committed the operation, may still be processing it, or may never have received it. A records UNKNOWN: this is A's knowledge state, not proof that the operation failed in B.\n\nUnder the agreed contract, B is the authoritative source of the business outcome. A owns the customer journey from request to resolution. A stable ID identifies the same intent, and B provides idempotent execution within the defined contract. B exposes an outcome lookup API with terminal statuses, although the API may occasionally be unavailable. Some discrepancies will never be reported by customers. Ownership of reconciliation, the final-resolution deadline, and exception handling are not yet defined.",
     "question": "Who determines the actual outcome, who discovers and reconciles UNKNOWN cases, and who owns unresolved exceptions? In two or three sentences, propose clear responsibilities and one acceptance test.",
