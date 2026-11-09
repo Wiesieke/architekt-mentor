@@ -239,7 +239,7 @@ test('AI architecture puzzle publishes both learning article and Quick/Mentor ex
    for(const file of ['starter-exercises.json','puzzles.json','puzzle-coach-en.json'])
      fs.copyFileSync(path.join('data',file),path.join(tmp,'data',file));
    const files=makeReleaseFiles(tmp,parsed,'2026-11-09');
-   assert.equal(files.length,10);
+   assert.equal(files.length,9, 'AI article does not use Foundations learning taxonomy');
    writeReleaseFiles(files);
    const starters=JSON.parse(fs.readFileSync(path.join(tmp,'data/starter-exercises.json'),'utf8'));
    const puzzles=JSON.parse(fs.readFileSync(path.join(tmp,'data/puzzles.json'),'utf8'));
