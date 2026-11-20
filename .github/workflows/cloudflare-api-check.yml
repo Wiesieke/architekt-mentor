@@ -33,3 +33,30 @@ jobs:
         run: npm run build
       - name: Bundle Cloudflare Pages Functions
         run: npx --yes wrangler@4 pages functions build --compatibility-date 2026-11-20 --outdir .cloudflare/bundle
+      - name: Smoke-test real local Cloudflare Pages runtime (no secrets)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 pages dev dist --compatibility-date 2026-11-20 --port 8788 > /tmp/am-cloudflare-pages.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for attempt in {1..30}; do
+            code=$(curl -s -o /tmp/am-health.json -w '%{http_code}' --max-time 2 http://127.0.0.1:8788/api/health || true)
+            if [ "$code" = 503 ]; then ready=1; break; fi
+            sleep 2
+          done
+          if [ "$ready" != 1 ]; then
+            echo 'Cloudflare Pages readiness route failed'
+            tail -n 45 /tmp/am-cloudflare-pages.log
+            exit 1
+          fi
+          grep -q '"status":"degraded"' /tmp/am-health.json
+          for endpoint in generate evaluate-puzzle; do
+            code=$(curl -s -o /tmp/am-method.json -w '%{http_code}' --max-time 5 "http://127.0.0.1:8788/api/$endpoint")
+            if [ "$code" != 405 ]; then
+              echo "Wrong API status for $endpoint: $code"
+              exit 1
+            fi
+          done
+          echo 'Cloudflare Pages runtime routes responded as expected.'
