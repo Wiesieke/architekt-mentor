@@ -1,0 +1,9 @@
+# ArchitectMentor: static Cloudflare Pages redirects.
+# Intentional default /en/ for the apex URL; the previous Vercel middleware
+# used geolocation to pick /pl/ in Poland. This static fallback does not.
+/ /en/ 302
+/generator.html /narzedzia/hld/ 301
+/dlafirm.html /dlafirm/ 301
+/informacja-o-danych.html /informacja-o-danych/ 301
+/lamiglowki.html /lamiglowki/ 301
+/antywzorce.html /antywzorce/ 301

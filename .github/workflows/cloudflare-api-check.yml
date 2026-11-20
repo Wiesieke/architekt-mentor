@@ -5,6 +5,9 @@ on:
     paths:
       - 'functions/**'
       - 'api/**'
+      - '.node-version'
+      - 'public/**'
+      - 'scripts/cloudflare-static-preflight.mjs'
       - 'tests/cloudflare-api-adapter.test.mjs'
       - '.github/workflows/cloudflare-api-check.yml'
   workflow_dispatch:
@@ -29,8 +32,8 @@ jobs:
         run: npm ci
       - name: Verify Cloudflare adapter HTTP contracts
         run: node --test tests/cloudflare-api-adapter.test.mjs
-      - name: Verify static Astro pages still build
-        run: npm run build
+      - name: Build and verify the Cloudflare Pages static output
+        run: npm run build && node scripts/cloudflare-static-preflight.mjs
       - name: Bundle Cloudflare Pages Functions
         run: npx --yes wrangler@4 pages functions build --compatibility-date 2026-11-20 --outdir .cloudflare/bundle
       - name: Smoke-test real local Cloudflare Pages runtime (no secrets)
