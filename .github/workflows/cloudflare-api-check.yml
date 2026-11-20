@@ -34,13 +34,14 @@ jobs:
         run: node --test tests/cloudflare-api-adapter.test.mjs
       - name: Build and verify the Cloudflare Pages static output
         run: npm run build && node scripts/cloudflare-static-preflight.mjs
-      - name: Bundle Cloudflare Pages Functions
-        run: npx --yes wrangler@4 pages functions build --compatibility-date 2026-11-20 --outdir .cloudflare/bundle
+      # Keep this in sync with the Wrangler version reported by Cloudflare Pages Git builds.
+      - name: Bundle Functions with the Cloudflare Pages Git builder version
+        run: npx --yes wrangler@3.114.17 pages functions build --compatibility-date 2026-11-20 --compatibility-flag nodejs_compat --outdir .cloudflare/bundle
       - name: Smoke-test real local Cloudflare Pages runtime (no secrets)
         shell: bash
         run: |
           set -euo pipefail
-          npx --yes wrangler@4 pages dev dist --compatibility-date 2026-11-20 --port 8788 > /tmp/am-cloudflare-pages.log 2>&1 &
+          npx --yes wrangler@4 pages dev dist --compatibility-date 2026-11-20 --compatibility-flag nodejs_compat --port 8788 > /tmp/am-cloudflare-pages.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           ready=0
