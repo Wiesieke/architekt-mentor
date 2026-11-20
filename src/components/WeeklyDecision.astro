@@ -1,0 +1,51 @@
+---
+import data from '../data/weekly-decision.json';
+interface Props { locale: 'pl' | 'en' }
+const { locale } = Astro.props;
+const copy = data[locale];
+---
+<weekly-decision class="decision" aria-labelledby="weekly-decision-title">
+  <h2 id="weekly-decision-title">{copy.title}</h2>
+  <p>{copy.notice}</p>
+  <div class="modes" role="group" aria-label={copy.title}>
+    <button type="button" data-mode="quick" aria-pressed="true" aria-controls="weekly-quick">{copy.quick}</button>
+    <button type="button" data-mode="mentor" aria-pressed="false" aria-controls="weekly-mentor">{copy.mentor}</button>
+  </div>
+  <div id="weekly-quick" data-quick>
+    <fieldset><legend>{copy.question}</legend>{copy.options.map(option =>
+      <label class="option"><input type="radio" name="weekly-choice" value={option.id} /> <span>{option.id}. {option.text}</span></label>
+    )}</fieldset>
+    <button type="button" data-check>{copy.check}</button>
+    <button type="button" data-hint-button aria-expanded="false" aria-controls="weekly-hint">{copy.hintButton}</button>
+    <p id="weekly-hint" data-hint hidden>{copy.hint}</p>
+    <p data-feedback role="status" tabindex="-1" hidden></p>
+  </div>
+  <div id="weekly-mentor" data-mentor hidden>
+    <p id="weekly-privacy">{copy.privacy}</p>
+    <label for="weekly-initial">{copy.initialLabel}</label>
+    <textarea id="weekly-initial" rows="5" maxlength="4000" aria-describedby="weekly-privacy"></textarea>
+    <button type="button" data-question-button aria-expanded="false" aria-controls="weekly-followup">{copy.questionButton}</button>
+    <div id="weekly-followup" data-followup hidden>
+      <p>{copy.followup}</p>
+      <label for="weekly-followup-answer">{copy.followupLabel}</label>
+      <textarea id="weekly-followup-answer" data-followup-answer rows="4" maxlength="4000" aria-describedby="weekly-privacy"></textarea>
+    </div>
+  </div>
+  <noscript><p>{copy.noscript}</p></noscript>
+  <script type="application/json" data-decision-copy set:html={JSON.stringify({ copy, correctId: data.correctId }).replace(/</g, '\\u003c')} />
+</weekly-decision>
+<script>
+  import { mountDecision } from '../lib/weekly-decision.mjs';
+  class WeeklyDecision extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.mounted) return;
+      this.dataset.mounted = 'true';
+      const { copy, correctId } = JSON.parse(this.querySelector('[data-decision-copy]')!.textContent!);
+      mountDecision(this, copy, correctId);
+    }
+  }
+  if (!customElements.get('weekly-decision')) customElements.define('weekly-decision', WeeklyDecision);
+</script>
+<style>
+.decision{display:block;background:#e9f2ef;border:1px solid #607f80;border-radius:12px;padding:clamp(16px,3vw,28px);margin-block:28px}.decision h2{margin-top:0}fieldset{border:0;padding:0;margin-block:20px}legend{font-weight:700}.option{display:flex;gap:10px;padding:14px 8px;cursor:pointer}.option input{flex-shrink:0;width:20px;height:20px;margin-top:5px}button{font:inherit;cursor:pointer;border:1px solid #275d65;border-radius:6px;background:white;color:#17424b;padding:10px 14px;min-height:44px;margin:5px}button[aria-pressed=true]{background:#17424b;color:white}.modes{display:flex;flex-wrap:wrap}textarea{display:block;box-sizing:border-box;width:100%;font:inherit;resize:vertical;margin-block:10px;border:1px solid #607f80;border-radius:5px;padding:12px}button:focus-visible,input:focus-visible,textarea:focus-visible,[data-feedback]:focus{outline:3px solid #9a6400;outline-offset:3px}[data-feedback]{padding:14px;border-left:4px solid #275d65}[hidden]{display:none!important}
+</style>
