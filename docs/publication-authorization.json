@@ -1,31 +1,36 @@
 {
   "project": "ArchitectMentor",
   "authorizedBy": "Wiesław Ejsymont",
-  "recordedAt": "2026-10-25",
-  "evidence": "Publisher's explicit instruction 2026-10-25: authorize automatic ArchitectMentor Daily and Weekly without each final SHA personal approval, only after full editorial, linguistic, legal and technical gates.",
+  "recordedAt": "2026-10-29",
+  "evidence": "Publisher's subsequent instructions on 28-29 Oct 2026: ArchitectMentor is event-driven, all complete material is reviewed in ArchitectMentor Desk, publisher corrects/holds/rejects or approves, and only then separately authorizes release.",
   "scope": [
-    "Daily PL/EN",
-    "Weekly PL/EN",
-    "original associated assets and metadata"
+    "New original ArchitectMentor articles, PL/EN",
+    "Patterns, anti-patterns, puzzles, architecture-in-motion, events and conferences"
   ],
-  "mode": "delegated-quality-gated-release",
-  "personalReviewRequired": false,
-  "personalApproval": null,
-  "supersedes": "Human-per-SHA approval mode of 2026-10-17 for routine Daily/Weekly only",
+  "mode": "human-approved-desk-revision-plus-explicit-release",
+  "researchCadence": "daily",
+  "publicationCadence": "only when a complete valuable item is approved for release",
+  "weeklyOrDailySeries": false,
+  "personalReviewRequired": true,
+  "productionReleaseAllowedWithoutPublisherDecision": false,
+  "internalDeskApprovalIsPublicationAuthorization": false,
+  "supersedes": "2026-10-25 delegated-quality-gated-release authorization for ArchitectMentor Daily/Weekly",
   "excludes": [
-    "newsletter/email sends",
+    "WRYCUT Daily and Weekly (different project)",
+    "newsletter sends",
     "commercial commitments",
-    "confidential material"
+    "confidential internal employer material"
   ],
-  "scheduleChanged": false,
-  "policyUpdatedAt": "2026-10-25",
   "approvalRequirements": {
-    "approver": "delegated editorial automation under Wiesław Ejsymont authority",
-    "scope": "each exact final Daily or Weekly revision including PL/EN and assets",
-    "evidence": "SHA-bound real editorial/source/rights/language/technical QA report, all checks passing and preview verified",
-    "onContentChange": "delegated gate invalidated; rerun all checks",
-    "beforeApproval": "draft PR and Vercel Preview only; no merge or production release",
-    "technicalChecks": "CI, build, source/provenance, rights, PL/EN, Vercel Preview, production verification",
-    "humanReview": "do not assert; required only on explicit publisher hold or escalated scope"
-  }
+    "editor": "Wiesław Ejsymont",
+    "content": "Exact immutable PL/EN Desk inbox_id and approved_revision",
+    "editorialEvidence": "APPROVED review after sources, rights, facts, PL/EN check; no TEST_ONLY or analysis-only content",
+    "releaseEvidence": "Separate explicit publisher instruction to issue the approved revision",
+    "technicalEvidence": "PR checks, source/rights verification, PL/EN preview, build, RSS and sitemap validation",
+    "onContentChange": "Invalidate the former release decision; obtain new approval for amended revision",
+    "beforeRelease": "Draft pull request and Vercel Preview only; no production merge",
+    "afterRelease": "Check production PL/EN routes, deployment and published content"
+  },
+  "policyUpdatedAt": "2026-10-29",
+  "note": "Repository policy describes governance. Enforce in CI/branch rules and release automation before enabling unattended publication."
 }
