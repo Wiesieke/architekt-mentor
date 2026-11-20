@@ -1,0 +1,29 @@
+name: ArchitectMentor radar quality
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'radar/**'
+      - 'tests/radar-contract.test.cjs'
+      - '.github/workflows/radar-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  radar-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce independent radar safety contract
+        run: node --test tests/radar-contract.test.cjs
+      - name: Verify PHP CLI syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          php -v
+          for path in radar/lh/private/*.php; do
+            php -l "$path"
+          done
