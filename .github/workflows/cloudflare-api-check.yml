@@ -1,0 +1,35 @@
+name: ArchitectMentor Cloudflare API compatibility
+
+on:
+  pull_request:
+    paths:
+      - 'functions/**'
+      - 'api/**'
+      - 'tests/cloudflare-api-adapter.test.mjs'
+      - '.github/workflows/cloudflare-api-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cloudflare-functions:
+    name: Cloudflare Pages bundle and API contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out proposed revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Node 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify Cloudflare adapter HTTP contracts
+        run: node --test tests/cloudflare-api-adapter.test.mjs
+      - name: Verify static Astro pages still build
+        run: npm run build
+      - name: Bundle Cloudflare Pages Functions
+        run: npx --yes wrangler@4 pages functions build --outdir .cloudflare/bundle
