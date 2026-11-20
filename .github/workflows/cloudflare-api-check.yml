@@ -32,4 +32,4 @@ jobs:
       - name: Verify static Astro pages still build
         run: npm run build
       - name: Bundle Cloudflare Pages Functions
-        run: npx --yes wrangler@4 pages functions build --outdir .cloudflare/bundle
+        run: npx --yes wrangler@4 pages functions build --compatibility-date 2026-11-20 --outdir .cloudflare/bundle
