@@ -1,0 +1,9 @@
+name = "architekt-mentor"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-11-20"
+# The Pages Git builder uses Wrangler 3 and requires explicit Node compatibility.
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NODE_VERSION = "24"
+PUBLIC_SITE_INDEXABLE = "false"
