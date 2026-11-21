@@ -1,0 +1,24 @@
+<h2>Co ogłosił AWS</h2>
+<p>19 listopada 2026 r. AWS ogłosił, że agenci mogą płacić za poszczególne wywołania wybranych ofert AWS Marketplace obsługujących protokół x402. Płatności przechodzą przez Amazon Bedrock AgentCore payments i trafiają w USD na istniejący rachunek AWS. W tej ścieżce klient nie potrzebuje portfela kryptowalutowego. AWS opisuje również limity wydatków, ograniczenia sprzedawców i widoczność transakcji w CloudTrail oraz Cost Explorer. Sama usługa AgentCore payments jest ogólnie dostępna od 18 sierpnia 2026 r.</p>
+<h2>Pytanie do architekta</h2>
+<p><strong>Fikcyjny scenariusz edukacyjny.</strong> Agent badawczy znajduje dane w płatnym API. Koszt pojedynczego zapytania jest niski, ale wiele zadań działa równolegle. Zespół chce dopuścić rutynowe zakupy od wcześniej wybranych dostawców. Nowy dostawca lub podwyższenie budżetu wymaga zgody właściciela kosztów. Co powinno rozstrzygnąć, czy konkretne zapytanie może zostać opłacone?</p>
+<h2>Trzy warianty</h2>
+<ul>
+<li><strong>A. Zgoda człowieka na każdą płatność.</strong> Zapewnia kontrolę konkretnego wydatku. Przy dużej liczbie drobnych operacji wydłuża jednak czas zadania i obciąża osobę zatwierdzającą.</li>
+<li><strong>B. Delegacja ograniczona polityką.</strong> Właściciel kosztów zatwierdza sprzedawców i limity. Moduł poza modelem sprawdza każdą intencję zakupu, a sprawy poza zakresem przekazuje człowiekowi. Wymaga utrzymania reguł i monitorowania wydatków.</li>
+<li><strong>C. Sam limit sesji.</strong> To proste zabezpieczenie pojedynczej sesji. Zostawia otwarte pytanie o łączny wydatek równoległych sesji oraz o to, komu agent może zapłacić.</li>
+</ul>
+<h2>Proponowana decyzja</h2>
+<p>Wybrałbym <strong>B</strong> przy podanych założeniach. Agent zgłasza intencję. Polityka porównuje dostawcę, cenę i cel z zatwierdzonym zakresem. Warstwa wykonawcza rejestruje udzieloną zgodę i wiąże ją z płatnością. Właściciel kosztów zachowuje kontrolę nad zmianą reguł. Limit sesji uzupełniłbym limitem łącznym dla budżetu zespołu, obejmującym równoległe zadania.</p>
+<p>Brak odpowiedzi po wysłaniu żądania pozostawia wynik nieznany. Kontrakt wykonawcy musi powiedzieć, czy ten sam identyfikator operacji chroni przed ponownym obciążeniem oraz czy można odczytać stan po tej samej referencji. Gdy kontrakt tego nie gwarantuje, wstrzymaj nową płatność do wyjaśnienia wyniku.</p>
+<h2>Jak sprawdzić decyzję</h2>
+<p>Użyj symulatora i fikcyjnych rozliczeń. Test przechodzi, jeśli zakupy w zatwierdzonym zakresie są dopuszczane, nowy sprzedawca trafia do akceptacji, a dwie równoległe sesje nie mogą razem przekroczyć wspólnego budżetu. Zasymuluj też utratę odpowiedzi po zarejestrowaniu płatności i sprawdź, czy zespół może ustalić wynik bez drugiego obciążenia. Zapisz dowody pozwalające powiązać zadanie, decyzję polityki i wpis rozliczeniowy.</p>
+<h2>Źródła</h2>
+<ul>
+<li><a href="https://aws.amazon.com/about-aws/whats-new/2026/11/marketplace-agentic-payments-agentcore/" rel="noopener noreferrer">AWS Marketplace i zakupy x402, 19 listopada 2026</a></li>
+<li><a href="https://aws.amazon.com/blogs/machine-learning/enable-ai-agents-to-pay-for-aws-marketplace-x402-products-with-amazon-bedrock-agentcore-payments/" rel="noopener noreferrer">Opis integracji i ustawień AWS, 19 listopada 2026</a></li>
+<li><a href="https://aws.amazon.com/about-aws/whats-new/2026/08/bedrock-agentcore-payments-ga/" rel="noopener noreferrer">Ogólna dostępność AgentCore payments, 18 sierpnia 2026</a></li>
+</ul>
+
+<div class="source"><strong>Źródło pierwotne:</strong> <a href="https://aws.amazon.com/about-aws/whats-new/2026/11/marketplace-agentic-payments-agentcore/" rel="noopener noreferrer">https://aws.amazon.com/about-aws/whats-new/2026/11/marketplace-agentic-payments-agentcore/</a>. Analiza ArchitectMentor.</div>
+<p><a href="/lamiglowki/2026-11-21-agent-wydatek-polityka/">Przećwicz decyzję: szybki wybór lub mentor →</a></p>

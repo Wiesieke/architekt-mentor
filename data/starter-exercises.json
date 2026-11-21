@@ -1,5 +1,116 @@
 [
   {
+    "id": "2026-11-21-agent-wydatek-polityka",
+    "pl": {
+      "title": "Kto zatwierdza wydatek agenta?",
+      "difficulty": "Średni",
+      "goal": "Wybrać kontrolę wydatków, która uwzględnia dostawców i wspólny budżet.",
+      "scenario": "Fikcyjny scenariusz edukacyjny\n\nAgent badawczy potrzebuje płatnego API. Pojedyncze zapytania są tanie, ale wiele zadań działa równolegle. Zespół ma zatwierdzoną listę sprzedawców i wspólny budżet. Właściciel kosztów musi zgodzić się na nowych sprzedawców i wyższe limity. Rutynowe płatności mają przechodzić automatycznie.",
+      "question": "W 2–3 zdaniach wybierz sposób zatwierdzania płatności i podaj jeden test, który pokaże, czy ograniczenia działają przy równoległych zadaniach.",
+      "analysis": "Najlepszym punktem wyjścia jest delegacja ograniczona polityką. Agent zgłasza intencję, a osobny moduł sprawdza zgodność sprzedawcy i kwoty oraz wspólny dostępny budżet. Zmianę zakresu zatwierdza właściciel kosztów. W symulatorze uruchom dwie sesje, z których każda mieści się w limicie indywidualnym, ale obie razem przekraczają budżet. Jedna operacja powinna zostać odrzucona lub skierowana do decyzji, a wynik zapisany w audycie.",
+      "hints": [
+        "Kto może zmienić listę sprzedawców i limity wydatków?",
+        "Czy limit pojedynczej sesji chroni wspólny budżet?",
+        "Jak sprawdzisz łączny koszt dwóch zadań działających jednocześnie?"
+      ],
+      "quick": {
+        "question": "Który mechanizm spełnia warunki fikcyjnego zespołu?",
+        "hint": "Sprawdź, kto egzekwuje listę sprzedawców i jaki zakres ma limit.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "a",
+            "text": "Wymagać ręcznego zatwierdzania każdego żądania do płatnego API.",
+            "explanation": "Zapewnia kontrolę pojedynczego zakupu, ale nie spełnia warunku automatyzacji rutynowych płatności."
+          },
+          {
+            "id": "b",
+            "text": "Pozwolić na zakupy zatwierdzane przez niezależną politykę listy sprzedawców i wspólnego budżetu.",
+            "explanation": "Pozwala automatyzować typowe zakupy oraz ograniczyć uprawnienia i łączne wydatki wielu sesji."
+          },
+          {
+            "id": "c",
+            "text": "Przydzielić każdej sesji osobny limit i pozwolić agentowi wybrać sprzedawcę.",
+            "explanation": "Limit działa w obrębie sesji. Nadal można przekroczyć wspólny budżet lub kupić od sprzedawcy spoza listy."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "policy_owner",
+          "label": "Właściciel reguł",
+          "expected": "Oddziela propozycję agenta od egzekwowania polityki oraz zmiany limitów i dostawców."
+        },
+        {
+          "id": "shared_cap",
+          "label": "Wspólny limit",
+          "expected": "Rozpoznaje, że sam limit sesji nie gwarantuje egzekwowania łącznego budżetu."
+        },
+        {
+          "id": "acceptance_test",
+          "label": "Test akceptacyjny",
+          "expected": "Opisuje konkretną próbę równoległych płatności i oczekiwany wynik odmowy lub eskalacji."
+        }
+      ],
+      "learnSlug": "agent-kupuje-dostep-do-api-kto-zatwierdza-wydatek-am-20261120-001",
+      "learnSection": "architektura-it-ai"
+    },
+    "en": {
+      "title": "Who Approves an Agent's Spend?",
+      "difficulty": "Intermediate",
+      "goal": "Choose a spending control that accounts for both sellers and a shared budget.",
+      "scenario": "Fictional educational scenario\n\nA research agent needs a paid API. Individual requests are cheap, but multiple jobs run in parallel. The team has an approved seller list and a shared budget. The budget owner must approve new sellers and higher limits. Routine payments should proceed automatically.",
+      "question": "In two or three sentences, choose a payment authorization model and one test that would show whether it works when jobs run in parallel.",
+      "analysis": "Policy-bounded delegation is the best starting point. The agent submits its intent and a separate component checks the seller, amount, and available shared budget. The budget owner approves changes to scope. In a simulator, run two sessions that each fit their individual limit but jointly exceed the shared budget. One transaction should be rejected or escalated, with the decision recorded for audit.",
+      "hints": [
+        "Who can change approved sellers and spending limits?",
+        "Does a single-session cap protect a budget shared by concurrent jobs?",
+        "How would you check the combined cost of two jobs running at the same time?"
+      ],
+      "quick": {
+        "question": "Which mechanism meets the requirements of this fictional team?",
+        "hint": "Consider who enforces the seller list and what the budget limit covers.",
+        "correctId": "b",
+        "options": [
+          {
+            "id": "a",
+            "text": "Require manual approval for every request to a paid API.",
+            "explanation": "It provides scrutiny for each purchase but fails the requirement to automate routine payments."
+          },
+          {
+            "id": "b",
+            "text": "Allow purchases that pass an independent policy for the seller list and shared budget.",
+            "explanation": "It automates routine purchases while enforcing authorization and aggregate spend across sessions."
+          },
+          {
+            "id": "c",
+            "text": "Give each session its own spending cap and let the agent pick its seller.",
+            "explanation": "The cap expires at the session boundary. The design can still exceed the team budget or pay an unapproved seller."
+          }
+        ]
+      },
+      "criteria": [
+        {
+          "id": "policy_owner",
+          "label": "Policy ownership",
+          "expected": "Separates the agent's proposal from policy enforcement and from changes to seller lists or caps."
+        },
+        {
+          "id": "shared_cap",
+          "label": "Shared spending limit",
+          "expected": "Recognizes that a session cap alone cannot enforce the shared budget across concurrent jobs."
+        },
+        {
+          "id": "acceptance_test",
+          "label": "Acceptance test",
+          "expected": "Describes a concrete concurrent-purchase test and the expected rejection or escalation."
+        }
+      ],
+      "learnSlug": "an-agent-pays-for-api-access-who-approves-the-spend-am-20261120-001",
+      "learnSection": "architecture-with-ai"
+    }
+  },
+  {
     "id": "2026-11-09-agent-postgresql-kontrola",
     "pl": {
       "title": "Baza w dwie sekundy: kto pozwala agentowi tworzyć PostgreSQL?",
