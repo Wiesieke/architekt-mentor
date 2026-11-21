@@ -1,4 +1,25 @@
 {
+  "2026-11-21-agent-wydatek-polityka": {
+    "scenario": "Fictional educational scenario\n\nA research agent needs a paid API. Individual requests are cheap, but multiple jobs run in parallel. The team has an approved seller list and a shared budget. The budget owner must approve new sellers and higher limits. Routine payments should proceed automatically.",
+    "question": "In two or three sentences, choose a payment authorization model and one test that would show whether it works when jobs run in parallel.",
+    "criteria": [
+      {
+        "id": "policy_owner",
+        "label": "Policy ownership",
+        "expected": "Separates the agent's proposal from policy enforcement and from changes to seller lists or caps."
+      },
+      {
+        "id": "shared_cap",
+        "label": "Shared spending limit",
+        "expected": "Recognizes that a session cap alone cannot enforce the shared budget across concurrent jobs."
+      },
+      {
+        "id": "acceptance_test",
+        "label": "Acceptance test",
+        "expected": "Describes a concrete concurrent-purchase test and the expected rejection or escalation."
+      }
+    ]
+  },
   "2026-11-09-agent-postgresql-kontrola": {
     "scenario": "Fictional educational scenario\n\nA software team uses coding agents and needs a separate PostgreSQL-compatible database for every task or pull request, so migrations and integration tests can run in parallel. Instances are short-lived and contain synthetic data only. Production data must never be copied into them. A central platform already enforces IAM, spending limits and resource inventory.\n\nThe team is considering three designs: a shared staging database, standard managed PostgreSQL per task, and AlloyDB Express per task. Google announced AlloyDB Express on 4 November 2026 as Preview, not GA. The vendor reports provisioning in approximately two seconds through public DNS and 20 seconds through Private Service Connect; resuming an idle instance may take roughly 20 seconds. Preview limitations include a 20 GB data limit, no CMEK, no SLA and no backups.\n\nThe team has not established whether those claims hold in its own network and CI pipeline. The architect must choose a limited proof-of-concept design and define the agent's authority. This is not an account of a real deployment or an endorsement of Preview for sensitive data.",
     "question": "What architecture decision would you make for this short-lived PoC, and what constraints would you place on agent autonomy? Explain your choice in terms of isolation, security, cost and exit strategy.",

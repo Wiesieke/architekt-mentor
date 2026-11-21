@@ -1,0 +1,24 @@
+<h2>What AWS announced</h2>
+<p>On November 19, 2026, AWS announced that agents can pay per request for select AWS Marketplace listings that use x402. Amazon Bedrock AgentCore payments processes these purchases in US dollars through the customer&#39;s existing AWS bill. This route does not require a crypto wallet. AWS also describes spending limits, seller restrictions, and transaction visibility in CloudTrail and Cost Explorer. AgentCore payments itself became generally available on August 18, 2026.</p>
+<h2>The architecture question</h2>
+<p><strong>Fictional educational scenario.</strong> A research agent finds data in a paid API. Each request costs little, but multiple jobs run in parallel. The team wants routine purchases from preapproved sellers to proceed. The budget owner must approve a new seller or a higher spending limit. What should decide whether a particular request can be paid for?</p>
+<h2>Three options</h2>
+<ul>
+<li><strong>A. Human approval for every payment.</strong> Provides scrutiny of each expense. A high volume of small purchases adds delays and places a recurring burden on the approver.</li>
+<li><strong>B. Policy-bounded delegation.</strong> The budget owner approves sellers and limits. A component outside the model checks each purchase intent and escalates exceptions. This adds work to maintain policies and monitor spend.</li>
+<li><strong>C. A session cap only.</strong> A simple way to limit exposure within one session. It leaves open who can be paid and how much parallel sessions can spend in total.</li>
+</ul>
+<h2>Proposed decision</h2>
+<p>I would choose <strong>B</strong> under these assumptions. The agent submits a purchase intent. The policy checks the seller, price, and purpose against the approved scope. The execution layer records the authorization and links it to the payment. The budget owner retains control of changes to the rules. Add a shared team budget that covers concurrent jobs alongside each session cap.</p>
+<p>A missing response after sending a payment request leaves the outcome unknown. The executor&#39;s contract must say whether the same operation ID protects against duplicate charges and whether its status is available by that reference. If the contract provides no such guarantee, hold any new payment until the outcome is established.</p>
+<h2>How to test the decision</h2>
+<p>Use a simulator and fictional billing records. The design passes if in-scope transactions proceed, a new seller is routed for approval, and two concurrent sessions cannot exceed the shared budget together. Simulate a lost response after the payment has been registered and check that the team can establish the outcome without a second charge. Keep evidence that links the task, the policy decision, and the billing record.</p>
+<h2>Sources</h2>
+<ul>
+<li><a href="https://aws.amazon.com/about-aws/whats-new/2026/11/marketplace-agentic-payments-agentcore/" rel="noopener noreferrer">AWS Marketplace and x402 purchases, November 19, 2026</a></li>
+<li><a href="https://aws.amazon.com/blogs/machine-learning/enable-ai-agents-to-pay-for-aws-marketplace-x402-products-with-amazon-bedrock-agentcore-payments/" rel="noopener noreferrer">AWS walkthrough of integration and controls, November 19, 2026</a></li>
+<li><a href="https://aws.amazon.com/about-aws/whats-new/2026/08/bedrock-agentcore-payments-ga/" rel="noopener noreferrer">AgentCore payments general availability, August 18, 2026</a></li>
+</ul>
+
+<div class="source"><strong>Primary source:</strong> <a href="https://aws.amazon.com/about-aws/whats-new/2026/11/marketplace-agentic-payments-agentcore/" rel="noopener noreferrer">https://aws.amazon.com/about-aws/whats-new/2026/11/marketplace-agentic-payments-agentcore/</a>. ArchitectMentor analysis.</div>
+<p><a href="/en/practice/2026-11-21-agent-wydatek-polityka/">Practice this decision: quick choice or mentor →</a></p>

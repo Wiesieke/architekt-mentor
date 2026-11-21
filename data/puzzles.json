@@ -1,5 +1,70 @@
 [
   {
+    "id": "2026-11-21-agent-wydatek-polityka",
+    "week": "ĆWICZENIE ARCHITEKTONICZNE · 2 TRYBY",
+    "date": "2026-11-21",
+    "title": "Kto zatwierdza wydatek agenta?",
+    "difficulty": "Średni",
+    "goal": "Wybrać kontrolę wydatków, która uwzględnia dostawców i wspólny budżet.",
+    "scenario": "Fikcyjny scenariusz edukacyjny\n\nAgent badawczy potrzebuje płatnego API. Pojedyncze zapytania są tanie, ale wiele zadań działa równolegle. Zespół ma zatwierdzoną listę sprzedawców i wspólny budżet. Właściciel kosztów musi zgodzić się na nowych sprzedawców i wyższe limity. Rutynowe płatności mają przechodzić automatycznie.",
+    "question": "W 2–3 zdaniach wybierz sposób zatwierdzania płatności i podaj jeden test, który pokaże, czy ograniczenia działają przy równoległych zadaniach.",
+    "hints": [
+      "Kto może zmienić listę sprzedawców i limity wydatków?",
+      "Czy limit pojedynczej sesji chroni wspólny budżet?",
+      "Jak sprawdzisz łączny koszt dwóch zadań działających jednocześnie?"
+    ],
+    "analysis": "Najlepszym punktem wyjścia jest delegacja ograniczona polityką. Agent zgłasza intencję, a osobny moduł sprawdza zgodność sprzedawcy i kwoty oraz wspólny dostępny budżet. Zmianę zakresu zatwierdza właściciel kosztów. W symulatorze uruchom dwie sesje, z których każda mieści się w limicie indywidualnym, ale obie razem przekraczają budżet. Jedna operacja powinna zostać odrzucona lub skierowana do decyzji, a wynik zapisany w audycie.",
+    "quick": {
+      "question": "Który mechanizm spełnia warunki fikcyjnego zespołu?",
+      "hint": "Sprawdź, kto egzekwuje listę sprzedawców i jaki zakres ma limit.",
+      "correctId": "b",
+      "options": [
+        {
+          "id": "a",
+          "text": "Wymagać ręcznego zatwierdzania każdego żądania do płatnego API.",
+          "explanation": "Zapewnia kontrolę pojedynczego zakupu, ale nie spełnia warunku automatyzacji rutynowych płatności."
+        },
+        {
+          "id": "b",
+          "text": "Pozwolić na zakupy zatwierdzane przez niezależną politykę listy sprzedawców i wspólnego budżetu.",
+          "explanation": "Pozwala automatyzować typowe zakupy oraz ograniczyć uprawnienia i łączne wydatki wielu sesji."
+        },
+        {
+          "id": "c",
+          "text": "Przydzielić każdej sesji osobny limit i pozwolić agentowi wybrać sprzedawcę.",
+          "explanation": "Limit działa w obrębie sesji. Nadal można przekroczyć wspólny budżet lub kupić od sprzedawcy spoza listy."
+        }
+      ]
+    },
+    "coach": {
+      "criteria": [
+        {
+          "id": "policy_owner",
+          "label": "Właściciel reguł",
+          "expected": "Oddziela propozycję agenta od egzekwowania polityki oraz zmiany limitów i dostawców."
+        },
+        {
+          "id": "shared_cap",
+          "label": "Wspólny limit",
+          "expected": "Rozpoznaje, że sam limit sesji nie gwarantuje egzekwowania łącznego budżetu."
+        },
+        {
+          "id": "acceptance_test",
+          "label": "Test akceptacyjny",
+          "expected": "Opisuje konkretną próbę równoległych płatności i oczekiwany wynik odmowy lub eskalacji."
+        }
+      ]
+    },
+    "related": [
+      {
+        "type": "AI",
+        "title": "Agent kupuje dostęp do API. Kto zatwierdza wydatek?",
+        "description": "Przeczytaj pełne omówienie i granice rozwiązania",
+        "href": "/architektura-it-ai/agent-kupuje-dostep-do-api-kto-zatwierdza-wydatek-am-20261120-001/"
+      }
+    ]
+  },
+  {
     "id": "2026-11-09-agent-postgresql-kontrola",
     "week": "ĆWICZENIE ARCHITEKTONICZNE · 2 TRYBY",
     "date": "2026-11-09",
