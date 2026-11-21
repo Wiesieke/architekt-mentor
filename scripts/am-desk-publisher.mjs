@@ -46,7 +46,7 @@ async function waitChecks(number) {
     const found=required.map(status);
     const failed=found.some(c=>c&&['FAILURE','CANCELLED','TIMED_OUT','ACTION_REQUIRED','NEUTRAL','SKIPPED'].includes(
       String(c.conclusion??c.state??'').toUpperCase()));
-    if(failed)throw new Error('Mandatory PR quality or Vercel Preview check failed');
+    if(failed)throw new Error('Mandatory PR quality or Cloudflare Preview check failed');
     const passed=found.every(c=>c&&['SUCCESS'].includes(
       String(c.conclusion??c.state??'').toUpperCase()));
     if(passed){
@@ -199,7 +199,7 @@ async function main() {
       return;
     }
     // A PR is not READY merely because it was created. Both manual and
-    // delegated releases must pass the same CI, editorial and Vercel Preview
+    // delegated releases must pass the same CI, editorial and Cloudflare Preview
     // gates, and then recheck the exact approved Desk revision.
     if(auto && pr.isDraft)gh('pr','ready',String(pr.number));
     stage='ci_and_preview';
