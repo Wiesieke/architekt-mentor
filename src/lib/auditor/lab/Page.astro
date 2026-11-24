@@ -1,0 +1,181 @@
+---
+import Studio from '../../../layouts/Studio.astro';
+import {examples, isLocalRequest, localHeaders} from './service.server.mjs';
+import {reportPath} from './integration.mjs';
+
+export const prerender = false;
+if (!import.meta.env.DEV || !isLocalRequest(Astro.request, Astro.url, Astro.clientAddress)) {
+  return new Response(null, {status:404, headers:localHeaders});
+}
+for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers.set(name, value);
+---
+<Studio title="Auditor Lab" description="Lokalne laboratorium audytu dokumentacji HLD i ADR." active="tools">
+  <div class="container lab" data-auditor-lab data-report-path={reportPath}>
+    <header class="lab-hero">
+      <a class="lab-back" href="/narzedzia/">Wszystkie narzędzia</a>
+      <div class="eyebrow">Laboratorium lokalne · v0.3.1</div>
+      <h1>Auditor Lab</h1>
+      <p>Sprawdź, jak audytor ocenia dowody dotyczące idempotentności w HLD i ADR. Zobacz, z których fragmentów dokumentów wynika decyzja reguły <strong>ARCH-001</strong>.</p>
+    </header>
+
+    <noscript><p class="lab-note">Włącz JavaScript, aby skorzystać z laboratorium.</p></noscript>
+    <section class="lab-panel" aria-labelledby="lab-docs-title">
+      <p class="lab-step">01 / Źródła</p>
+      <h2 id="lab-docs-title">Dokumenty HLD i ADR</h2>
+      <fieldset class="lab-modes">
+        <legend>Skąd pochodzą dokumenty?</legend>
+        <label><input type="radio" name="lab-mode" value="demo" checked /> Przykład syntetyczny</label>
+        <label><input type="radio" name="lab-mode" value="own" /> Własne dokumenty</label>
+      </fieldset>
+      <div id="lab-demo-input">
+        <label class="lab-label" for="lab-example">Wybierz przykład</label>
+        <select id="lab-example">
+          {examples.map(({id, label}) => <option value={id}>{label}</option>)}
+        </select>
+        <p class="lab-hint">Po uruchomieniu zajrzysz do obu dokumentów i ich cytatów w sekcji źródeł raportu.</p>
+      </div>
+      <div id="lab-own-input" hidden>
+        <p id="lab-file-help" class="lab-hint">Jeden HLD i jeden ADR. Wklej tekst lub wybierz plik UTF-8 (.txt, .md, .markdown). Minimum 20 po przycięciu, maksimum 30 000 jednostek tekstu na dokument. PDF i DOCX nie są obsługiwane.</p>
+        <div class="lab-doc-grid">
+          {['HLD', 'ADR'].map(kind => (
+            <div class="lab-document" data-document={kind}>
+              <h3>{kind}</h3>
+              <label class="lab-label" for={`lab-file-${kind}`}>Wczytaj plik {kind}</label>
+              <input id={`lab-file-${kind}`} type="file" accept=".txt,.md,.markdown" aria-describedby={`lab-file-help lab-error-${kind}`} />
+              <label class="lab-label" for={`lab-text-${kind}`}>Treść {kind}</label>
+              <textarea id={`lab-text-${kind}`} rows="5" autocomplete="off" spellcheck="false" aria-describedby={`lab-file-help lab-meta-${kind} lab-error-${kind}`}></textarea>
+              <p id={`lab-meta-${kind}`} class="lab-hint" data-meta>Brak dokumentu.</p>
+              <p id={`lab-error-${kind}`} class="lab-error" role="status" data-error></p>
+              <button type="button" class="button secondary" data-remove disabled>Usuń {kind}</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="lab-panel lab-run" aria-labelledby="lab-run-title">
+      <div>
+        <p class="lab-step">02 / Uruchomienie</p>
+        <h2 id="lab-run-title">Tryb analizy</h2>
+        <p id="lab-mode-info">Demo offline korzysta z ręcznie przygotowanych faktów i podpisanych recenzji testowych. Nie wywołuje modelu AI.</p>
+        <p class="lab-ai"><strong>Analiza AI: niedostępna.</strong> Nie ma skonfigurowanego backendu ekstrakcji.</p>
+      </div>
+      <button id="lab-run" class="button" type="button" disabled>Uruchom demo offline</button>
+      <p id="lab-progress" class="lab-progress" role="status"></p>
+    </section>
+
+    <section id="lab-results" class="lab-panel lab-results" aria-labelledby="lab-results-title" hidden>
+      <p class="lab-step">03 / Wyniki</p>
+      <div class="lab-result-heading">
+        <div>
+          <h2 id="lab-results-title" tabindex="-1">Wynik audytu</h2>
+          <p id="lab-summary"></p>
+        </div>
+        <a id="lab-export" class="button secondary" download>Pobierz JSON</a>
+      </div>
+      <p class="lab-note"><strong>Dane syntetyczne.</strong> Recenzje testowe nie są autoryzacją człowieka. Ocena dotyczy dokumentacji, nie gwarantuje poprawności wdrożenia.</p>
+      <div class="lab-switch" role="group" aria-label="Widok wyników">
+        <button class="button secondary" type="button" data-view="report" aria-pressed="true" aria-controls="lab-report">Raport</button>
+        <button class="button secondary" type="button" data-view="graph" aria-pressed="false" aria-controls="lab-graph">Graf powiązań</button>
+      </div>
+      <div id="lab-report"></div>
+      <div id="lab-graph" hidden>
+        <h3>Graf dowodów</h3>
+        <p class="lab-hint">Wybierz węzeł, żeby podświetlić jego powiązania i cytaty. Efekty i cytaty to widoki pól raportu, nie nowe wnioski audytu. Na telefonie graf przewija się poziomo.</p>
+        <p class="lab-legend"><span>Linia ciągła: zakres twierdzenia</span> <span>Linia przerywana: źródło cytatu</span> <span>Linia kropkowana: niepotwierdzone przypisanie</span></p>
+        <div class="lab-graph-scroll" tabindex="0" role="region" aria-label="Przewijany graf dowodów" id="lab-chart"></div>
+        <div id="lab-node" class="lab-node" tabindex="-1">Wybierz węzeł grafu.</div>
+      </div>
+      <section class="lab-sources" aria-labelledby="lab-sources-title">
+        <h3 id="lab-sources-title">Dokumenty źródłowe</h3>
+        <div id="lab-sources" class="lab-doc-grid"></div>
+      </section>
+    </section>
+  </div>
+</Studio>
+
+<script>
+  import './client.mjs';
+</script>
+
+<style is:global>
+  .lab [hidden]{display:none!important}
+  .lab{padding-block:24px 64px}
+  .lab-hero{margin-bottom:15px;max-width:66ch}
+  .lab-back{display:inline-block;margin-bottom:8px;color:var(--teal);font-weight:700;font-size:.875rem}
+  .lab h1{font-size:clamp(2.2rem,5vw,3.55rem);margin:4px 0 8px}
+  .lab-hero p{color:var(--muted);margin:0}
+  .lab-panel{border:1px solid var(--line);border-radius:14px;background:var(--white);padding:clamp(14px,2.1vw,24px);margin-bottom:12px}
+  .lab-step{color:var(--teal);font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+  .lab h2{margin:0 0 10px;font-size:clamp(1.45rem,3vw,1.85rem)}
+  .lab h3{margin:0 0 12px;font-size:1.2rem}
+  .lab-modes{padding:0;border:0;margin:0 0 16px;display:flex;flex-wrap:wrap;gap:8px 22px}
+  .lab-modes legend,.lab-label{font-weight:700;margin-bottom:5px}
+  .lab-modes input{accent-color:var(--teal)}
+  .lab-label{display:block}
+  .lab select,.lab textarea{width:100%;border:1px solid #aebfb9;border-radius:8px;background:#fff;color:var(--ink);padding:9px 11px;font:inherit}
+  .lab select{max-width:33rem}
+  .lab textarea{resize:vertical;min-height:96px}
+  .lab input[type=file]{width:100%;margin-bottom:10px}
+  .lab select:focus-visible,.lab summary:focus-visible,.lab [tabindex]:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+  .lab input[type=file]::file-selector-button{border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);padding:5px 8px;margin-right:8px;font:inherit;cursor:pointer}
+  .lab-hint,.lab-ai{font-size:.875rem;color:var(--muted);margin:7px 0 0}
+  .lab-note{background:var(--mint);padding:12px 15px;border-radius:8px;font-size:.9rem}
+  .lab-doc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .lab #lab-own-input .lab-doc-grid{margin-top:14px}
+  .lab-document,.lab-evidence,.lab-node,.lab-finding{min-width:0;border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--white);overflow-wrap:anywhere}
+  .lab-error{margin:5px 0;color:#9b2727;font-size:.875rem}
+  .lab .button{font-size:.875rem;min-height:40px;padding:8px 14px}
+  .lab .button:disabled{opacity:.55;cursor:not-allowed}
+  .lab-run,.lab-result-heading{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px 24px}
+  .lab-run{background:#f0f7f4}
+  .lab-run p:not(.lab-step),.lab-result-heading p{margin-bottom:0}
+  .lab-progress{flex-basis:100%;margin:0}
+  .lab-progress:empty{display:none}
+  .lab-switch{display:flex;flex-wrap:wrap;gap:8px;margin:17px 0}
+  .lab-switch [aria-pressed=true]{color:#fff;background:var(--teal)}
+  .lab-finding{margin-bottom:12px;padding:clamp(12px,2vw,20px)}
+  .lab-finding h3{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap}
+  .lab-assessment{padding:clamp(12px,2vw,18px);background:#f3f8f6;border-radius:8px}
+  .lab-assessment p{margin:0 0 8px}
+  .lab-assessment p:last-child{margin-bottom:0}
+  .lab-action{padding-left:10px;border-left:3px solid var(--teal)}
+  .lab-tally,.lab-technical{font-size:.875rem}
+  .lab-evidence-section{margin-top:14px}
+  .lab-evidence-section h4{margin:0;font:800 .95rem/1.35 var(--display)}
+  .lab-evidence-key{display:inline-block;color:var(--teal-dark);font-size:.8rem;font-weight:800}
+  .lab-gap-list{color:#694816;margin:6px 0 0;padding-left:22px}
+  .lab-technical{border-top:1px solid var(--line);margin-top:14px;padding-top:10px}
+  .lab-technical p,.lab-technical ul{margin:6px 0}
+  .lab #lab-results-title,.lab #lab-node{scroll-margin-top:155px}
+  .lab-status{display:inline-block;padding:3px 8px;border-radius:6px;font:800 .76rem/1.5 var(--sans);background:#edf1f4;color:#364f65}
+  .lab-status.PASS{background:#deefe6;color:#195c42}
+  .lab-status.NEEDS_REVIEW{background:#fbecd1;color:#6b490a}
+  .lab-status.FAIL{background:#fce5e4;color:#902c2c}
+  .lab-evidence{margin-top:8px;background:#f7faf8}
+  .lab-evidence p{margin:3px 0 8px}
+  .lab-evidence blockquote{margin:8px 0;padding-left:12px;border-left:3px solid var(--teal);white-space:pre-wrap}
+  .lab .lab-link{border:0;background:none;color:var(--teal);padding:3px 0;text-decoration:underline;text-underline-offset:3px;font-weight:700;text-align:left}
+  .lab-legend{font-size:.83rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0}
+  .lab-graph-scroll{overflow:auto;background:var(--paper);border:1px solid var(--line);border-radius:10px}
+  .lab-graph-scroll svg{display:block;width:100%;min-width:980px}
+  .lab-graph-scroll line{stroke:#516f77;stroke-width:1.4;fill:none}
+  .lab-graph-scroll .evidenced_by,.lab-graph-scroll .source_document{stroke-dasharray:6 5}
+  .lab-graph-scroll .is-uncertain{stroke:#8b5813;stroke-dasharray:2 4}
+  .lab-graph-scroll line.is-related{stroke-width:3}
+  .lab-graph-scroll rect{fill:var(--white);stroke:var(--teal);stroke-width:1.5}
+  .lab-graph-scroll [data-type=effect] rect,.lab-graph-scroll [data-type=protection] rect{stroke:#806129}
+  .lab-graph-scroll [data-type=source] rect{stroke-dasharray:4 3}
+  .lab-graph-scroll a.is-related rect{fill:#e2f1e9}
+  .lab-graph-scroll a.is-selected rect{stroke:var(--teal-dark);stroke-width:4}
+  .lab-graph-scroll a:hover rect,.lab-graph-scroll a:focus-visible rect{stroke-width:3}
+  .lab-graph-scroll text{fill:var(--ink);font:700 13px var(--sans);pointer-events:none}
+  .lab-graph-scroll .lab-graph-type{fill:var(--muted);font-size:11px}
+  .lab-node{margin-top:12px}
+  .lab-node ul{padding-left:22px}
+  .lab-sources{margin-top:20px}
+  .lab summary{cursor:pointer;color:var(--teal);font-weight:800}
+  .lab-source-text{margin:7px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:.9rem;scroll-margin-top:160px}
+  .lab-source-text mark{background:#fae3aa;color:var(--ink);scroll-margin-top:160px}
+  @media(max-width:620px){.lab{padding-block:16px 48px}.lab-doc-grid{grid-template-columns:1fr}.lab h3{gap:5px 8px}}
+</style>
