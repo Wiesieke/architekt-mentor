@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ArchitectMentor: install dependencies",
+      "type": "shell",
+      "command": "npm ci",
+      "problemMatcher": []
+    },
+    {
+      "label": "ArchitectMentor: local site (Astro)",
+      "type": "shell",
+      "command": "npm run dev",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "ArchitectMentor: auditor demo (offline)",
+      "type": "shell",
+      "command": "node scripts/auditor-poc-demo.mjs",
+      "problemMatcher": []
+    },
+    {
+      "label": "ArchitectMentor: auditor tests",
+      "type": "shell",
+      "command": "node --test tests/auditor.test.mjs",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "ArchitectMentor: full test suite",
+      "type": "shell",
+      "command": "node --test",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "ArchitectMentor: build",
+      "type": "shell",
+      "command": "npm run build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "ArchitectMentor: static Cloudflare preflight",
+      "type": "shell",
+      "command": "node scripts/cloudflare-static-preflight.mjs",
+      "problemMatcher": []
+    }
+  ]
+}
