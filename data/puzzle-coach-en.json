@@ -1,4 +1,25 @@
 {
+  "2026-11-24-podatnosc-wlasciciel-systemu": {
+    "scenario": "Practice-inspired educational scenario\n\nAll names, versions, findings and times are fictional. For this exercise, VULN-017 affects IngressKit versions 2.4.0 through 2.4.2 inclusive. Version 2.4.3 fixes it. For a real vulnerability, confirm affected versions with the component vendor.\n\nScanner findings\nasset-a17 — 2.4.2 · Detected today at 08:00.\nasset-b04 — 2.4.2 · Detected today at 08:05.\nasset-x09 — 2.4.1 · Last detected eight days ago.\n\nInventory and ownership\nasset-a17 — PROD, shared ingress edge-prod · The Platform team operates the ingress. The architecture register maps it to the Orders and Notifications systems.\nasset-b04 — TEST, Orders deployment · The Orders team maintains this deployment and runs acceptance tests.\nasset-x09 — Unknown environment, no inventory entry · No confirmed owner.",
+    "question": "1. Assign each finding to the team that can fix it or to the person responsible for finding its owner. Name who should verify that each affected system still works.\n2. Set the order of work. What new evidence about asset-x09 could change it?\n3. Define the evidence required to close each finding.",
+    "criteria": [
+      {
+        "id": "fix_owner",
+        "label": "Remediation and acceptance",
+        "expected": "Distinguishes the team patching the shared layer from the system owners who verify their services."
+      },
+      {
+        "id": "unknown_asset",
+        "label": "Unknown asset",
+        "expected": "Explains how to verify the asset identity, environment and owner and provides an escalation deadline."
+      },
+      {
+        "id": "closure_evidence",
+        "label": "Closure evidence",
+        "expected": "Requires evidence of the fixed version, exposure check and service tests or reliable evidence of decommissioning."
+      }
+    ]
+  },
   "2026-11-21-agent-wydatek-polityka": {
     "scenario": "Fictional educational scenario\n\nA research agent needs a paid API. Individual requests are cheap, but multiple jobs run in parallel. The team has an approved seller list and a shared budget. The budget owner must approve new sellers and higher limits. Routine payments should proceed automatically.",
     "question": "In two or three sentences, choose a payment authorization model and one test that would show whether it works when jobs run in parallel.",

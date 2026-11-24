@@ -1,0 +1,70 @@
+<p><strong>Scenariusz szkoleniowy.</strong> Wszystkie nazwy, wersje, wyniki i czasy są fikcyjne. W tym zadaniu zgłoszenie <code>VULN-017</code> obejmuje komponent <code>IngressKit</code> od wersji 2.4.0 do 2.4.2 włącznie. Wersja 2.4.3 usuwa podatność. W podobnym zadaniu z rzeczywistą podatnością zakres wersji należy potwierdzić u wydawcy komponentu.</p>
+<table>
+<thead>
+<tr>
+<th>Wynik skanera</th>
+<th>Wersja</th>
+<th>Obserwacja</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>asset-a17</code></td>
+<td>2.4.2</td>
+<td>Wykryto dziś o 08:00.</td>
+</tr>
+<tr>
+<td><code>asset-b04</code></td>
+<td>2.4.2</td>
+<td>Wykryto dziś o 08:05.</td>
+</tr>
+<tr>
+<td><code>asset-x09</code></td>
+<td>2.4.1</td>
+<td>Ostatnie wykrycie osiem dni temu.</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Zasób w inwentaryzacji</th>
+<th>Środowisko i wdrożenie</th>
+<th>Ewidencja odpowiedzialności</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>asset-a17</code></td>
+<td>PROD, wspólne wejście <code>edge-prod</code></td>
+<td>Zespół Platforma utrzymuje warstwę wejścia. Repozytorium wiąże ją z systemami Zamówienia i Powiadomienia.</td>
+</tr>
+<tr>
+<td><code>asset-b04</code></td>
+<td>TEST, wdrożenie systemu Zamówienia</td>
+<td>Zespół Zamówienia utrzymuje to wdrożenie i wykonuje testy odbiorowe.</td>
+</tr>
+<tr>
+<td><code>asset-x09</code></td>
+<td>Środowisko nieznane, brak wpisu w inwentaryzacji</td>
+<td>Brak potwierdzonego właściciela.</td>
+</tr>
+</tbody></table>
+<h2>Zadanie</h2>
+<ol>
+<li>Dla każdego wyniku przypisz wykonawcę poprawki lub osobę, która ma ustalić właściciela. Wskaż, kto potwierdza działanie systemu po zmianie.</li>
+<li>Wyznacz kolejność prac. Jakie dodatkowe dane o <code>asset-x09</code> mogą ją zmienić?</li>
+<li>Opisz dowód potrzebny do zamknięcia każdego zgłoszenia.</li>
+</ol>
+<h2>Szybka decyzja</h2>
+<p>Co zrobić jako pierwsze?</p>
+<ul>
+<li><strong>A.</strong> Utworzyć po jednym zgłoszeniu naprawczym dla każdego systemu podłączonego do <code>edge-prod</code>.</li>
+<li><strong>B.</strong> Zlecić Platformie poprawkę wspólnej warstwy, uzgodnić testy z oboma właścicielami systemów i równolegle wyjaśnić <code>asset-x09</code>.</li>
+<li><strong>C.</strong> Poczekać na rozpoznanie <code>asset-x09</code>, a następnie zlecić jedną wspólną zmianę dla wszystkich środowisk.</li>
+</ul>
+<h2>Omówienie</h2>
+<p><strong>B</strong> odpowiada założeniom ćwiczenia. Platforma zmienia wspólną warstwę produkcyjną. Właściciele Zamówień i Powiadomień potwierdzają potem działanie swoich usług. Zamówienia aktualizują własne wdrożenie testowe. Jeżeli TEST odzwierciedla konfigurację produkcyjną, wynik może pomóc w ocenie ryzyka, ale nadal potrzebny jest odbiór wspólnej warstwy PROD.</p>
+<p>Dla <code>asset-x09</code> zleć zespołom inwentaryzacji i bezpieczeństwa potwierdzenie tożsamości, aktualnego stanu i środowiska zasobu. Przydziel termin i osobę, do której sprawa wróci po jego przekroczeniu. Jeżeli zasób okaże się aktywny, produkcyjny i wystawiony na ruch zewnętrzny, ponownie oceń kolejność. Brak wpisu w inwentaryzacji pozostawia sprawę otwartą.</p>
+<p><strong>Dowód zamknięcia:</strong> potwierdzona wersja na właściwym zasobie, ponowna kontrola podatności oraz test uzgodnionych usług. Dla wycofanego zasobu może wystarczyć wiarygodny dowód wycofania po potwierdzeniu jego tożsamości.</p>
+<p><strong>Kryteria Mentora:</strong> rozdzielenie wykonawcy poprawki od właściciela systemu, osobna ścieżka dla zasobu o nieznanym statusie, mierzalny dowód zamknięcia.</p>
+
+<div class="source"><strong>Scenariusz fikcyjny.</strong> Źródło wzorca architektonicznego: <a href="https://www.cisa.gov/sites/default/files/2024-12/2024-Playbook-Grants-Cyber-508c.pdf" rel="noopener noreferrer">https://www.cisa.gov/sites/default/files/2024-12/2024-Playbook-Grants-Cyber-508c.pdf</a>. Link nie dokumentuje przedstawionego zdarzenia.</div>
+<p><a href="/lamiglowki/2026-11-24-podatnosc-wlasciciel-systemu/">Przećwicz decyzję: szybki wybór lub mentor</a></p>

@@ -1,0 +1,35 @@
+<h2>What the workflow engine remembers</h2>
+<p>Consider an order that reserves stock, takes payment and hands the order over for shipping. These steps may be minutes or hours apart. One may wait for human approval. The pattern records progress in durable storage. After a restart, the engine can reuse completed step results and continue according to its own recovery rules.</p>
+<p>The difficult case sits between performing an action and recording its result. If the payment provider took the money but the engine never received the response, the workflow history may show an incomplete step. AWS documents that steps can run more than once by default. Cloudflare also describes steps that the engine can retry after a failure.</p>
+<h2>Design the retry boundary</h2>
+<ul>
+<li><strong>Give the action a stable identifier.</strong> For example, use <code>order-742:charge:v1</code>. Store it before the first call and submit the same key on each attempt at that action. Agree with the receiving system on the key&#39;s scope and lifetime.</li>
+<li><strong>Distinguish failure from an unknown outcome.</strong> Mark a missing response as “outcome unknown”. If the receiver provides an authoritative status lookup by identifier, reconcile the result before kicking off another action. If it offers neither deduplication nor status lookup, route the case for review.</li>
+<li><strong>Define how a step ends.</strong> Set a retry limit and decide what happens when it is reached. Specify who can resume the workflow, release stock or issue a refund. A refund is a separate action with its own identifier.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Expected behaviour</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The workflow stops after reserving stock</td>
+<td>On resumption, it uses the confirmed reservation result.</td>
+</tr>
+<tr>
+<td>The provider accepts a charge request, but the response is lost</td>
+<td>Look up the outcome or retry with the same key if the provider&#39;s contract guarantees deduplication.</td>
+</tr>
+<tr>
+<td>The outcome cannot be established and a retry is unsafe</td>
+<td>Record the exception with the action identifier and route it for review.</td>
+</tr>
+</tbody></table>
+<h2>When the pattern earns its keep</h2>
+<p>Use durable execution when a process has several dependent steps, waits for other systems or people, and recovering state by hand would cost time or money. A single write to one database usually needs only a transaction. A simple background job may need only a queue and deduplication at the receiver. A workflow engine brings its own execution history, retry rules and operational responsibilities.</p>
+<p>On 19 November, AWS announced OpenTelemetry support for Lambda Durable Functions. A trace can cover steps, waits and callbacks. It helps operators find where execution stalled. The payment system still provides the evidence that a charge went through.</p>
+<p><strong>Acceptance test.</strong> Simulate a response being lost after the receiver commits the action. Resume the workflow. The receiver should show one business action, and the workflow history should link every attempt to it.</p>
+<p><strong>Sources:</strong> <a href="https://docs.aws.amazon.com/lambda/latest/dg/durable-execution-idempotency.html" rel="noopener noreferrer">AWS Lambda — idempotency</a> · <a href="https://developers.cloudflare.com/workflows/build/rules-of-workflows/" rel="noopener noreferrer">Cloudflare — rules of Workflows</a> · <a href="https://aws.amazon.com/about-aws/whats-new/2026/11/lambda-durable-otel/" rel="noopener noreferrer">AWS — OpenTelemetry support, 19 November 2026</a></p>
+
