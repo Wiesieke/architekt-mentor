@@ -1,0 +1,29 @@
+name: ArchitectMentor auditor PoC tests
+
+on:
+  pull_request:
+    paths:
+      - 'src/lib/auditor/**'
+      - 'tests/auditor.test.mjs'
+      - 'scripts/auditor-poc-demo.mjs'
+      - '.github/workflows/auditor-poc.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out candidate revision
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Set up Node 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - name: Test auditor with mocked provider
+        run: node --test tests/auditor.test.mjs
+      - name: Verify offline demo runs without API secrets
+        run: node scripts/auditor-poc-demo.mjs
