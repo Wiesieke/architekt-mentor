@@ -15,6 +15,7 @@ const areas = [
  {id:'decisions',pl:'Analiza i decyzje',en:'Analysis and decisions'},
 ];
 const assignments: Record<string,string> = {
+ '2026-11-24-podatnosc-wlasciciel-systemu':'security',
  '2026-11-21-agent-wydatek-polityka':'data',
  '2026-11-09-agent-postgresql-kontrola':'data',
  '2026-10-30-unknown-odpowiedzialnosc':'integration',

@@ -1,6 +1,9 @@
 // Editorial index for the prototype. Dates mark publication on this site,
 // not the date when the technology described in an article was announced.
 export const editions = [
+  {"kind":"PODSTAWY","title":"Durable Execution. Jak wznowić proces po awarii bez powtarzania operacji?","summary":"Trwały stan procesu · bezpieczne ponowienia · test odbiorowy","href":"/podstawy-architektury/durable-execution-bezpieczne-wznowienie/","published":"2026-11-24"},
+  {"kind":"W RUCHU","title":"The Open Group zaprasza do zgłaszania uwag do O-DXA for Government","summary":"The Open Group · ITU-T · AIP i EIRA","href":"/architektura-w-ruchu/the-open-group-o-dxa-for-government-uwagi/","eventDate":"2026-11-10","published":"2026-11-24"},
+  { kind:'ĆWICZENIE', title:"Skaner wykrył podatność. Kto ma ją usunąć?", summary:'Średni · szybka decyzja i warsztat z mentorem', href:'/lamiglowki/2026-11-24-podatnosc-wlasciciel-systemu/', published:"2026-11-24" },
   { kind:'ĆWICZENIE', title:"Kto zatwierdza wydatek agenta?", summary:'Średni · szybka decyzja i warsztat z mentorem', href:'/lamiglowki/2026-11-21-agent-wydatek-polityka/', published:"2026-11-21" },
   { kind:'ĆWICZENIE', title:"Baza w dwie sekundy: kto pozwala agentowi tworzyć PostgreSQL?", summary:'Średni · szybka decyzja i warsztat z mentorem', href:'/lamiglowki/2026-11-09-agent-postgresql-kontrola/', published:"2026-11-09" },
   { kind:'ĆWICZENIE', title:"Transakcja UNKNOWN: kto ma doprowadzić sprawę do końca?", summary:'Średni · 2 minuty lub warsztat z mentorem · wynik, rekoncyliacja, wyjątki', href:'/lamiglowki/2026-10-30-unknown-odpowiedzialnosc/', published:'2026-10-30' },

@@ -1,0 +1,35 @@
+<h2>Co zapamiętuje silnik procesu</h2>
+<p>Wyobraźmy sobie obsługę zamówienia. System rezerwuje towar, pobiera płatność i przekazuje zamówienie do wysyłki. Pomiędzy tymi krokami mogą upłynąć minuty lub godziny. Jeden z nich może czekać na decyzję człowieka. Wzorzec polega na zapisaniu postępu w trwałym magazynie stanu. Po restarcie silnik może wykorzystać wyniki zakończonych kroków, a dalsze przetwarzanie rozpocząć zgodnie z regułami wznowienia danego silnika.</p>
+<p>Trudny przypadek pojawia się między wykonaniem operacji a zapisaniem jej wyniku. Jeżeli operator płatności pobrał pieniądze, ale silnik nie otrzymał odpowiedzi, w historii procesu ten krok może wyglądać na niedokończony. Dokumentacja AWS wskazuje, że kroki domyślnie mogą wykonać się więcej niż raz. Cloudflare również opisuje kroki, które w razie awarii mogą być ponawiane.</p>
+<h2>Jak zaprojektować granicę ponowienia</h2>
+<ul>
+<li><strong>Nadaj operacji stały identyfikator.</strong> Przykład to <code>order-742:charge:v1</code>. Zapisz go przed pierwszym wywołaniem i prześlij ten sam klucz przy każdej próbie wykonania tej samej operacji. Uzgodnij z odbiorcą zakres i okres ważności klucza.</li>
+<li><strong>Oddziel błąd od braku wiedzy o wyniku.</strong> Przy braku odpowiedzi użyj statusu „wynik nieznany”. Jeśli system odbiorcy udostępnia wiarygodny odczyt stanu po identyfikatorze, uzgodnij wynik przed uruchomieniem kolejnej operacji. Gdy odbiorca nie zapewnia ani deduplikacji, ani odczytu stanu, skieruj sprawę do wyjaśnienia.</li>
+<li><strong>Zapisz warunki zakończenia.</strong> Każdy krok powinien mieć limit prób i określoną ścieżkę po jego wyczerpaniu. Ustal też, kto może wznowić proces, wycofać rezerwację albo zlecić zwrot środków. Zwrot jest osobną operacją z własnym identyfikatorem.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Sytuacja</th>
+<th>Oczekiwane zachowanie</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Proces zatrzymał się po rezerwacji</td>
+<td>Po wznowieniu wykorzystuje potwierdzony wynik rezerwacji.</td>
+</tr>
+<tr>
+<td>Operator płatności przyjął żądanie, lecz odpowiedź zaginęła</td>
+<td>Proces sprawdza wynik lub ponawia z tym samym kluczem, jeśli kontrakt odbiorcy gwarantuje deduplikację.</td>
+</tr>
+<tr>
+<td>Nie da się potwierdzić wyniku ani bezpiecznie ponowić operacji</td>
+<td>Proces zapisuje wyjątek wraz z identyfikatorem operacji i przekazuje go do wyjaśnienia.</td>
+</tr>
+</tbody></table>
+<h2>Kiedy wzorzec się opłaca</h2>
+<p>Sięgnij po Durable Execution, gdy proces ma kilka zależnych kroków, czeka na inne systemy lub człowieka i koszt ręcznego odtwarzania stanu jest istotny. Dla pojedynczego zapisu w jednej bazie zwykle wystarczy transakcja. Dla prostego zadania wykonywanego w tle może wystarczyć kolejka z kontrolą duplikatów u odbiorcy. Silnik procesów dodaje własną historię, reguły ponowień i obowiązki operacyjne.</p>
+<p>19 listopada AWS ogłosił obsługę OpenTelemetry dla Lambda Durable Functions. Ślad obejmuje m.in. kroki, oczekiwanie i wywołania zwrotne. To pomaga odnaleźć moment, w którym proces się zatrzymał. Dowód pobrania płatności nadal pochodzi z systemu płatniczego.</p>
+<p><strong>Test odbiorowy.</strong> Zasymuluj utratę odpowiedzi po tym, jak odbiorca zapisał operację. Uruchom wznowienie. Odbiorca powinien wykazać jedną operację biznesową, a historia procesu powinna pozwolić powiązać z nią wszystkie próby.</p>
+<p><strong>Źródła:</strong> <a href="https://docs.aws.amazon.com/lambda/latest/dg/durable-execution-idempotency.html" rel="noopener noreferrer">AWS Lambda — idempotencja</a> · <a href="https://developers.cloudflare.com/workflows/build/rules-of-workflows/" rel="noopener noreferrer">Cloudflare — reguły Workflows</a> · <a href="https://aws.amazon.com/about-aws/whats-new/2026/11/lambda-durable-otel/" rel="noopener noreferrer">AWS — obsługa OpenTelemetry, 19 listopada 2026</a></p>
+
