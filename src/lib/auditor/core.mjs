@@ -81,28 +81,38 @@ export function buildGraph(documents, extraction) {
 
 export function evaluateIdempotency(documents, extraction) {
   validateExtraction(documents, extraction);
+  if (extraction.flows.length === 0) {
+    return [{
+      ruleId: 'ARCH-001', flowId: null, flowName: null, status: 'NEEDS_REVIEW',
+      message: 'Nie wyodrębniono żadnego przepływu. Audyt nie mógł ocenić reguły; sprawdź kompletność ekstrakcji.',
+      evidence: []
+    }];
+  }
   return extraction.flows.map(flow => {
     const claims = extraction.claims.filter(c => c.flowId === flow.id);
     const repeated = claims.find(c => c.kind === 'possible_duplicate_delivery');
     const once = claims.find(c => c.kind === 'exactly_once_requirement');
-    const mechanism = claims.find(c => c.kind === 'protection_documented');
+    const mechanisms = claims.filter(c => c.kind === 'protection_documented');
     let status, message;
-    if (repeated && once && !mechanism) {
+    // In PoC 0.1 the LLM's claim classification is NOT independently
+    // verified for polarity, tense or the correct business flow. A quote
+    // that happens to exist cannot establish a successful control.
+    if (repeated && once && mechanisms.length === 0) {
       status = 'NEEDS_REVIEW';
-      message = 'Dokumenty dopuszczają duplikaty, ale wymagają jednokrotnego efektu; nie znaleziono opisu zabezpieczenia.';
-    } else if (repeated && once && mechanism) {
-      status = 'PASS';
-      message = 'Dokumentacja wskazuje mechanizm ochronny; skuteczność implementacji nie jest potwierdzona.';
-    } else if (claims.length === 0) {
+      message = 'Wymóg jednokrotnego efektu i możliwe duplikaty są udokumentowane, ale nie wskazano zabezpieczenia. Należy zweryfikować projekt.';
+    } else if (repeated && once && mechanisms.length > 0) {
       status = 'NEEDS_REVIEW';
-      message = 'Za mało danych do oceny przepływu.';
+      message = 'Znaleziono wzmiankę o zabezpieczeniu; trzeba niezależnie potwierdzić, że jest ono stosowane w tym przepływie, a cytat nie dotyczy planu, negacji lub innego systemu.';
+    } else if (claims.length === 0 || repeated || once) {
+      status = 'NEEDS_REVIEW';
+      message = 'Brak kompletu przesłanek do oceny ARCH-001. Nie oznacza to, że kontrola nie jest potrzebna.';
     } else {
       status = 'NOT_APPLICABLE';
-      message = 'Nie stwierdzono kompletu przesłanek uruchamiających tę regułę; nie oznacza to braku ryzyka.';
+      message = 'Nie znaleziono przesłanek tej reguły w zweryfikowanych dowodach; nie jest to potwierdzenie zgodności całej architektury.';
     }
     return {
       ruleId: 'ARCH-001', flowId: flow.id, flowName: flow.name, status, message,
-      evidence: [repeated, once, mechanism].filter(Boolean).map(c => ({
+      evidence: [repeated, once, ...mechanisms].filter(Boolean).map(c => ({
         claimId:c.id, kind:c.kind, documentId:c.documentId, quote:c.quote
       }))
     };
@@ -117,7 +127,8 @@ export function audit(documents, extraction) {
     limitations: [
       'Only ARCH-001 is implemented.',
       'Missing documentation is not evidence that a safeguard does not exist.',
-      'Source quotations are checked, but correct interpretation still requires human review.'
+      'Source quotations are checked, but their meaning, polarity and flow assignment remain unverified.',
+      'PoC 0.1 intentionally does not emit PASS without independent evidence validation.'
     ]
   };
 }
