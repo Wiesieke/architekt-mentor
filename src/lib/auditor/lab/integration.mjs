@@ -2,6 +2,7 @@ import {fileURLToPath} from 'node:url';
 
 const route = '/narzedzia/auditor-lab';
 export const reportPath = `${route}/demo.json`;
+export const aiPath = `${route}/ai.json`;
 
 export default {
   name: 'architectmentor-auditor-lab',
@@ -12,7 +13,7 @@ export default {
         // Vite replaces its default deny list when this field is configured.
         '.env', '.env.*', '*.{crt,pem,key,p12,pfx,cer,der}', '.npmrc', '.yarnrc.yml', '**/.git/**',
         '.dev.vars', '.dev.vars.*',
-        '**/auditor-benchmark.mjs', '**/auditor.test.mjs', '**/auditor-poc-demo.mjs',
+        '**/auditor-*.test.mjs', '**/auditor.test.mjs', '**/fixtures/auditor-*.mjs', '**/scripts/auditor-*.mjs',
         '**/auditor/core.mjs', '**/auditor/openai-extractor.mjs', '**/lab/*.server.mjs'
       ]}}}});
       if (![false, 'localhost', '127.0.0.1', '::1'].includes(config.server.host)) return;
@@ -20,6 +21,7 @@ export default {
         injectRoute({pattern, entrypoint:fileURLToPath(new URL(entry, import.meta.url)), prerender:false});
       inject(route, './Page.astro');
       inject(reportPath, './demo.server.mjs');
+      inject(aiPath, './ai.server.mjs');
     }
   }
 };

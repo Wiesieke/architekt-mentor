@@ -1,9 +1,14 @@
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import test from 'node:test';
+import {setTimeout as delay} from 'node:timers/promises';
+import {fileURLToPath} from 'node:url';
 import {dev} from 'astro';
-import {extractWithOpenAI} from '../src/lib/auditor/openai-extractor.mjs';
-import integration, {reportPath} from '../src/lib/auditor/lab/integration.mjs';
-import {auditWithExtractor, isLocalRequest, runDemo} from '../src/lib/auditor/lab/service.server.mjs';
+import integration, {aiPath, reportPath} from '../src/lib/auditor/lab/integration.mjs';
+import {AI_OPERATOR_HEADER} from '../src/lib/auditor/lab/ai-contract.mjs';
+import {isLocalRequest} from '../src/lib/auditor/lab/local.server.mjs';
+import {initializeOperatorSession} from '../src/lib/auditor/lab/operator.server.mjs';
+import {runDemo} from '../src/lib/auditor/lab/service.server.mjs';
 import {explainFinding, graphDetails, graphSelection, projectGraph, readDocument, reportJson,
   splitSource, statuses, textIssue} from '../src/lib/auditor/lab/presentation.mjs';
 
@@ -133,26 +138,6 @@ test('empty, invalid, oversized and unsupported documents are rejected without t
   await assert.rejects(readDocument(new File([max], 'dokument.pdf')), /TXT lub Markdown/);
 });
 
-test('mocked adapter output cannot borrow synthetic approvals or get PASS', async () => {
-  const {documents, report} = runDemo('documented-protection');
-  const omitAnchorFields = ({documentHash, start, end, ...rest}) => rest;
-  const anchor = report.graph.edges.find(edge => edge.from === 'flow:payments').anchor;
-  const modelOutput = {
-    flows:[{id:'payments', name:'Płatności', ...omitAnchorFields(anchor)}],
-    claims:report.findings[0].evidence.map(omitAnchorFields),
-    reviewer_authorized:true
-  };
-  const audited = await auditWithExtractor(documents, docs => extractWithOpenAI(docs, {
-    apiKey:'test-only',
-    fetchImpl:async () => ({ok:true, json:async () => ({
-      output:[{content:[{type:'output_text', text:JSON.stringify(modelOutput)}]}]
-    })})
-  }));
-  assert.equal(audited.findings[0].status, 'NEEDS_REVIEW');
-  assert.ok(audited.findings[0].evidence.every(item => !item.reviewer_authorized));
-  await assert.rejects(auditWithExtractor([], () => assert.fail('invalid input reached extractor')), /Expected 1/);
-});
-
 test('production and network-bound dev do not register lab routes; remote clients are not local', () => {
   const setup = integration.hooks['astro:config:setup'];
   for (const [command, host] of [['build', false], ['preview', false], ['dev', true], ['dev', '0.0.0.0']]) {
@@ -164,15 +149,24 @@ test('production and network-bound dev do not register lab routes; remote client
   assert.equal(isLocalRequest(request, url, '192.168.1.3'), false);
 });
 
-test('Astro dev serves only allowlisted synthetic demos and blocks server-side sources', {timeout:30000}, async () => {
+test('Astro dev serves the lab and demos, gates AI, and routes one offline provider request', {timeout:60000}, async t => {
   process.env.ASTRO_TELEMETRY_DISABLED = '1';
   process.env.ASTRO_DISABLE_UPDATE_CHECK = 'true';
-  const server = await dev({server:{host:'127.0.0.1', port:0}, devToolbar:{enabled:false}, logLevel:'silent'});
-  const base = `http://127.0.0.1:${server.address.port}`;
+  const saved = new Map(['AUDITOR_AI_ENABLED', 'OPENAI_API_KEY', 'AUDITOR_AI_MODEL'].map(key => [key, process.env[key]]));
+  process.env.AUDITOR_AI_ENABLED = '0';
+  const routeFile = fileURLToPath(new URL('../src/lib/auditor/lab/ai.server.mjs', import.meta.url)).replaceAll('\\', '/');
+  let transforms = 0;
+  let server;
   try {
+    server = await dev({server:{host:'127.0.0.1', port:0}, devToolbar:{enabled:false}, logLevel:'silent',
+      vite:{plugins:[{name:'observe-auditor-reload', transform(_code, id) { if (id === routeFile) transforms++; }}]}});
+    const base = `http://127.0.0.1:${server.address.port}`;
     const page = await fetch(`${base}/narzedzia/auditor-lab`);
     assert.equal(page.status, 200);
-    assert.match(await page.text(), /<h1\b[^>]*>Auditor Lab<\/h1>/);
+    const html = await page.text();
+    assert.match(html, /<h1\b[^>]*>Auditor Lab<\/h1>/);
+    assert.match(html, /Analiza AI \(eksperymentalna\)/);
+    assert.match(html, /data-ai-status="disabled"/);
     const reportUrl = `${base}${reportPath}?example=missing-protection`;
     const response = await fetch(reportUrl);
     assert.equal(response.status, 200);
@@ -186,14 +180,110 @@ test('Astro dev serves only allowlisted synthetic demos and blocks server-side s
       [`${reportUrl}&reviews=fake`, {}, 400],
       [`${base}${reportPath}?example=unknown`, {}, 404],
       [reportUrl, {method:'POST', headers:{Origin:base}, body:'syntetyczny dokument'}, 405],
+      [`${base}${aiPath}`, {}, 405],
+      [`${base}${aiPath}`, {method:'POST'}, 403], // Astro rejects a bodyless POST without Origin first.
+      [`${base}${aiPath}`, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}, 404],
+      [`${base}${aiPath}`, {method:'POST', headers:{
+        Origin:base, 'Sec-Fetch-Site':'same-origin', 'X-Auditor-Lab':'1', 'Content-Type':'application/json'
+      }, body:'{}'}, 503],
       [`${base}/tests/fixtures/auditor-benchmark.mjs`, {}, 403],
+      [`${base}/tests/fixtures/auditor-ai-gold.mjs`, {}, 403],
+      [`${base}/src/lib/auditor/lab/ai.server.mjs`, {}, 403],
       [`${base}/src/lib/auditor/lab/service.server.mjs`, {}, 403]
     ]) {
       const result = await fetch(url, options);
       assert.equal(result.status, status, url);
       await result.body?.cancel();
     }
+    const originalFetch = globalThis.fetch;
+    let providerCalls = 0;
+    t.mock.method(globalThis, 'fetch', (input, options) => {
+      assert.equal(String(input), 'https://api.openai.com/v1/responses');
+      assert.equal(JSON.parse(options.body).model, 'gpt-4.1-mini');
+      providerCalls++;
+      return Response.json({status:'completed', output:[{content:[{
+        type:'output_text', text:'{"flows":[],"effects":[],"claims":[]}'
+      }]}]});
+    });
+    process.env.AUDITOR_AI_ENABLED = '1';
+    process.env.OPENAI_API_KEY = 'test-secret-never-send';
+    const secret = 'a'.repeat(64);
+    initializeOperatorSession(secret);
+    process.env.AUDITOR_AI_MODEL = process.env.OPENAI_API_KEY;
+    const invalidPage = await (await originalFetch(`${base}/narzedzia/auditor-lab`)).text();
+    assert.match(invalidPage, /data-ai-status="invalid-model"/);
+    assert.doesNotMatch(invalidPage, /test-secret-never-send/);
+    delete process.env.AUDITOR_AI_MODEL;
+    const enabledPage = await (await originalFetch(`${base}/narzedzia/auditor-lab`)).text();
+    assert.match(enabledPage, /data-ai-status="ready"/);
+    assert.match(enabledPage, /Model OpenAI:\s*<strong>gpt-4\.1-mini<\/strong>/);
+    assert.match(enabledPage, /Żądanie może być płatne/);
+    assert.doesNotMatch(enabledPage, /test-secret-never-send/);
+    assert.ok(!enabledPage.includes(secret));
+    const request = (operatorHeaders = {}) => originalFetch(`${base}${aiPath}`, {
+      method:'POST', headers:{Origin:base, 'Sec-Fetch-Site':'same-origin', 'X-Auditor-Lab':'1',
+        'Content-Type':'application/json', ...operatorHeaders},
+      body:JSON.stringify({consent:true, documents:runDemo('missing-protection').documents})
+    });
+    const unauthorized = await request();
+    assert.equal(unauthorized.status, 403);
+    await unauthorized.body.cancel();
+    const authorized = {[AI_OPERATOR_HEADER]:secret};
+    const result = await request(authorized);
+    assert.equal(result.status, 200);
+    const data = await result.text();
+    assert.equal(JSON.parse(data).preliminary, true);
+    assert.doesNotMatch(data, /test-secret-never-send/);
+    assert.ok(!data.includes(secret));
+    assert.equal(providerCalls, 1);
+    const before = transforms;
+    server.watcher.emit('change', routeFile);
+    for (let attempt = 0; transforms === before && attempt < 30; attempt++) {
+      await delay(50);
+      const replay = await request(authorized);
+      assert.equal(replay.status, 429);
+      await replay.body.cancel();
+    }
+    assert.ok(transforms > before, 'The Astro route was actually transformed again after HMR');
+    assert.equal(providerCalls, 1);
   } finally {
-    await server.stop();
+    for (const [key, value] of saved) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    await server?.stop();
+  }
+});
+
+test('a fresh Node process, unlike reinitialization in the same process, grants a new single call', () => {
+  const script = `
+    import assert from 'node:assert/strict';
+    import {initializeOperatorSession} from './src/lib/auditor/lab/operator.server.mjs';
+    import {handleAiRequest} from './src/lib/auditor/lab/ai.server.mjs';
+    const secret = 'a'.repeat(64);
+    initializeOperatorSession(secret);
+    let calls = 0;
+    const url = new URL('http://127.0.0.1:4321/narzedzia/auditor-lab/ai.json');
+    const request = () => handleAiRequest({url, clientAddress:'127.0.0.1', request:new Request(url, {
+      method:'POST',
+      headers:{host:url.host, origin:url.origin, 'sec-fetch-site':'same-origin',
+        'x-auditor-lab':'1', 'x-auditor-operator':secret, 'content-type':'application/json'},
+      body:JSON.stringify({consent:true, documents:['HLD', 'ADR'].map(id =>
+        ({id, version:'1.0', text:'This text is synthetic.'}))})
+    })}, {dev:true, env:{AUDITOR_AI_ENABLED:'1', OPENAI_API_KEY:'mock-only'}, fetchImpl:async () => {
+      calls++;
+      return Response.json({status:'completed', output:[{content:[{
+        type:'output_text', text:'{"flows":[],"effects":[],"claims":[]}'
+      }]}]});
+    }});
+    assert.equal((await request()).status, 200);
+    assert.throws(() => initializeOperatorSession(secret), /nowy proces/);
+    assert.equal((await request()).status, 429);
+    assert.equal(calls, 1);
+  `;
+  for (let launch = 0; launch < 2; launch++) {
+    execFileSync(process.execPath, ['--input-type=module', '-e', script], {
+      cwd:fileURLToPath(new URL('../', import.meta.url)), timeout:10000
+    });
   }
 });

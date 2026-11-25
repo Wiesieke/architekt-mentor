@@ -1,19 +1,24 @@
 ---
 import Studio from '../../../layouts/Studio.astro';
-import {examples, isLocalRequest, localHeaders} from './service.server.mjs';
-import {reportPath} from './integration.mjs';
+import {examples} from './service.server.mjs';
+import {isLocalRequest, localHeaders} from './local.server.mjs';
+import {aiAvailability, requestedAiModel} from './ai.server.mjs';
+import {AI_MAX_DOC_UNITS, AI_MAX_INPUT_BYTES, AI_OPERATOR_SECRET_LENGTH} from './ai-contract.mjs';
+import {aiPath, reportPath} from './integration.mjs';
 
 export const prerender = false;
 if (!import.meta.env.DEV || !isLocalRequest(Astro.request, Astro.url, Astro.clientAddress)) {
   return new Response(null, {status:404, headers:localHeaders});
 }
 for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers.set(name, value);
+const aiStatus = aiAvailability();
+const aiModel = aiStatus === 'ready' ? requestedAiModel() : null;
 ---
 <Studio title="Auditor Lab" description="Lokalne laboratorium audytu dokumentacji HLD i ADR." active="tools">
-  <div class="container lab" data-auditor-lab data-report-path={reportPath}>
+  <div class="container lab" data-auditor-lab data-report-path={reportPath} data-ai-path={aiPath} data-ai-status={aiStatus}>
     <header class="lab-hero">
       <a class="lab-back" href="/narzedzia/">Wszystkie narzędzia</a>
-      <div class="eyebrow">Laboratorium lokalne · v0.3.1</div>
+      <div class="eyebrow">Laboratorium lokalne · v0.4.1</div>
       <h1>Auditor Lab</h1>
       <p>Sprawdź, jak audytor ocenia dowody dotyczące idempotentności w HLD i ADR. Zobacz, z których fragmentów dokumentów wynika decyzja reguły <strong>ARCH-001</strong>.</p>
     </header>
@@ -23,9 +28,10 @@ for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers
       <p class="lab-step">01 / Źródła</p>
       <h2 id="lab-docs-title">Dokumenty HLD i ADR</h2>
       <fieldset class="lab-modes">
-        <legend>Skąd pochodzą dokumenty?</legend>
-        <label><input type="radio" name="lab-mode" value="demo" checked /> Przykład syntetyczny</label>
-        <label><input type="radio" name="lab-mode" value="own" /> Własne dokumenty</label>
+        <legend>Wybierz tryb</legend>
+        <label><input type="radio" name="lab-mode" value="demo" checked /> Demo offline</label>
+        <label><input type="radio" name="lab-mode" value="own" /> Walidacja dokumentów</label>
+        <label><input type="radio" name="lab-mode" value="ai" /> Analiza AI (eksperymentalna)</label>
       </fieldset>
       <div id="lab-demo-input">
         <label class="lab-label" for="lab-example">Wybierz przykład</label>
@@ -36,6 +42,7 @@ for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers
       </div>
       <div id="lab-own-input" hidden>
         <p id="lab-file-help" class="lab-hint">Jeden HLD i jeden ADR. Wklej tekst lub wybierz plik UTF-8 (.txt, .md, .markdown). Minimum 20 po przycięciu, maksimum 30 000 jednostek tekstu na dokument. PDF i DOCX nie są obsługiwane.</p>
+        <p id="lab-ai-input-help" class="lab-hint" hidden>Używaj wyłącznie dokumentów syntetycznych. Limit AI to {AI_MAX_DOC_UNITS.toLocaleString('pl-PL')} jednostek UTF-16 na dokument i {AI_MAX_INPUT_BYTES.toLocaleString('pl-PL')} bajtów UTF-8 łącznie.</p>
         <div class="lab-doc-grid">
           {['HLD', 'ADR'].map(kind => (
             <div class="lab-document" data-document={kind}>
@@ -44,6 +51,10 @@ for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers
               <input id={`lab-file-${kind}`} type="file" accept=".txt,.md,.markdown" aria-describedby={`lab-file-help lab-error-${kind}`} />
               <label class="lab-label" for={`lab-text-${kind}`}>Treść {kind}</label>
               <textarea id={`lab-text-${kind}`} rows="5" autocomplete="off" spellcheck="false" aria-describedby={`lab-file-help lab-meta-${kind} lab-error-${kind}`}></textarea>
+              <div data-ai-version hidden>
+                <label class="lab-label" for={`lab-version-${kind}`}>Wersja {kind}</label>
+                <input id={`lab-version-${kind}`} data-version type="text" value="1.0" maxlength="40" autocomplete="off" />
+              </div>
               <p id={`lab-meta-${kind}`} class="lab-hint" data-meta>Brak dokumentu.</p>
               <p id={`lab-error-${kind}`} class="lab-error" role="status" data-error></p>
               <button type="button" class="button secondary" data-remove disabled>Usuń {kind}</button>
@@ -58,10 +69,24 @@ for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers
         <p class="lab-step">02 / Uruchomienie</p>
         <h2 id="lab-run-title">Tryb analizy</h2>
         <p id="lab-mode-info">Demo offline korzysta z ręcznie przygotowanych faktów i podpisanych recenzji testowych. Nie wywołuje modelu AI.</p>
-        <p class="lab-ai"><strong>Analiza AI: niedostępna.</strong> Nie ma skonfigurowanego backendu ekstrakcji.</p>
+        <p id="lab-ai-status" class="lab-ai" hidden>
+          {aiStatus === 'ready' ? 'Integracja AI jest włączona. Limit: jedno wywołanie na uruchomienie serwera.' : aiStatus === 'missing-key'
+            ? 'Analiza AI jest niedostępna: brak klucza OpenAI po stronie serwera.'
+            : aiStatus === 'invalid-model' ? 'Nieprawidłowa nazwa modelu OpenAI. Sprawdź konfigurację serwera.'
+            : aiStatus === 'missing-operator' ? 'Analiza AI wymaga uruchomienia serwera eksperymentalnego z sekretem operatora.'
+            : 'Analiza AI jest domyślnie wyłączona. Uruchom serwer eksperymentalny zgodnie z instrukcją laboratorium.'}
+        </p>
       </div>
       <button id="lab-run" class="button" type="button" disabled>Uruchom demo offline</button>
       <p id="lab-progress" class="lab-progress" role="status"></p>
+      <div id="lab-ai-confirm" class="lab-note" hidden>
+        {aiModel && <p>Model OpenAI: <strong>{aiModel}</strong></p>}
+        <p><strong>Treść obu dokumentów zostanie przekazana do OpenAI.</strong> Żądanie może być płatne i zużyje jedyną próbę także w razie błędu dostawcy. Nie wysyłaj dokumentów firmowych, danych osobowych ani sekretów.</p>
+        <label><input type="checkbox" id="lab-consent" /> Dokumenty są syntetyczne. Zgadzam się na ich przesłanie do OpenAI.</label>
+        <label for="lab-operator">Sekret operatora (nie klucz API)</label>
+        <input id="lab-operator" type="password" maxlength={AI_OPERATOR_SECRET_LENGTH} autocomplete="off" spellcheck="false" />
+        <button id="lab-send" class="button" type="button" disabled>Wyślij dokumenty i uruchom analizę AI</button>
+      </div>
     </section>
 
     <section id="lab-results" class="lab-panel lab-results" aria-labelledby="lab-results-title" hidden>
@@ -73,7 +98,11 @@ for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers
         </div>
         <a id="lab-export" class="button secondary" download>Pobierz JSON</a>
       </div>
-      <p class="lab-note"><strong>Dane syntetyczne.</strong> Recenzje testowe nie są autoryzacją człowieka. Ocena dotyczy dokumentacji, nie gwarantuje poprawności wdrożenia.</p>
+      <p id="lab-demo-note" class="lab-note"><strong>Dane syntetyczne.</strong> Recenzje testowe nie są autoryzacją człowieka. Ocena dotyczy dokumentacji, nie gwarantuje poprawności wdrożenia.</p>
+      <div id="lab-ai-note" class="lab-note" hidden>
+        <strong>Wynik wstępny — bez recenzji architekta.</strong> Zgodność cytatu z dokumentem nie potwierdza interpretacji ani kompletności ekstrakcji.
+        <p id="lab-usage"></p>
+      </div>
       <div class="lab-switch" role="group" aria-label="Widok wyników">
         <button class="button secondary" type="button" data-view="report" aria-pressed="true" aria-controls="lab-report">Raport</button>
         <button class="button secondary" type="button" data-view="graph" aria-pressed="false" aria-controls="lab-graph">Graf powiązań</button>
@@ -132,6 +161,8 @@ for (const [name, value] of Object.entries(localHeaders)) Astro.response.headers
   .lab-run p:not(.lab-step),.lab-result-heading p{margin-bottom:0}
   .lab-progress{flex-basis:100%;margin:0}
   .lab-progress:empty{display:none}
+  .lab #lab-ai-confirm{flex-basis:100%}
+  .lab #lab-ai-confirm label{display:block;margin:10px 0}
   .lab-switch{display:flex;flex-wrap:wrap;gap:8px;margin:17px 0}
   .lab-switch [aria-pressed=true]{color:#fff;background:var(--teal)}
   .lab-finding{margin-bottom:12px;padding:clamp(12px,2vw,20px)}

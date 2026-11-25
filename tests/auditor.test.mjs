@@ -108,14 +108,15 @@ test('empty extraction is reported as an evidence gap, not an empty success', ()
     [[null, 'NEEDS_REVIEW', 'NO_FLOWS']]);
 });
 
-const mockResponse = value => ({ok:true, json:async () => ({
+const mockResponse = value => Response.json({
   status:'completed', output:[{content:[{type:'output_text', text:JSON.stringify(value)}]}]
-})});
+});
 
 test('OpenAI adapter uses versioned input and derives offsets without trusting model approval', async () => {
   const fromProvider = ({start, end, documentHash, ...rest}) => rest;
   const payload = {
     flows:expectedFacts.flows.map(fromProvider),
+    effects:[{...fromProvider(expectedFacts.flows[0]), id:'charge', name:'Obciążenie', flowId:'payments'}],
     claims:expectedFacts.claims.map(c => ({...fromProvider(c), start:999, documentHash:'forged', quality:'reviewed'})),
     reviews
   };
@@ -126,7 +127,9 @@ test('OpenAI adapter uses versioned input and derives offsets without trusting m
     assert.deepEqual(JSON.parse(request.input), documents);
     return mockResponse(payload);
   }});
-  assert.deepEqual(parsed, expectedFacts);
+  assert.deepEqual({flows:parsed.flows, claims:parsed.claims}, expectedFacts);
+  assert.deepEqual(parsed.usage, {model:null, inputTokens:null, outputTokens:null});
+  assert.equal(parsed.effects[0].id, 'charge');
   assert.equal(audit(documents, parsed).findings[0].status, 'NEEDS_REVIEW');
 });
 
@@ -217,7 +220,7 @@ test('conflicting incident histories are visible rather than silently treated as
 test('OpenAI adapter refuses to guess which of two identical source quotes was cited', async () => {
   const repeated = {...documents[0], text:`${documents[0].text}\n${expectedFacts.flows[0].quote}`};
   await assert.rejects(() => extractWithOpenAI([repeated, documents[1]], {
-    apiKey:'test-key', fetchImpl:async () => mockResponse(expectedFacts)
+    apiKey:'test-key', fetchImpl:async () => mockResponse({...expectedFacts, effects:[]})
   }), /unique exact source quote/);
 });
 
