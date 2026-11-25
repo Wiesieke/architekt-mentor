@@ -1,4 +1,5 @@
-import {isLocalRequest, localHeaders, runDemo} from './service.server.mjs';
+import {isLocalRequest, localHeaders} from './local.server.mjs';
+import {runDemo} from './service.server.mjs';
 
 export const prerender = false;
 

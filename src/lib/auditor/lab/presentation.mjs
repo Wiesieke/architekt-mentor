@@ -163,7 +163,7 @@ export const graphTypes = {
   protection:'Mechanizm ochronny', source:'Dowód źródłowy', document:'Dokument'
 };
 
-export function projectGraph({graph, findings}) {
+export function projectGraph({graph, findings}, effects = []) {
   const claims = new Map(findings.flatMap(finding => finding.evidence.map(item => [`claim:${item.id}`, item])));
   const nodes = graph.nodes.map(node => {
     const item = claims.get(node.id);
@@ -173,12 +173,23 @@ export function projectGraph({graph, findings}) {
   });
   const byId = new Map(nodes.map(node => [node.id, node]));
   const edges = [];
+  function addSource(from, to, anchor) {
+    const id = `source:${from}:${to}`;
+    nodes.push({id, type:'source', label:`${anchor.documentId} · ${anchor.start}–${anchor.end}`, anchor});
+    edges.push({from, to:id, type:'evidenced_by', anchor}, {from:id, to, type:'source_document'});
+  }
+  for (const {id:effectId, flowId, name, ...anchor} of effects) {
+    const flow = `flow:${flowId}`;
+    const id = `effect:${flow}:${effectId}`;
+    const node = {id, type:'effect', effectId, flowName:byId.get(flow).label, label:`${name} (${effectId})`};
+    byId.set(id, node);
+    nodes.push(node);
+    edges.push({from:id, to:flow, type:'about', uncertain:true});
+    addSource(id, `doc:${anchor.documentId}`, anchor);
+  }
   for (const edge of graph.edges) {
     if (edge.type === 'evidenced_by') {
-      const {anchor} = edge;
-      const id = `source:${edge.from}:${edge.to}`;
-      nodes.push({id, type:'source', label:`${anchor.documentId} · ${anchor.start}–${anchor.end}`, anchor});
-      edges.push({...edge, to:id}, {from:id, to:edge.to, type:'source_document'});
+      addSource(edge.from, edge.to, edge.anchor);
       continue;
     }
     if (edge.type === 'about') {
@@ -218,6 +229,6 @@ export function graphSelection(graph, id) {
   return {edges, nodes:new Set([id, ...[...edges].flatMap(edge => [edge.from, edge.to])])};
 }
 
-export function reportJson(demo) {
-  return JSON.stringify({mode:demo.mode, example:demo.example, ...demo.report}, null, 2);
+export function reportJson({mode, example, preliminary, extraction, usage, report}) {
+  return JSON.stringify({mode, example, preliminary, extraction, usage, ...report}, null, 2);
 }
